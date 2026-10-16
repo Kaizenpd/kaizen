@@ -580,10 +580,11 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 let db=null, uid=null, myAvatar="", myName="", ready=false;
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
-let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
+let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), boardWk=load("pv-bwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
 if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
+if(boardWk!=="all"&&!/^\d{4}-\d{2}-\d{2}$/.test(boardWk))boardWk=WS;
 function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
 if(!["owner","status","phase"].includes(group))group="owner";
 if(!["week","month","all"].includes(period))period="week";
@@ -731,10 +732,13 @@ function boardCols(){
 const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
 function renderBoard(){
-  const all=[...tasks.values()].filter(t=>t.start&&(group==="owner"||who==="all"||t.owner===who)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
+  const wk=boardWk==="all"?null:boardWk, wkEnd=wk?addDays(wk,6):null;
+  const inWk=t=>!wk||(t.start<=wkEnd&&endOf(t)>=wk)||(wk===WS&&t.status!=="done"&&endOf(t)<WS);
+  const all=[...tasks.values()].filter(t=>t.start&&inWk(t)&&(group==="owner"||who==="all"||t.owner===who)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
+  const wkLabel=wk?(wk===WS?"Esta semana":wk===addDays(WS,7)?"Próxima semana":wk===addDays(WS,-7)?"Semana passada":"Semana")+` · ${short(wk)} a ${short(wkEnd)}`:"Todas as tarefas";
   $("#vBoard").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
+  <div class="phead"><div><div class="eyebrow">${wk===WS?"Inclui as atrasadas · ":""}Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1><p class="lede" style="margin-top:4px"><b>${wkLabel}</b></p></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Semana"><button type="button" data-bwk="-7" aria-label="Semana anterior">‹</button><button type="button" data-bwk="0" aria-pressed="${wk===WS}">Esta semana</button><button type="button" data-bwk="7" aria-label="Próxima semana">›</button><button type="button" data-bwk="all" aria-pressed="${!wk}">Tudo</button></div><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
   ${group==="owner"?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   <div class="kanban">${boardCols().map(c=>{
@@ -1021,11 +1025,12 @@ $("#main").addEventListener("click",e=>{
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
   const nd=e.target.closest("[data-negdel]");if(nd){const items=[...negItems(me)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
+  const bw=e.target.closest("[data-bwk]");if(bw){const v=bw.dataset.bwk;boardWk=v==="all"?"all":v==="0"?WS:addDays(boardWk==="all"?WS:boardWk,Number(v));store("pv-bwk",boardWk);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM);render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
   const pe=e.target.closest("[data-period]");if(pe){period=pe.dataset.period;store("pv-period",period);render();return}
   const cy=e.target.closest("[data-cycle]");if(cy){const t=tasks.get(cy.dataset.cycle);if(t)save({...t,status:{todo:"doing",doing:"done",done:"todo"}[t.status||"todo"]});return}
-  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol;openModal(null,group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k});return}
+  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol;const st0=boardWk!=="all"&&boardWk>TODAY?{start:boardWk}:{};openModal(null,{...st0,...(group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k})});return}
   const ev=e.target.closest(".ev");if(ev){const t=tasks.get(ev.dataset.id);if(t)openModal(t);return}
   const card=e.target.closest(".card");if(card){const t=tasks.get(card.dataset.id);if(t)openModal(t);return}
   const day=e.target.closest(".day[data-date]");if(day){openModal(null,{start:day.dataset.date});return}
