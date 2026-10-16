@@ -425,8 +425,8 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
       <div class="f"><label for="fPhase">Frente</label><select id="fPhase"></select></div>
     </div>
     <div class="row2">
-      <div class="f"><label for="fStart">Data</label><input type="date" id="fStart" required min="2026-09-01" max="2027-03-31"></div>
-      <div class="f"><label for="fEnd">Até (se durar vários dias)</label><input type="date" id="fEnd" min="2026-09-01" max="2027-03-31"></div>
+      <div class="f"><label for="fStart">Data</label><input type="date" id="fStart" required min="2026-01-01" max="2027-12-31"></div>
+      <div class="f"><label for="fEnd">Até (se durar vários dias)</label><input type="date" id="fEnd" min="2026-01-01" max="2027-12-31"></div>
     </div>
     <div class="row2">
       <div class="f"><label for="fTime">Horário (opcional)</label><input type="time" id="fTime"></div>
@@ -580,10 +580,11 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 let db=null, uid=null, myAvatar="", myName="", ready=false;
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
-let me=load("pv-me",""), view=load("pv-view","week"), calMonth=Number(load("pv-cal",TODAY.slice(0,7)==="2026-11"?"11":"10")), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
+let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
-if(calMonth!==10&&calMonth!==11)calMonth=10;
+if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
+function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
 if(!["owner","status","phase"].includes(group))group="owner";
 if(!["week","month","all"].includes(period))period="week";
 
@@ -693,7 +694,7 @@ async function doCopy(){
 
 /* calendário */
 function renderCal(){
-  const y=2026, m=calMonth, L=launchDate();
+  const y=+calYM.slice(0,4), m=+calYM.slice(5,7), L=launchDate();
   const list=[...tasks.values()].filter(t=>t.start&&(who==="all"||t.owner===who)).sort((a,b)=>(b.milestone?1:0)-(a.milestone?1:0)||byTime(a,b));
   const first=new Date(y,m-1,1), last=new Date(y,m,0);
   const lead=(first.getDay()+6)%7, total=Math.ceil((lead+last.getDate())/7)*7;
@@ -712,8 +713,8 @@ function renderCal(){
     cells+=`<div class="day${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${evs}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">${doneN} de ${monthT.length} concluídas no mês</div><h1>${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>2026</em></h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Mês"><button type="button" data-month="10" aria-pressed="${m===10}">Outubro</button><button type="button" data-month="11" aria-pressed="${m===11}">Novembro</button></div>
+  <div class="phead"><div><div class="eyebrow">${doneN} de ${monthT.length} concluídas no mês</div><h1>${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>${y}</em></h1></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Mês"><button type="button" data-month="-1" aria-label="Mês anterior">‹</button><button type="button" data-month="0" aria-pressed="${calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="Próximo mês">›</button></div>
   <select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   <div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}</div>
@@ -785,7 +786,7 @@ function renderIns(){
 function periodRange(){
   if(period==="week")return [WS,WE,"nesta semana"];
   if(period==="month"){const d=parse(TODAY);return [iso(new Date(d.getFullYear(),d.getMonth(),1)),iso(new Date(d.getFullYear(),d.getMonth()+1,0)),"neste mês"]}
-  return ["2026-10-01","2026-11-30","em outubro e novembro"];
+  {const y=TODAY.slice(0,4);return [y+"-01-01",y+"-12-31","em "+y]}
 }
 function renderTeam(){
   const [a,b,label]=periodRange();
@@ -798,7 +799,7 @@ function renderTeam(){
   const max=Math.max(1,...rows.map(r=>r.total));
   $("#vTeam").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">Previsto e feito ${label}</div><h1>O <em>time</em></h1><p class="lede">O que cada pessoa tinha para fazer, o que fechou, o que atrasou, o inegociável de hoje, os inegociáveis da semana. É o retrato da reunião de sexta.</p></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Período"><button type="button" data-period="week" aria-pressed="${period==="week"}">Esta semana</button><button type="button" data-period="month" aria-pressed="${period==="month"}">Este mês</button><button type="button" data-period="all" aria-pressed="${period==="all"}">Out e Nov</button></div></div></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Período"><button type="button" data-period="week" aria-pressed="${period==="week"}">Esta semana</button><button type="button" data-period="month" aria-pressed="${period==="month"}">Este mês</button><button type="button" data-period="all" aria-pressed="${period==="all"}">Este ano</button></div></div></div>
   <div class="card-s chart"><h3>Tarefas previstas e feitas</h3>
     <div class="ckey"><span><i style="background:color-mix(in srgb,var(--accent) 28%,transparent)"></i>Previstas</span><span><i style="background:var(--accent)"></i>Feitas</span></div>
     ${rows.map(r=>`<div class="crow"><span>${esc(r.p.name)}</span><div class="ctrack" role="img" aria-label="${esc(r.p.name)}: ${r.done} de ${r.total} feitas"><div class="p" style="width:${(r.total/max*100).toFixed(1)}%"></div><div class="d" style="width:${(r.done/max*100).toFixed(1)}%"></div></div><span class="cval">${r.done}/${r.total}</span></div>`).join("")}
@@ -1020,7 +1021,7 @@ $("#main").addEventListener("click",e=>{
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
   const nd=e.target.closest("[data-negdel]");if(nd){const items=[...negItems(me)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
-  const mo=e.target.closest("[data-month]");if(mo){calMonth=Number(mo.dataset.month);store("pv-cal",String(calMonth));render();return}
+  const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM);render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
   const pe=e.target.closest("[data-period]");if(pe){period=pe.dataset.period;store("pv-period",period);render();return}
   const cy=e.target.closest("[data-cycle]");if(cy){const t=tasks.get(cy.dataset.cycle);if(t)save({...t,status:{todo:"doing",doing:"done",done:"todo"}[t.status||"todo"]});return}
