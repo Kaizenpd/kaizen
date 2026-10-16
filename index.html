@@ -188,6 +188,8 @@ h1 em{font-style:normal;color:var(--accent)}
 /* calendário */
 .scroll{overflow-x:auto;border-radius:16px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow)}
 .grid{display:grid;grid-template-columns:repeat(7,minmax(104px,1fr));min-width:740px}
+.wkgrid{grid-template-columns:repeat(7,minmax(118px,1fr));min-width:830px}.day.wkday{min-height:56vh;padding-top:10px}.wkday .dnum span{text-transform:capitalize}
+.ev.wk{white-space:normal;padding:6px 8px}.ev.wk .tw{display:block;margin-bottom:2px}.wkempty{font-size:11px;color:var(--muted);padding:0 8px;opacity:.6}
 .dow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:10px;font-weight:800;border-bottom:1px solid var(--line)}
 .day{min-height:118px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:6px 0 8px;display:flex;flex-direction:column;gap:3px;cursor:pointer;min-width:0}
 .day:nth-child(7n){border-right:0}
@@ -580,11 +582,11 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 let db=null, uid=null, myAvatar="", myName="", ready=false;
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
-let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), boardWk=load("pv-bwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
+let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
 if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
-if(boardWk!=="all"&&!/^\d{4}-\d{2}-\d{2}$/.test(boardWk))boardWk=WS;
+if(calMode!=="week")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
 function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
 if(!["owner","status","phase"].includes(group))group="owner";
 if(!["week","month","all"].includes(period))period="week";
@@ -694,9 +696,34 @@ async function doCopy(){
 }
 
 /* calendário */
+function calTop(eyebrow,title){
+  return `<div class="phead"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button></div>
+  <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="${calMode==="week"?"Semana anterior":"Mês anterior"}">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="${calMode==="week"?"Próxima semana":"Próximo mês"}">›</button></div>
+  <select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>
+  <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>`;
+}
+function renderCalWeek(list){
+  const L=launchDate(), a=calWk, b=addDays(calWk,6), da=parse(a), db=parse(b);
+  const wt=list.filter(t=>t.start<=b&&endOf(t)>=a), dn=wt.filter(t=>t.status==="done").length;
+  const title=da.getMonth()===db.getMonth()?`${da.getDate()} a ${db.getDate()} de <em>${MNAME[db.getMonth()]}</em>`:`${da.getDate()} de ${MNAME[da.getMonth()].slice(0,3)} a ${db.getDate()} de <em>${MNAME[db.getMonth()].slice(0,3)}</em>`;
+  let cols="";
+  for(let i=0;i<7;i++){
+    const ds=addDays(a,i), d=parse(ds);
+    const evs=list.filter(t=>t.start<=ds&&endOf(t)>=ds).sort((x,y)=>(x.time||"99").localeCompare(y.time||"99")||byTime(x,y)).map(t=>
+      `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${esc(pname(t.owner))}</span>${esc(t.title)}</button>`).join("");
+    const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
+    cols+=`<div class="day wkday${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><span>${WD[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></span>${tag}</div>${evs||'<span class="wkempty">livre</span>'}</div>`;
+  }
+  $("#vCal").innerHTML=`<div class="stack">${calTop(`${dn} de ${wt.length} concluídas na semana · ${db.getFullYear()}`,title)}
+  <div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}</div>
+  <div class="scroll"><div class="grid wkgrid">${cols}</div></div>
+  <p class="empty" style="padding:0">Clique num dia para criar uma tarefa. Arraste uma tarefa para outro dia para mudar a data.</p></div>`;
+}
 function renderCal(){
   const y=+calYM.slice(0,4), m=+calYM.slice(5,7), L=launchDate();
   const list=[...tasks.values()].filter(t=>t.start&&(who==="all"||t.owner===who)).sort((a,b)=>(b.milestone?1:0)-(a.milestone?1:0)||byTime(a,b));
+  if(calMode==="week"){renderCalWeek(list);return}
   const first=new Date(y,m-1,1), last=new Date(y,m,0);
   const lead=(first.getDay()+6)%7, total=Math.ceil((lead+last.getDate())/7)*7;
   const monthT=list.filter(t=>t.start<=iso(last)&&endOf(t)>=iso(first)), doneN=monthT.filter(t=>t.status==="done").length;
@@ -714,10 +741,7 @@ function renderCal(){
     cells+=`<div class="day${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${evs}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">${doneN} de ${monthT.length} concluídas no mês</div><h1>${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>${y}</em></h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Mês"><button type="button" data-month="-1" aria-label="Mês anterior">‹</button><button type="button" data-month="0" aria-pressed="${calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="Próximo mês">›</button></div>
-  <select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>
-  <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
+  ${calTop(`${doneN} de ${monthT.length} concluídas no mês`,`${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>${y}</em>`)}
   <div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}</div>
   <div class="scroll"><div class="grid">${cells}</div></div>
   <p class="empty" style="padding:0">Clique num dia para criar uma tarefa. Arraste uma tarefa para mudar a data.</p></div>`;
@@ -732,13 +756,10 @@ function boardCols(){
 const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
 function renderBoard(){
-  const wk=boardWk==="all"?null:boardWk, wkEnd=wk?addDays(wk,6):null;
-  const inWk=t=>!wk||(t.start<=wkEnd&&endOf(t)>=wk)||(wk===WS&&t.status!=="done"&&endOf(t)<WS);
-  const all=[...tasks.values()].filter(t=>t.start&&inWk(t)&&(group==="owner"||who==="all"||t.owner===who)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
-  const wkLabel=wk?(wk===WS?"Esta semana":wk===addDays(WS,7)?"Próxima semana":wk===addDays(WS,-7)?"Semana passada":"Semana")+` · ${short(wk)} a ${short(wkEnd)}`:"Todas as tarefas";
+  const all=[...tasks.values()].filter(t=>t.start&&(group==="owner"||who==="all"||t.owner===who)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
   $("#vBoard").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">${wk===WS?"Inclui as atrasadas · ":""}Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1><p class="lede" style="margin-top:4px"><b>${wkLabel}</b></p></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Semana"><button type="button" data-bwk="-7" aria-label="Semana anterior">‹</button><button type="button" data-bwk="0" aria-pressed="${wk===WS}">Esta semana</button><button type="button" data-bwk="7" aria-label="Próxima semana">›</button><button type="button" data-bwk="all" aria-pressed="${!wk}">Tudo</button></div><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
+  <div class="phead"><div><div class="eyebrow">Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
   ${group==="owner"?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   <div class="kanban">${boardCols().map(c=>{
@@ -1025,12 +1046,12 @@ $("#main").addEventListener("click",e=>{
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
   const nd=e.target.closest("[data-negdel]");if(nd){const items=[...negItems(me)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
-  const bw=e.target.closest("[data-bwk]");if(bw){const v=bw.dataset.bwk;boardWk=v==="all"?"all":v==="0"?WS:addDays(boardWk==="all"?WS:boardWk,Number(v));store("pv-bwk",boardWk);render();return}
-  const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM);render();return}
+  const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
+  const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
   const pe=e.target.closest("[data-period]");if(pe){period=pe.dataset.period;store("pv-period",period);render();return}
   const cy=e.target.closest("[data-cycle]");if(cy){const t=tasks.get(cy.dataset.cycle);if(t)save({...t,status:{todo:"doing",doing:"done",done:"todo"}[t.status||"todo"]});return}
-  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol;const st0=boardWk!=="all"&&boardWk>TODAY?{start:boardWk}:{};openModal(null,{...st0,...(group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k})});return}
+  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol;openModal(null,group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k});return}
   const ev=e.target.closest(".ev");if(ev){const t=tasks.get(ev.dataset.id);if(t)openModal(t);return}
   const card=e.target.closest(".card");if(card){const t=tasks.get(card.dataset.id);if(t)openModal(t);return}
   const day=e.target.closest(".day[data-date]");if(day){openModal(null,{start:day.dataset.date});return}
