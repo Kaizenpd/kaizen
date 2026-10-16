@@ -394,7 +394,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
   <header class="topbar">
     <div class="brand"><div class="mark">改</div><div><b>Kaizen</b></div></div>
     <div class="mc"><span>Lanç. <b id="lDaysM">–</b>d</span><span>Black <b id="bfDaysM">–</b>d</span></div>
-    <button class="me" id="meBtnM" type="button" aria-label="Trocar pessoa"></button>
+    <span class="me" id="meBtnM" aria-hidden="true"></span>
   </header>
 
   <main class="main" id="main">
@@ -579,7 +579,9 @@ const newId=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 function weekStart(s){const d=parse(s);return addDays(s,-((d.getDay()+6)%7))}
 const WS=weekStart(TODAY), WE=addDays(WS,6);
 
-let db=null, uid=null, myAvatar="", myName="", ready=false;
+let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
+/* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
+const EMAIL_PERSON={"gabrielmasca6@gmail.com":"gabriel","pavan.matheus10@gmail.com":"matheus","nicholasgsc96@gmail.com":"nicolas","jkdorea@gmail.com":"joao"};
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
@@ -611,7 +613,7 @@ function renderShell(){
   $("#lDays").textContent=ld;$("#bfDays").textContent=bd;$("#lDaysM").textContent=ld;$("#bfDaysM").textContent=bd;
   $("#lDate").textContent=fullDate(L);
   const pic=size=>myAvatar?`<img src="${esc(myAvatar)}" alt="">`:(me?avatar(me,size):`<span class="av" style="--c:var(--ph-gestao);width:${size}px;height:${size}px">?</span>`);
-  $("#whoBox").innerHTML=`${pic(34)}<div><div class="nm">${me?esc(pname(me)):"Quem é você?"}</div><div class="sub">${me?esc(person(me).role||"no Kaizen"):"escolha seu nome"}</div></div><button type="button" id="meBtn">${me?"Trocar":"Escolher"}</button>`;
+  $("#whoBox").innerHTML=`${pic(34)}<div><div class="nm">${me?esc(pname(me)):"Sem perfil ligado"}</div><div class="sub">${me?esc(person(me).role||"no Kaizen"):esc(myEmail)}</div></div>`;
   $("#meBtnM").innerHTML=pic(30);
   $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";
 }
@@ -645,7 +647,7 @@ function negHtml(p,editable){
 function renderWeek(){
   const el=$("#vWeek");
   if(!me){
-    el.innerHTML=`<div class="card-s pick"><div class="eyebrow">Primeiro acesso</div><h2>Quem é você?</h2><p>Escolha seu nome para ver só as suas tarefas. Você só faz isso uma vez.</p><div class="pick-row">${TEAM.map(p=>`<button type="button" class="pick-btn" data-me="${p.id}">${avatar(p.id,30)}${p.name}</button>`).join("")}</div></div>`;
+    el.innerHTML=`<div class="card-s pick"><div class="eyebrow">Perfil não encontrado</div><h2>Seu login ainda não está ligado a ninguém do time</h2><p>Você entrou com <b>${esc(myEmail)}</b>. Peça para o Gabriel ligar esse e-mail ao seu perfil no Kaizen.</p></div>`;
     return;
   }
   const {late,today,week,next,inWeek}=myLists(), doneW=inWeek.filter(t=>t.status==="done").length;
@@ -955,10 +957,11 @@ async function setMe(pid,silent){
   if(!silent)toast("Olá, "+pname(pid));
 }
 function guessMe(){const first=norm(myName).split(/\s+/)[0];if(!first)return "";const p=TEAM.find(p=>p.alias.includes(first));return p?p.id:""}
+function emailPerson(){return EMAIL_PERSON[myEmail]||guessMe()}
 function resolveMe(){
-  if(uid&&members.get(uid)){const p=members.get(uid).person;if(p&&p!==me){me=p;store("pv-me",p)}return}
-  if(!me){const g=guessMe();if(g)setMe(g,true);return}
-  if(uid&&membersReady&&db)setMe(me,true);
+  const p=emailPerson();
+  if(!p){me="";store("pv-me","");render();return}
+  if(p!==me||!members.get(uid)||members.get(uid).person!==p)setMe(p,true);
 }
 function setNegItems(items){write("inegociaveis",{id:negId(me,WS),person:me,week:WS,items},negs)}
 function toggleFocus(taskId){
@@ -1011,10 +1014,8 @@ function sendComment(){
 document.addEventListener("click",e=>{
   const nv=e.target.closest("[data-view]");if(nv){setView(nv.dataset.view);return}
   if(e.target.closest("[data-close]")||e.target.classList.contains("scrim")){closeAll();return}
-  if(e.target.closest("#meBtn")||e.target.closest("#meBtnM")){$("#whoModal").hidden=false;return}
   if(e.target.closest("#helpBtn")){$("#helpModal").hidden=false;return}
   if(e.target.closest("#cmSend")){sendComment();return}
-  const pm=e.target.closest("[data-me]");if(pm){closeAll();setMe(pm.dataset.me);return}
   if(e.target.closest("[data-newtask]")){openModal(null);return}
   if(e.target.closest("[data-newins]")){openIns();return}
   if(e.target.closest("[data-copy]")){doCopy();return}
@@ -1128,7 +1129,7 @@ function startRealtime(){
 }
 function startApp(session){
   $("#login").hidden=true;
-  uid=session.user.id;myName=(session.user.email||"").split("@")[0].replace(/[._\-0-9]+/g," ");myAvatar="";
+  uid=session.user.id;myEmail=(session.user.email||"").trim().toLowerCase();myName=myEmail.split("@")[0].replace(/[._\-0-9]+/g," ");myAvatar="";me=emailPerson();store("pv-me",me);
   db=makeDb();startRealtime();
   const sub=(col,setter,onErr)=>db.collection(col).onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});setter(m);render();if(!$("#modal").hidden&&editing)renderComments()},onErr||(()=>{}));
   sub("tasks",m=>{tasks=m;ready=true},()=>toast("Não deu para carregar. Recarregue a página."));
@@ -1139,7 +1140,7 @@ function startApp(session){
   sub("sonhos",m=>{sonhos=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
-  db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else if(uid&&members.get(uid)&&members.get(uid).person!==me){me=members.get(uid).person;store("pv-me",me)}render()});
+  db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
 }
 function showLogin(){ $("#login").hidden=false; setTimeout(()=>$("#lEmail").focus(),0) }
 $("#loginForm").addEventListener("submit",async e=>{
