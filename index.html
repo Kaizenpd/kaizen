@@ -283,6 +283,9 @@ h1 em{font-style:normal;color:var(--accent)}
 .sheet h4{margin:0;font-size:12px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .sheet .sub{margin:0;color:var(--muted)}
 .sheet .sub b{color:var(--fg)}
+.ttl{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow:auto}
+.ttl button{all:unset;cursor:pointer;padding:10px 12px;border:1px solid var(--line);border-radius:12px;font-weight:700}
+.ttl button:hover,.ttl button:focus-visible{border-color:var(--accent)}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
 .f label{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -353,6 +356,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
     <div class="ritual"><b>Daily às 16h</b>, de segunda a sexta.<br><b>Reunião estratégica</b> às sextas.<br>Uma coisa fechada por dia.</div>
     <div class="side-foot">
       <button class="help-btn" id="helpBtn" type="button">Como o Kaizen funciona</button>
+      <button class="help-btn" id="ttBtn" type="button">Conectar TickTick</button>
       <button class="help-btn" id="pwBtn" type="button">Trocar minha senha</button>
       <button class="help-btn" id="logoutBtn" type="button">Sair</button>
       <div class="who" id="whoBox"></div>
@@ -473,6 +477,13 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
     <p class="lerr" id="pwErr" hidden></p>
     <div class="foot"><div class="r"><button type="button" class="ghost" data-close>Cancelar</button><button type="submit" class="primary">Salvar senha</button></div></div>
   </form>
+</div>
+<div class="scrim" id="ttModal" hidden>
+  <div class="sheet" style="max-width:460px">
+    <h3>TickTick</h3>
+    <div id="ttBody"></div>
+    <div class="foot"><div class="r" id="ttFoot"><button type="button" class="ghost" data-close>Fechar</button></div></div>
+  </div>
 </div>
 <div class="login" id="login" hidden>
   <form class="lcard" id="loginForm" autocomplete="on">
@@ -778,19 +789,22 @@ function render(){
   else n.hidden=true;
   $("#importBox").hidden=!(ready&&db&&tasks.size===0&&insights.size===0);
   ({week:renderWeek,cal:renderCal,board:renderBoard,ins:renderIns,team:renderTeam})[view]();
+  if(typeof ttLabel==="function")ttLabel();
 }
 
 /* gravação */
 async function write(col,obj,map){
+  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt}}
   map.set(obj.id,obj);render();
   if(!db)return;
-  try{const {id,...body}=obj;await db.collection(col).doc(id).set(body)}
+  try{const {id,...body}=obj;await db.collection(col).doc(id).set(body);if(col==="tasks")ttPush({id})}
   catch(e){toast(e&&e.code==="invalid_argument"?"Sua sessão expirou. Entre de novo.":"Não deu para salvar. Tente de novo.")}
 }
 async function del(col,id,map){
+  const old=map.get(id);
   map.delete(id);render();
   if(!db)return;
-  try{await db.collection(col).doc(id).delete()}catch(e){toast("Não deu para excluir. Tente de novo.")}
+  try{await db.collection(col).doc(id).delete();if(col==="tasks"&&old&&old.tt)ttPush({id,deleted:true,tt:old.tt})}catch(e){toast("Não deu para excluir. Tente de novo.")}
 }
 const save=t=>write("tasks",t,tasks), saveIns=i=>write("insights",i,insights);
 async function setMe(pid,silent){
@@ -971,6 +985,8 @@ function startApp(session){
   sub("comments",m=>{comments=m});
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
+  sub("ticktick",m=>{ttStatus=m;ttLabel()});
+  ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else if(uid&&members.get(uid)&&members.get(uid).person!==me){me=members.get(uid).person;store("pv-me",me)}render()});
 }
 function showLogin(){ $("#login").hidden=false; setTimeout(()=>$("#lEmail").focus(),0) }
@@ -980,6 +996,53 @@ $("#loginForm").addEventListener("submit",async e=>{
   btn.disabled=false;btn.textContent="Entrar";
   if(error){$("#lErr").textContent="E-mail ou senha incorretos. Confira e tente de novo.";$("#lErr").hidden=false;return}
   $("#lPass").value="";startApp(data.session);
+});
+/* TickTick */
+var ttStatus=new Map();
+const ttLinked=()=>{const x=ttStatus.get(me);return x&&x.connected&&x.list};
+function ttPush(body){if(!db||!ttStatus.size)return;sb.functions.invoke("ticktick",{body:{action:"push",...body}}).catch(()=>{})}
+function ttLabel(){if(!ttStatus)return;const b=$("#ttBtn");if(b)b.textContent=ttLinked()?"TickTick ✓ "+ttStatus.get(me).list:"Conectar TickTick"}
+async function ttCall(action,extra){const{data,error}=await sb.functions.invoke("ticktick",{body:{action,...(extra||{})}});if(error)throw error;return data}
+function ttOpen(){
+  const x=ttStatus.get(me),body=$("#ttBody"),foot=$("#ttFoot");
+  const close='<button type="button" class="ghost" data-close>Fechar</button>';
+  if(!me||me==="time"){body.innerHTML='<p class="sub">Escolha quem é você no Kaizen antes de conectar.</p>';foot.innerHTML=close}
+  else if(x&&x.connected&&x.list){
+    const when=x.lastSync?new Date(x.lastSync).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}):"ainda não";
+    body.innerHTML=`<p class="sub">Conectado à lista <b>${esc(x.list)}</b>. Suas tarefas do Kaizen vão para essa lista e o que você criar lá aparece aqui, em até 5 minutos.</p><p class="sub" style="font-size:13px">Última sincronização: ${esc(when)}${x.error?`<br><b>${esc(x.error)}</b>`:""}</p>`;
+    foot.innerHTML=`<button type="button" class="ghost" id="ttOff">Desconectar</button><button type="button" class="ghost" id="ttList">Trocar lista</button><button type="button" class="primary" id="ttNow">Sincronizar agora</button>`;
+  }else if(x&&x.connected){body.innerHTML='<p class="sub">Carregando suas listas…</p>';foot.innerHTML=close;ttPick()}
+  else{
+    body.innerHTML=`<p class="sub">Ligue uma lista do seu TickTick ao Kaizen. Tarefas suas criadas aqui vão para lá, e o que você criar lá aparece aqui. Concluir e editar vale nos dois lados.</p>${x&&x.error?`<p class="sub"><b>${esc(x.error)}</b></p>`:""}`;
+    foot.innerHTML=close+'<button type="button" class="primary" id="ttGo">Conectar</button>';
+  }
+  $("#ttModal").hidden=false;
+}
+async function ttPick(){
+  const body=$("#ttBody");
+  try{const{projects}=await ttCall("projects");
+    body.innerHTML='<p class="sub">Qual lista do TickTick vai ficar ligada ao Kaizen?</p><div class="ttl">'+(projects||[]).map(p=>`<button type="button" data-ttp="${esc(p.id)}" data-ttn="${esc(p.name)}">${esc(p.name)}</button>`).join("")+"</div>";
+  }catch(e){body.innerHTML='<p class="sub">Não deu para carregar suas listas. Tente conectar de novo.</p>'}
+}
+function ttReturn(){
+  const q=new URLSearchParams(location.search).get("tt");if(!q)return;
+  history.replaceState(null,"",location.pathname);
+  if(q==="erro")toast("Não deu para conectar ao TickTick. Tente de novo.");
+  else if(q==="lista"){$("#ttBody").innerHTML='<p class="sub">Carregando suas listas…</p>';$("#ttFoot").innerHTML='<button type="button" class="ghost" data-close>Fechar</button>';$("#ttModal").hidden=false;ttPick()}
+  else toast("TickTick conectado");
+}
+document.addEventListener("click",async e=>{
+  if(e.target.closest("#ttBtn")){ttOpen();return}
+  if(e.target.closest("#ttGo")){const b=e.target.closest("#ttGo");b.disabled=true;b.textContent="Abrindo…";
+    try{const{url}=await ttCall("start");location.href=url}catch(err){b.disabled=false;b.textContent="Conectar";toast("Não deu para iniciar a conexão. Tente de novo.")}return}
+  const p=e.target.closest("[data-ttp]");
+  if(p){$("#ttBody").innerHTML='<p class="sub">Ligando a lista e sincronizando… pode levar alguns segundos.</p>';
+    try{const r=await ttCall("setProject",{id:p.dataset.ttp,name:p.dataset.ttn});closeAll();toast(`Pronto! ${r.pulled||0} vieram do TickTick, ${r.pushed||0} foram para lá.`)}
+    catch(err){$("#ttBody").innerHTML='<p class="sub">Não deu para sincronizar agora. Tente "Sincronizar agora" em instantes.</p>'}return}
+  if(e.target.closest("#ttNow")){const b=e.target.closest("#ttNow");b.disabled=true;b.textContent="Sincronizando…";
+    try{const r=await ttCall("syncNow");closeAll();toast(`Sincronizado: ${r.pulled||0} vieram, ${r.pushed||0} foram.`)}catch(err){b.disabled=false;b.textContent="Sincronizar agora";toast("Não deu para sincronizar. Tente de novo.")}return}
+  if(e.target.closest("#ttList")){$("#ttBody").innerHTML='<p class="sub">Carregando suas listas…</p>';$("#ttFoot").innerHTML='<button type="button" class="ghost" data-close>Fechar</button>';ttPick();return}
+  if(e.target.closest("#ttOff")){try{await ttCall("disconnect");closeAll();toast("TickTick desconectado")}catch(err){toast("Não deu para desconectar. Tente de novo.")}return}
 });
 $("#pwBtn").addEventListener("click",()=>{$("#pw1").value="";$("#pw2").value="";$("#pwErr").hidden=true;$("#pwModal").hidden=false;setTimeout(()=>$("#pw1").focus(),0)});
 $("#pwForm").addEventListener("submit",async e=>{
