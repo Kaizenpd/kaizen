@@ -314,6 +314,12 @@ h1 em{font-style:normal;color:var(--accent)}
 .amsg{padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:6px}
 .amsg p{margin:0;white-space:pre-wrap}.amsg.done{opacity:.55}.amsg small{color:var(--muted);font-size:12px}
 .dash{padding:10px;display:flex;flex-direction:column;gap:6px}.dash iframe{width:100%;height:75vh;min-height:420px;border:0;border-radius:10px;background:var(--surface-2)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chips label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 10px 5px 6px;font-size:13px;font-weight:700;cursor:pointer}
+.chips label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}.chips input{accent-color:var(--accent)}
+.meetbox{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface-2)}
+.lbl{font-size:12px;font-weight:800;color:var(--muted)}.hint{margin:0;font-size:12px;color:var(--muted)}
+.meetrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:13px}.meetrow b{font-family:var(--f-mono);font-size:12px}.meetrow span{flex:1;min-width:0;font-weight:700}
+.ev .rec{opacity:.7}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
 .f label{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -437,6 +443,16 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
     <div class="f"><label for="fLink">Link (Drive, documento, página)</label><input id="fLink" type="url" inputmode="url" placeholder="https://drive.google.com/..." maxlength="600"></div>
     <div id="fLinkOpen"></div>
     <label class="chk" for="fMs"><input type="checkbox" id="fMs"> Marco importante (aparece em destaque)</label>
+    <label class="chk" for="fMeet"><input type="checkbox" id="fMeet"> É reunião: mandar convite por e-mail para a agenda de cada participante</label>
+    <div class="meetbox" id="meetBox" hidden>
+      <div class="f"><span class="lbl">Participantes</span><div class="chips" id="fAtt"></div></div>
+      <div class="row2">
+        <div class="f"><label for="fDur">Duração</label><select id="fDur"><option value="15">15 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 hora</option><option value="90">1h30</option><option value="120">2 horas</option></select></div>
+        <div class="f"><label for="fRec">Repetir</label><select id="fRec"><option value="">Não repete</option><option value="weekdays">Todo dia útil (seg a sex)</option><option value="weekly">Toda semana, mesmo dia</option><option value="monthly">Todo mês, mesmo dia</option></select></div>
+      </div>
+      <div class="f"><label for="fCall">Link da chamada (Meet, Zoom)</label><input id="fCall" type="url" inputmode="url" placeholder="https://meet.google.com/..." maxlength="600"></div>
+      <p class="hint" id="meetHint">Cada participante recebe o convite no e-mail e ele entra na agenda. Mudou a data ou cancelou? A agenda de todos se atualiza sozinha.</p>
+    </div>
     <div class="f"><label for="fNotes">Notas</label><textarea id="fNotes" maxlength="2000"></textarea></div>
     <div class="comments" id="cmBox"></div>
     <div class="foot">
@@ -594,6 +610,18 @@ if(!["owner","status","phase"].includes(group))group="owner";
 if(!["week","month","all"].includes(period))period="week";
 
 function endOf(t){return t.end&&t.end>=t.start?t.end:t.start}
+const REC_NAME={weekdays:"todo dia útil",weekly:"toda semana",monthly:"todo mês"};
+function occurs(t,ds){
+  if(!t.start)return false;
+  if(!t.rec)return t.start<=ds&&endOf(t)>=ds;
+  if(ds<t.start)return false;
+  const d=parse(ds),s0=parse(t.start);
+  if(t.rec==="weekdays")return d.getDay()>0&&d.getDay()<6;
+  if(t.rec==="weekly")return d.getDay()===s0.getDay();
+  if(t.rec==="monthly")return d.getDate()===s0.getDate();
+  return false;
+}
+const meetEmailsOk=()=>true;
 const byTime=(a,b)=>a.start.localeCompare(b.start)||(a.time||"99").localeCompare(b.time||"99")||a.title.localeCompare(b.title);
 function launchDate(){const t=tasks.get("t30");return t&&t.start?t.start:"2026-11-06"}
 function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
@@ -631,7 +659,7 @@ function rowHtml(t,showDate,fid){
 }
 function greet(){const h=new Date().getHours();return h<5?"Boa noite":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"}
 function myLists(){
-  const mine=[...tasks.values()].filter(t=>t.start&&(t.owner===me||t.owner==="time"));
+  const mine=[...tasks.values()].filter(t=>t.start&&!t.rec&&(t.owner===me||t.owner==="time"));
   const late=mine.filter(t=>t.status!=="done"&&endOf(t)<TODAY).sort(byTime);
   const today=mine.filter(t=>t.start<=TODAY&&endOf(t)>=TODAY).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
   const week=mine.filter(t=>t.start>TODAY&&t.start<=WE).sort(byTime);
@@ -676,6 +704,7 @@ function renderWeek(){
       ${sec("Próxima semana",next,"Nada marcado ainda.",true,"is-next")}
     </div>
     <aside class="wside">
+      ${meetTodayHtml()}
       <div class="card-s box"><h3>Meus inegociáveis da semana</h3>${negHtml(me,true)}</div>
       <form class="card-s box" id="qins" autocomplete="off"><h3>Anotar insight</h3><textarea id="qText" required maxlength="1500" aria-label="Insight" placeholder="Uma ideia, um aprendizado, algo para não esquecer"></textarea><button type="submit" class="primary" style="align-self:flex-start">Guardar na caixa de entrada</button></form>
       <div class="card-s box"><h3>Próximos marcos</h3><div>${ms.map(t=>`<button type="button" class="msrow" data-open="${t.id}" style="--c:${phc(t.phase)}"><span class="msd">${short(t.start)}</span><span>${esc(t.title)}</span></button>`).join("")||'<p class="empty">Nenhum marco à frente.</p>'}</div></div>
@@ -707,13 +736,13 @@ function calTop(eyebrow,title){
 }
 function renderCalWeek(list){
   const L=launchDate(), a=calWk, b=addDays(calWk,6), da=parse(a), db=parse(b);
-  const wt=list.filter(t=>t.start<=b&&endOf(t)>=a), dn=wt.filter(t=>t.status==="done").length;
+  const wt=list.filter(t=>!t.rec&&t.start<=b&&endOf(t)>=a), dn=wt.filter(t=>t.status==="done").length;
   const title=da.getMonth()===db.getMonth()?`${da.getDate()} a ${db.getDate()} de <em>${MNAME[db.getMonth()]}</em>`:`${da.getDate()} de ${MNAME[da.getMonth()].slice(0,3)} a ${db.getDate()} de <em>${MNAME[db.getMonth()].slice(0,3)}</em>`;
   let cols="";
   for(let i=0;i<7;i++){
     const ds=addDays(a,i), d=parse(ds);
-    const evs=list.filter(t=>t.start<=ds&&endOf(t)>=ds).sort((x,y)=>(x.time||"99").localeCompare(y.time||"99")||byTime(x,y)).map(t=>
-      `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${esc(pname(t.owner))}</span>${esc(t.title)}</button>`).join("");
+    const evs=list.filter(t=>occurs(t,ds)).sort((x,y)=>(x.time||"99").localeCompare(y.time||"99")||byTime(x,y)).map(t=>
+      `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner))}${t.rec?` <i class="rec">↻ ${REC_NAME[t.rec]}</i>`:""}</span>${esc(t.title)}</button>`).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
     cols+=`<div class="day wkday${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><span>${WD[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></span>${tag}</div>${evs||'<span class="wkempty">livre</span>'}</div>`;
   }
@@ -728,16 +757,16 @@ function renderCal(){
   if(calMode==="week"){renderCalWeek(list);return}
   const first=new Date(y,m-1,1), last=new Date(y,m,0);
   const lead=(first.getDay()+6)%7, total=Math.ceil((lead+last.getDate())/7)*7;
-  const monthT=list.filter(t=>t.start<=iso(last)&&endOf(t)>=iso(first)), doneN=monthT.filter(t=>t.status==="done").length;
+  const monthT=list.filter(t=>!t.rec&&t.start<=iso(last)&&endOf(t)>=iso(first)), doneN=monthT.filter(t=>t.status==="done").length;
   let cells=["Seg","Ter","Qua","Qui","Sex","Sáb","Dom"].map(d=>`<div class="dow">${d}</div>`).join("");
   for(let i=0;i<total;i++){
     const d=new Date(y,m-1,1-lead+i), ds=iso(d), out=d.getMonth()!==m-1, wd=i%7;
     if(out){cells+=`<div class="day out"><div class="dnum">${d.getDate()}</div></div>`;continue}
-    const evs=list.filter(t=>t.start<=ds&&endOf(t)>=ds).map(t=>{
-      const s=t.start===ds, e=endOf(t)===ds, head=s||wd===0||d.getDate()===1;
+    const evs=list.filter(t=>occurs(t,ds)).map(t=>{
+      const s=t.rec?true:t.start===ds, e=t.rec?true:endOf(t)===ds, head=s||wd===0||d.getDate()===1;
       const cls=["ev",t.status==="done"?"done":"",t.milestone?"ms":""];
       if(!head){cls.push("cont");if(e)cls.push("last")}
-      const label=head?`<span class="tw">${s&&t.time?esc(t.time)+" · ":""}${esc(pname(t.owner).slice(0,3).toUpperCase())}</span>${esc(t.title)}`:"";
+      const label=head?`<span class="tw">${s&&t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner).slice(0,3).toUpperCase())}</span>${esc(t.title)}`:"";
       return `<button type="button" class="${cls.join(" ")}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}">${label}</button>`}).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
     cells+=`<div class="day${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${evs}</div>`;
@@ -842,6 +871,16 @@ function renderTeam(){
   </div>`).join("")}</div></div>`;
 }
 
+/* reuniões */
+const attOf=t=>Array.isArray(t.att)&&t.att.length?t.att:["all"];
+const inMeet=(t,p)=>t.meeting&&(attOf(t).includes("all")||attOf(t).includes(p)||t.owner===p);
+function meetTodayHtml(){
+  const ms=[...tasks.values()].filter(t=>t.meeting&&inMeet(t,me)&&occurs(t,TODAY)).sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
+  if(!ms.length)return "";
+  return `<div class="card-s box"><h3>Reuniões de hoje</h3>${ms.map(t=>{const u=safeUrl(t.call);return `<div class="meetrow"><b>${esc(t.time||"--:--")}</b><span>${esc(t.title)}</span>${u?`<a class="mini" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Entrar</a>`:""}<button type="button" class="mini" data-open="${t.id}">Ver</button></div>`}).join("")}</div>`;
+}
+function invPush(body){if(!db)return;sb.functions.invoke("convites",{body}).then(({data,error})=>{if(error){toast("Tarefa salva, mas o convite não foi enviado. Tente salvar de novo.");return}if(data&&data.sent)toast(`Convite enviado para ${data.sent} pessoa${data.sent>1?"s":""}`)}).catch(()=>{})}
+
 /* mérito: placar */
 const PTS={done:1,dia:3,sem:1,ins:1};
 function scoreRows(a,b){
@@ -875,9 +914,9 @@ function metasHtml(){
     return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt"><b>${esc(m.title)}</b>${m.prize?`<span class="prize">Prêmio: ${esc(m.prize)}</span>`:""}</div>
     <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div><label class="mpct"><input type="number" min="0" max="100" step="5" value="${pr}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button></div></div>`}).join("")}</div>`).join(""):'<p class="empty">Nenhuma meta ainda. Cadastre a primeira abaixo.</p>'}
   <form class="mform" id="metaForm" autocomplete="off">
-    <select class="sel" id="mSetor" aria-label="Setor">${SETORES.map(st=>`<option value="${st.id}"${HOME_AREA[me]===st.id?" selected":""}>${esc(st.name)}</option>`).join("")}</select>
-    <input class="inp" id="mTitle" required maxlength="140" placeholder="Meta (ex.: 300 vendas na Black)" aria-label="Meta">
-    <input class="inp" id="mPrize" maxlength="100" placeholder="Bonificação (ex.: R$ 1.000 + day off)" aria-label="Bonificação">
+    <select class="sel" id="mtSetor" aria-label="Setor">${SETORES.map(st=>`<option value="${st.id}"${HOME_AREA[me]===st.id?" selected":""}>${esc(st.name)}</option>`).join("")}</select>
+    <input class="inp" id="mtTitle" required maxlength="140" placeholder="Meta (ex.: 300 vendas na Black)" aria-label="Meta">
+    <input class="inp" id="mtPrize" maxlength="100" placeholder="Bonificação (ex.: R$ 1.000 + day off)" aria-label="Bonificação">
     <button class="primary" type="submit">Adicionar meta</button>
   </form></div>`;
 }
@@ -935,7 +974,7 @@ function render(){
 
 /* gravação */
 async function write(col,obj,map){
-  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt}}
+  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv}}
   map.set(obj.id,obj);render();
   if(!db)return;
   try{const {id,...body}=obj;await db.collection(col).doc(id).set(body);if(col==="tasks")ttPush({id})}
@@ -997,6 +1036,9 @@ function openModal(t,d={}){
   $("#fTitle").value=v.title;$("#fOwner").value=v.owner||"time";$("#fPhase").value=v.phase||"gestao";
   $("#fStart").value=v.start;$("#fEnd").value=v.end||"";$("#fTime").value=v.time||"";$("#fStatus").value=v.status||"todo";
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
+  const att=v.meeting?attOf(v):["all"];
+  $("#fMeet").checked=!!v.meeting;$("#meetBox").hidden=!v.meeting;$("#fDur").value=String(v.dur||60);$("#fRec").value=v.rec||"";$("#fCall").value=v.call||"";
+  $("#fAtt").innerHTML=`<label><input type="checkbox" value="all"${att.includes("all")?" checked":""}> Todos</label>`+TEAM.map(p=>`<label><input type="checkbox" value="${p.id}"${!att.includes("all")&&att.includes(p.id)?" checked":""}> ${esc(p.name)}</label>`).join("");
   $("#delBtn").hidden=!t;$("#cmBox").innerHTML="";renderComments();$("#modal").hidden=false;setTimeout(()=>$("#fTitle").focus(),0);
 }
 function openIns(){
@@ -1026,15 +1068,23 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.id==="cmText"){e.preventDefault();sendComment()}
 });
 $("#fLink").addEventListener("input",renderLinkOpen);
+$("#fMeet").addEventListener("change",()=>{$("#meetBox").hidden=!$("#fMeet").checked});
+$("#fAtt").addEventListener("change",e=>{const all=$("#fAtt input[value=all]");if(e.target.value==="all"&&e.target.checked)$("#fAtt").querySelectorAll("input:not([value=all])").forEach(i=>i.checked=false);else if(e.target.checked)all.checked=false});
 $("#form").addEventListener("submit",e=>{
   e.preventDefault();
   const start=$("#fStart").value;let end=$("#fEnd").value;if(end&&end<start)end=start;if(end===start)end="";
-  const id=editing||newId("t");
-  save({id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value,phase:$("#fPhase").value,start,end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)});
+  const id=editing||newId("t"), prev=editing?tasks.get(editing):null, meeting=$("#fMeet").checked;
+  if(meeting&&!$("#fTime").value){toast("Reunião precisa de horário.");$("#fTime").focus();return}
+  let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);if(!att.length||att.includes("all"))att=["all"];
+  const t={id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value,phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
+  if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
+  if(prev&&prev.inv)t.inv=prev.inv;
+  save(t);
+  if(meeting||(prev&&prev.inv))setTimeout(()=>invPush({action:"push",id}),700);
   const pi=pendingIns&&insights.get(pendingIns);if(pi)saveIns({...pi,status:"tarefa",taskId:id});
   closeAll();toast(pi?"Insight virou tarefa":"Tarefa salva");
 });
-$("#delBtn").onclick=()=>{if(!delArmed){delArmed=true;$("#delBtn").textContent="Confirmar exclusão";return}const id=editing;closeAll();del("tasks",id,tasks);toast("Tarefa excluída")};
+$("#delBtn").onclick=()=>{if(!delArmed){delArmed=true;$("#delBtn").textContent="Confirmar exclusão";return}const id=editing, old=tasks.get(id);closeAll();del("tasks",id,tasks);toast("Tarefa excluída");if(old&&old.inv)invPush({action:"cancel",id,task:old})};
 $("#insForm").addEventListener("submit",e=>{
   e.preventDefault();const text=$("#iText").value.trim();if(!text)return;
   saveIns({id:newId("i"),text,area:$("#iArea").value,tag:$("#iTag").value.trim(),owner:$("#iOwner").value,by:me||"",status:"nova",createdAt:new Date().toISOString()});
@@ -1082,7 +1132,7 @@ $("#main").addEventListener("submit",e=>{
     toast("Guardado na caixa de entrada");return}
   if(e.target.id==="dreamForm"){e.preventDefault();const text=$("#dText").value.trim();if(!text||!me)return;write("sonhos",{id:newId("s"),person:me,text,why:$("#dWhy").value.trim(),createdAt:new Date().toISOString()},sonhos);toast("Sonho no mural");return}
   if(e.target.id==="anonForm"){e.preventDefault();const text=$("#aText").value.trim();if(!text)return;anonSent=true;write("anonimo",{id:newId("a"),kind:$("#aKind").value,text,at:new Date().toISOString(),done:false},anon);toast("Enviado sem identificação");return}
-  if(e.target.id==="metaForm"){e.preventDefault();const title=$("#mTitle").value.trim();if(!title)return;write("metas",{id:newId("m"),setor:$("#mSetor").value,title,prize:$("#mPrize").value.trim(),progress:0,createdAt:new Date().toISOString()},metas);toast("Meta cadastrada");return}
+  if(e.target.id==="metaForm"){e.preventDefault();const title=$("#mtTitle").value.trim();if(!title)return;write("metas",{id:newId("m"),setor:$("#mtSetor").value,title,prize:$("#mtPrize").value.trim(),progress:0,createdAt:new Date().toISOString()},metas);toast("Meta cadastrada");return}
   if(e.target.id==="dashForm"){e.preventDefault();const u=safeUrl($("#dashUrl").value);if(!u&&$("#dashUrl").value.trim()){toast("Cole um link começando com https://");return}write("config",{id:"dashboard",...(cfg.get("dashboard")||{}),url:u},cfg);toast(u?"Painel ligado":"Link removido");return}
   if(e.target.id==="dinsForm"){e.preventDefault();const text=$("#diText").value.trim();if(!text)return;write("dashins",{id:newId("d"),text,by:me||"",at:new Date().toISOString()},dashIns);toast("Anotado");return}
   if(e.target.id==="negForm"){e.preventDefault();const text=$("#negText").value.trim();if(!text)return;setNegItems([...negItems(me),{text,done:false}]);setTimeout(()=>{const i=$("#negText");if(i)i.focus()},0)}
