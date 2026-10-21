@@ -320,6 +320,32 @@ h1 em{font-style:normal;color:var(--accent)}
 .lbl{font-size:12px;font-weight:800;color:var(--muted)}.hint{margin:0;font-size:12px;color:var(--muted)}
 .meetrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:13px}.meetrow b{font-family:var(--f-mono);font-size:12px}.meetrow span{flex:1;min-width:0;font-weight:700}
 .ev .rec{opacity:.7}
+.rk.rk3{grid-template-columns:34px minmax(140px,1.6fr) repeat(2,minmax(120px,1fr)) 70px;min-width:480px}
+.metas2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.sgroup{display:flex;flex-direction:column;gap:10px}.sgh{margin:6px 0 0;font-family:var(--f-display);font-size:16px}
+.eqlist{display:flex;flex-direction:column;gap:6px}.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}.eqrow b{min-width:90px}.eqmail{flex:1;min-width:160px;color:var(--muted);font-size:13px}
+.negmain .neg{gap:8px}.negmain .negi{font-size:15px}.negprog{display:flex;align-items:center;gap:10px}.negprog .bar{flex:1}.negprog small{color:var(--muted);font-weight:700;font-size:12px}
+label.negi{cursor:pointer}
+.filebtn{cursor:pointer}
+.dreamday.withph{display:flex;gap:16px;align-items:center}.dreamday img{width:84px;height:84px;object-fit:cover;border-radius:14px;flex:none}
+.dream img{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block}
+.bigmeta{position:relative;overflow:hidden;min-height:180px;display:flex;align-items:flex-end;background:linear-gradient(135deg,#052e22,#0b4d38);color:#fff;border:0}
+.bigmeta::before{content:"";position:absolute;inset:0;background:var(--ph) center/cover no-repeat;opacity:.45}
+.bigmeta .bmin{position:relative;padding:22px;display:flex;flex-direction:column;gap:8px;width:100%;background:linear-gradient(transparent,rgba(0,0,0,.55))}
+.bigmeta h2{margin:0;font-family:var(--f-display);font-size:30px}.bigmeta p{margin:0;color:#d1fae5}.bigmeta .eyebrow{color:#a7f3d0}.bigmeta .bar{background:rgba(255,255,255,.2)}.bigmeta small{color:#d1fae5;font-weight:700}
+.bigmeta .mini{color:#fff;border-color:rgba(255,255,255,.4);align-self:flex-start}.bigmeta .inp{background:rgba(0,0,0,.35);color:#fff}
+.vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.val{position:relative;padding:14px;border-radius:12px;background:var(--surface-2)}.val b{display:block;margin-top:6px}.val p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.vi{font-size:26px;line-height:1}.val .x,.ben .x,.kpi2 .x{all:unset;cursor:pointer;position:absolute;top:6px;right:8px;color:var(--muted)}
+.cult2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
+.ben{position:relative;display:flex;align-items:center;gap:12px;padding:10px 26px 10px 12px;border-radius:12px;background:var(--surface-2)}.ben>div{flex:1}.ben p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.book{display:flex;gap:14px;align-items:center}.book img{width:70px;height:100px;object-fit:cover;border-radius:6px}.book p{margin:2px 0;color:var(--muted)}.book small{color:var(--muted)}
+.inp.sm{flex:0 1 150px}
+.kpi2{position:relative;padding:14px;border-radius:12px;background:var(--surface-2)}.kpi2 .v{font-family:var(--f-display);font-size:26px;font-weight:800}.kpi2 .l{font-weight:700;font-size:13px}.kpi2 small{color:var(--muted);font-size:11px}
+.mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.met{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;border:1px solid var(--line);border-top:4px solid var(--ok)}.met.st-atencao{border-top-color:#f59e0b}.met.st-ruim{border-top-color:var(--bad)}
+.mh{display:flex;align-items:center;justify-content:space-between;gap:8px}.mst{font-size:12px;font-weight:800;color:var(--muted)}.sel.sm{padding:4px 8px;font-size:12px}
+.act{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px 8px;border-radius:8px;background:var(--surface-2)}.act span{flex:1}.act .x{all:unset;cursor:pointer;color:var(--muted)}
+.helpvid{width:100%;border-radius:12px;background:#000;aspect-ratio:16/9}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
 .f label{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
@@ -496,13 +522,14 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
 <div class="scrim" id="helpModal" hidden>
   <div class="sheet">
     <h3>Como o Kaizen funciona</h3>
+    <video class="helpvid" controls preload="none" src="kaizen-tutorial.mp4"></video>
     <p class="sub"><b>Kaizen (改善)</b> é melhoria contínua: um pouco melhor todo dia. Aqui fica o planejamento do time inteiro. Toda ideia vira insight, todo insight ganha um destino, toda tarefa tem dono e data, e cada pessoa fecha pelo menos uma coisa por dia.</p>
     <h4>No dia a dia</h4>
     <ol>
       <li><b>Abra em "Minha semana".</b> Marque com a estrela o <b>inegociável do dia</b>: a tarefa que não pode deixar de ser feita hoje. Se não fez, está errado.</li>
       <li><b>Terminou? Marque a caixinha.</b> Clique na tarefa para mudar data, horário ou responsável, colocar o link do Drive ou comentar.</li>
-      <li><b>Na daily das 16h</b>, cada um conta o que fechou e o que faz amanhã. O botão "Copiar para o WhatsApp" monta a mensagem.</li>
-      <li><b>Segunda-feira</b>, cada um escreve os seus <b>inegociáveis da semana</b>: o que não pode deixar de acontecer.</li>
+      <li><b>Na daily das 16h</b>, cada um conta o que fechou e o que faz amanhã. O botão "Enviar resumo no Slack" manda o seu dia no canal do time.</li>
+      <li><b>Segunda-feira</b>, os <b>inegociáveis da semana</b> de cada pessoa são definidos com os sócios: o que não pode deixar de acontecer. Durante a semana, cada um marca o que cumpriu.</li>
     </ol>
     <h4>Toda sexta</h4>
     <ol>
@@ -545,8 +572,11 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
 </div>
 
 <script>
-const PEOPLE=[{id:"gabriel",name:"Gabriel",c:"comercial",role:"Funil de vendas",alias:["gabriel"]},{id:"matheus",name:"Matheus",c:"conteudo",role:"Conteúdo",alias:["matheus","mateus"]},{id:"nicolas",name:"Nicholas",c:"trafego",role:"Funil e tráfego",alias:["nicolas","nicholas"]},{id:"joao",name:"João",c:"sucesso",role:"Sucesso do cliente",alias:["joao"]},{id:"lucas",name:"Lucas",c:"produto",role:"Produto",alias:["lucas"]},{id:"time",name:"Time todo",c:"gestao",role:"",alias:[]}];
-const TEAM=PEOPLE.filter(p=>p.id!=="time");
+const BASE_PEOPLE=[{id:"gabriel",papel:"socio",setor:"funil",name:"Gabriel",c:"comercial",role:"Funil de vendas",alias:["gabriel"]},{id:"matheus",papel:"socio",setor:"conteudo",name:"Matheus",c:"conteudo",role:"Conteúdo",alias:["matheus","mateus"]},{id:"nicolas",papel:"socio",setor:"funil",name:"Nicholas",c:"trafego",role:"Funil e tráfego",alias:["nicolas","nicholas"]},{id:"joao",papel:"socio",setor:"sucesso",name:"João",c:"sucesso",role:"Sucesso do cliente",alias:["joao"]},{id:"lucas",papel:"colab",setor:"produto",name:"Lucas",c:"produto",role:"Produto",alias:["lucas"]},{id:"time",name:"Time todo",c:"gestao",role:"",alias:[]}];
+let PEOPLE=BASE_PEOPLE.slice();
+let TEAM=PEOPLE.filter(p=>p.id!=="time"), peopleDocs=new Map();
+const SETOR_C={conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto",gestao:"gestao"}, SETOR_N={conteudo:"Conteúdo",funil:"Funil de vendas",sucesso:"Sucesso do cliente",produto:"Produto",gestao:"Gestão"};
+function rebuildPeople(){const map=new Map(BASE_PEOPLE.map(p=>[p.id,{...p}]));peopleDocs.forEach(d=>{const b=map.get(d.id)||{id:d.id,alias:[norm(d.name||d.id).split(" ")[0]],c:SETOR_C[d.setor]||"gestao"};const setor=d.setor||b.setor;map.set(d.id,{...b,name:d.name||b.name,email:String(d.email||b.email||"").toLowerCase(),setor,papel:d.papel||b.papel||"colab",role:b.id&&BASE_PEOPLE.some(x=>x.id===b.id)&&!d.setor?b.role:(SETOR_N[setor]||b.role||""),off:!!d.off})});const t=map.get("time");map.delete("time");PEOPLE=[...[...map.values()].filter(x=>!x.off),t];TEAM=PEOPLE.filter(x=>x.id!=="time");fillSelects()}
 const AREAS=[{id:"conteudo",name:"Conteúdo",lead:"Líder: Matheus",c:"conteudo"},{id:"funil",name:"Funil de vendas",lead:"Líderes: Gabriel e Nicholas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",lead:"Líder: João",c:"sucesso"},{id:"produto",name:"Produto",lead:"Líder: Lucas",c:"produto"}];
 const INS_ST=[{id:"nova",name:"Caixa de entrada"},{id:"agora",name:"Para o lançamento"},{id:"novembro",name:"Novembro"},{id:"dezembro",name:"Dezembro"},{id:"depois",name:"Algum dia"},{id:"tarefa",name:"Virou tarefa"}];
 const HOME_AREA={gabriel:"funil",nicolas:"funil",matheus:"conteudo",joao:"sucesso",lucas:"produto"};
@@ -597,8 +627,8 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 
 let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
-const EMAIL_PERSON={"gabrielmasca6@gmail.com":"gabriel","pavan.matheus10@gmail.com":"matheus","nicholasgsc96@gmail.com":"nicolas","jkdorea@gmail.com":"joao"};
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
+let checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
@@ -667,10 +697,10 @@ function myLists(){
   const inWeek=mine.filter(t=>t.start<=WE&&endOf(t)>=WS);
   return {late,today,week,next,inWeek};
 }
-function negHtml(p,editable){
-  const items=negItems(p);
-  const list=items.map((it,k)=>`<div class="negi${it.done?" done":""}">${editable?`<input type="checkbox" class="tick" data-negtick="${k}" aria-label="Feito: ${esc(it.text)}"${it.done?" checked":""}>`:`<input type="checkbox" class="tick" disabled${it.done?" checked":""} aria-label="${esc(it.text)}">`}<span>${esc(it.text)}</span>${editable?`<button type="button" class="x" data-negdel="${k}" aria-label="Remover">×</button>`:""}</div>`).join("");
-  return `<div class="neg">${list||`<p class="empty">${editable?"O que não pode deixar de acontecer nesta semana? Até 5 itens.":"Ainda não definiu."}</p>`}</div>${editable&&items.length<5?`<form class="addrow" id="negForm"><input type="text" class="inp" id="negText" maxlength="120" placeholder="Ex.: fechar a oferta" aria-label="Novo inegociável"><button class="ghost" type="submit">Adicionar</button></form>`:""}`;
+function negHtml(p,canEdit,canTick){
+  const items=negItems(p), done=items.filter(i=>i.done).length;
+  const list=items.map((it,k)=>`<div class="negi${it.done?" done":""}"><input type="checkbox" class="tick" data-negtick="${k}" aria-label="Feito: ${esc(it.text)}"${it.done?" checked":""}${canTick?"":" disabled"}><span>${esc(it.text)}</span>${canEdit?`<button type="button" class="x" data-negdel="${k}" aria-label="Remover">×</button>`:""}</div>`).join("");
+  return `<div class="neg" data-negp="${p}">${items.length?`<div class="negprog"><div class="bar" aria-hidden="true"><i style="width:${Math.round(done/items.length*100)}%"></i></div><small>${done} de ${items.length}</small></div>`:""}${list||`<p class="empty">${canEdit?"O que não pode deixar de acontecer nesta semana? Até 5 itens.":p===me?"Os seus inegociáveis são definidos com os sócios na reunião de segunda.":"Ainda não definidos."}</p>`}${canEdit&&items.length<5?`<form class="addrow negForm" autocomplete="off"><input type="text" class="inp" maxlength="120" placeholder="Ex.: fechar a oferta" aria-label="Novo inegociável"><button class="ghost" type="submit">Adicionar</button></form>`:""}</div>`;
 }
 function renderWeek(){
   const el=$("#vWeek");
@@ -686,10 +716,11 @@ function renderWeek(){
   const d=parse(TODAY);
   el.innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">${WD[d.getDay()]}, ${d.getDate()} de ${MNAME[d.getMonth()]}</div><h1>${greet()}, <em>${esc(pname(me))}</em></h1><p class="lede">Um pouco melhor todo dia. Na daily das 16h, conte o que fechou hoje e o que faz amanhã.</p></div>
-  <div class="actions"><button type="button" class="ghost" data-copy>${svg("copy")}Copiar para o WhatsApp</button><button type="button" class="ghost" data-newins>Anotar insight</button><button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
+  <div class="actions"><button type="button" class="ghost" data-copy>${svg("chat")}Enviar resumo no Slack</button><button type="button" class="ghost" data-newins>Anotar insight</button><button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   ${introDone?"":`<div class="card-s intro"><h3>Bem-vindo ao Kaizen</h3><p>A central do time: toda ideia vira insight, todo insight ganha um destino, toda tarefa tem dono e data, e cada pessoa fecha pelo menos uma coisa por dia.</p><ol><li>Marque com a <b>estrela</b> o seu inegociável do dia.</li><li><b>Marque a caixinha</b> quando terminar. Clique na tarefa para editar, colocar link ou comentar.</li><li>Na segunda, escreva seus <b>inegociáveis da semana</b>.</li></ol><div class="row"><p>Dúvidas depois? "Como o Kaizen funciona", no menu.</p><button type="button" class="primary" data-intro>Entendi</button></div></div>`}
   ${dreamHtml()}
   <div class="card-s focus"><div class="k" aria-hidden="true">改善</div><h3>Inegociável do dia</h3>${f?`<div class="ft"><input type="checkbox" class="tick" data-tick="${f.id}" aria-label="Marcar inegociável como feito"${f.status==="done"?" checked":""}><b>${esc(f.title)}</b></div><p>${f.status==="done"?"Cumprido. Inegociável é inegociável.":"Isso não pode passar de hoje. Se não fez, está errado."}</p>`:`<p>Escolha a tarefa que não pode deixar de ser feita hoje. Clique na estrela ao lado dela.</p>`}</div>
+  <div class="card-s box negmain"><h3>Meus inegociáveis da semana</h3>${negHtml(me,isSocio(),true)}</div>
   <div class="kpis">
     <div class="card-s kpi${late.length?" bad":""}"><div class="v">${late.length}</div><div class="l">atrasadas</div></div>
     <div class="card-s kpi"><div class="v">${today.filter(t=>t.status!=="done").length}</div><div class="l">para hoje</div></div>
@@ -705,7 +736,7 @@ function renderWeek(){
     </div>
     <aside class="wside">
       ${meetTodayHtml()}
-      <div class="card-s box"><h3>Meus inegociáveis da semana</h3>${negHtml(me,true)}</div>
+      ${remindersHtml()}
       <form class="card-s box" id="qins" autocomplete="off"><h3>Anotar insight</h3><textarea id="qText" required maxlength="1500" aria-label="Insight" placeholder="Uma ideia, um aprendizado, algo para não esquecer"></textarea><button type="submit" class="primary" style="align-self:flex-start">Guardar na caixa de entrada</button></form>
       <div class="card-s box"><h3>Próximos marcos</h3><div>${ms.map(t=>`<button type="button" class="msrow" data-open="${t.id}" style="--c:${phc(t.phase)}"><span class="msd">${short(t.start)}</span><span>${esc(t.title)}</span></button>`).join("")||'<p class="empty">Nenhum marco à frente.</p>'}</div></div>
     </aside>
@@ -722,7 +753,8 @@ function copyText(){
 }
 async function doCopy(){
   const txt=copyText();
-  try{await navigator.clipboard.writeText(txt);toast("Copiado. É só colar no WhatsApp.")}
+  try{const {data,error}=await sb.functions.invoke("slack",{body:{action:"send",text:txt}});if(!error&&data&&data.ok){toast("Resumo enviado no Slack");return}}catch(e){}
+  try{await navigator.clipboard.writeText(txt);toast("O Slack ainda não está ligado: copiei o resumo para você colar.")}
   catch(e){$("#copyText").value=txt;$("#copyModal").hidden=false;setTimeout(()=>{$("#copyText").focus();$("#copyText").select()},0)}
 }
 
@@ -731,7 +763,7 @@ function calTop(eyebrow,title){
   return `<div class="phead"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>
   <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button></div>
   <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="${calMode==="week"?"Semana anterior":"Mês anterior"}">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="${calMode==="week"?"Próxima semana":"Próximo mês"}">›</button></div>
-  <select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>
+  ${isSocio()?`<select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`:""}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>`;
 }
 function renderCalWeek(list){
@@ -782,7 +814,7 @@ function renderCal(){
 function boardCols(){
   if(group==="status")return STATUSES.map(s=>({id:s.id,name:s.name,c:s.id==="done"?"var(--ok)":s.id==="doing"?"var(--doing)":"var(--muted)"}));
   if(group==="phase")return PHASES.map(p=>({id:p.id,name:p.name,c:phc(p.id)}));
-  return PEOPLE.map(p=>({id:p.id,name:p.name,av:p.id}));
+  return PEOPLE.filter(p=>isSocio()||p.id===me||p.id==="time").map(p=>({id:p.id,name:p.name,av:p.id}));
 }
 const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
@@ -791,7 +823,7 @@ function renderBoard(){
   $("#vBoard").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1></div>
   <div class="actions"><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
-  ${group==="owner"?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
+  ${group==="owner"||!isSocio()?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   <div class="kanban">${boardCols().map(c=>{
     const items=all.filter(t=>groupKey(t)===c.id), dn=items.filter(t=>t.status==="done").length, pct=items.length?Math.round(dn/items.length*100):0;
@@ -846,15 +878,27 @@ function periodRange(){
 }
 function renderTeam(){
   const [a,b,label]=periodRange();
-  const rows=TEAM.map(p=>{
-    const ts=[...tasks.values()].filter(t=>t.start&&t.owner===p.id&&t.start<=b&&endOf(t)>=a);
+  const vis=visibleTeam();
+  const rows=vis.map(p=>{
+    const ts=[...tasks.values()].filter(t=>t.start&&!t.rec&&t.owner===p.id&&t.start<=b&&endOf(t)>=a);
     const done=ts.filter(t=>t.status==="done").length, late=ts.filter(t=>t.status!=="done"&&endOf(t)<TODAY).length, doing=ts.filter(t=>t.status==="doing").length;
     const f=focus.get(focusId(p.id,TODAY)), ft=f&&tasks.get(f.taskId);
     return {p,total:ts.length,done,late,doing,pct:ts.length?Math.round(done/ts.length*100):0,ft};
   });
   const max=Math.max(1,...rows.map(r=>r.total));
+  const setores=[...new Set(vis.map(p=>p.setor||"gestao"))];
+  if(teamSetor!=="all"&&!setores.includes(teamSetor))teamSetor="all";
+  const cards=rows.filter(r=>teamSetor==="all"||(r.p.setor||"gestao")===teamSetor);
+  const groups=(teamSetor==="all"?setores:[teamSetor]).map(st=>({st,rows:cards.filter(r=>(r.p.setor||"gestao")===st)})).filter(g=>g.rows.length);
+  const card=r=>`<div class="card-s pcard">
+    <div class="hd">${avatar(r.p.id,38)}<div><b>${esc(r.p.name)}</b><small>${esc(r.p.role||"")}${r.p.papel==="socio"?" · sócio":""}</small></div><span class="pct">${r.pct}%</span></div>
+    <div class="bar" aria-hidden="true"><i style="width:${r.pct}%"></i></div>
+    <div class="stats"><div><b>${r.total}</b><span>Previstas</span></div><div><b>${r.done}</b><span>Feitas</span></div><div><b>${r.doing}</b><span>Fazendo</span></div><div class="${r.late?"bad":""}"><b>${r.late}</b><span>Atrasadas</span></div></div>
+    <div class="pfocus"><span>Inegociável hoje</span>${r.ft?`<b>${esc(r.ft.title)}${r.ft.status==="done"?" ✓":""}</b>`:"<i>não definiu</i>"}</div>
+    <div><div class="eyebrow" style="margin-bottom:6px">Inegociáveis da semana</div>${negHtml(r.p.id,isSocio(),isSocio()||r.p.id===me)}</div>
+  </div>`;
   $("#vTeam").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Previsto e feito ${label}</div><h1>O <em>time</em></h1><p class="lede">O que cada pessoa tinha para fazer, o que fechou, o que atrasou, o inegociável de hoje, os inegociáveis da semana. É o retrato da reunião de sexta.</p></div>
+  <div class="phead"><div><div class="eyebrow">Previsto e feito ${label}</div><h1>O <em>time</em></h1><p class="lede">${isSocio()?"O que cada pessoa tinha para fazer e o que fechou, o placar dos inegociáveis e as metas. É o retrato da reunião de sexta.":"O que você tinha para fazer e o que fechou, o placar dos inegociáveis do time e as suas metas."}</p></div>
   <div class="actions"><div class="seg" role="group" aria-label="Período"><button type="button" data-period="week" aria-pressed="${period==="week"}">Esta semana</button><button type="button" data-period="month" aria-pressed="${period==="month"}">Este mês</button><button type="button" data-period="all" aria-pressed="${period==="all"}">Este ano</button></div></div></div>
   <div class="card-s chart"><h3>Tarefas previstas e feitas</h3>
     <div class="ckey"><span><i style="background:color-mix(in srgb,var(--accent) 28%,transparent)"></i>Previstas</span><span><i style="background:var(--accent)"></i>Feitas</span></div>
@@ -862,13 +906,9 @@ function renderTeam(){
   </div>
   ${scoreHtml(a,b,label)}
   ${metasHtml()}
-  <div class="team">${rows.map(r=>`<div class="card-s pcard">
-    <div class="hd">${avatar(r.p.id,38)}<div><b>${esc(r.p.name)}</b><small>${esc(r.p.role)}</small></div><span class="pct">${r.pct}%</span></div>
-    <div class="bar" aria-hidden="true"><i style="width:${r.pct}%"></i></div>
-    <div class="stats"><div><b>${r.total}</b><span>Previstas</span></div><div><b>${r.done}</b><span>Feitas</span></div><div><b>${r.doing}</b><span>Fazendo</span></div><div class="${r.late?"bad":""}"><b>${r.late}</b><span>Atrasadas</span></div></div>
-    <div class="pfocus"><span>Inegociável hoje</span>${r.ft?`<b>${esc(r.ft.title)}${r.ft.status==="done"?" ✓":""}</b>`:"<i>não definiu</i>"}</div>
-    <div><div class="eyebrow" style="margin-bottom:6px">Inegociáveis da semana</div>${negHtml(r.p.id,false)}</div>
-  </div>`).join("")}</div></div>`;
+  ${vis.length>1?`<div class="seg" role="group" aria-label="Setor"><button type="button" data-tsetor="all" aria-pressed="${teamSetor==="all"}">Todos os setores</button>${setores.map(st=>`<button type="button" data-tsetor="${st}" aria-pressed="${teamSetor===st}">${esc(SETOR_N[st]||st)}</button>`).join("")}</div>`:""}
+  ${groups.map(g=>`<div class="sgroup">${vis.length>1?`<h3 class="sgh">${esc(SETOR_N[g.st]||g.st)}</h3>`:""}<div class="team">${g.rows.map(card).join("")}</div></div>`).join("")}
+  ${equipeHtml()}</div>`;
 }
 
 /* reuniões */
@@ -881,80 +921,156 @@ function meetTodayHtml(){
 }
 function invPush(body){if(!db)return;sb.functions.invoke("convites",{body}).then(({data,error})=>{if(error){toast("Tarefa salva, mas o convite não foi enviado. Tente salvar de novo.");return}if(data&&data.sent)toast(`Convite enviado para ${data.sent} pessoa${data.sent>1?"s":""}`)}).catch(()=>{})}
 
-/* mérito: placar */
-const PTS={done:1,dia:3,sem:1,ins:1};
+/* papéis */
+const isSocio=()=>person(me).papel==="socio";
+const canSeePerson=pid=>isSocio()||pid===me;
+const visibleTeam=()=>TEAM.filter(p=>canSeePerson(p.id));
+
+/* utilidades de configuração (listas editadas pelos sócios) */
+const cfgItems=k=>{const c=cfg.get(k);return c&&Array.isArray(c.items)?c.items:[]};
+function setCfg(k,patch){write("config",{id:k,...(cfg.get(k)||{}),...patch},cfg)}
+function resizeImage(file,max){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+const safeImg=u=>/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u||"")?u:safeUrl(u);
+
+/* mérito: placar dos inegociáveis */
+const PTS={dia:3,sem:1};
 function scoreRows(a,b){
   const lim=b<TODAY?b:TODAY;
   return TEAM.map(p=>{
-    const done=[...tasks.values()].filter(t=>t.owner===p.id&&t.status==="done"&&t.start&&endOf(t)>=a&&t.start<=b).length;
-    let diaSet=0,diaOk=0;focus.forEach(f=>{if(f.person===p.id&&f.date>=a&&f.date<=lim){const t=tasks.get(f.taskId);if(t){diaSet++;if(t.status==="done")diaOk++}}});
+    let diaSet=0,diaOk=0;focus.forEach(f=>{if(f.person===p.id&&f.date>=a&&f.date<=lim){diaSet++;const t=tasks.get(f.taskId);if(f.done||(t&&t.status==="done"))diaOk++}});
     let semOk=0,semAll=0;negs.forEach(n=>{if(n.person===p.id&&n.week>=weekStart(a)&&n.week<=b&&Array.isArray(n.items)){semAll+=n.items.length;semOk+=n.items.filter(i=>i.done).length}});
-    const ins=[...insights.values()].filter(i=>(i.by||i.owner)===p.id&&(i.createdAt||"").slice(0,10)>=a&&(i.createdAt||"").slice(0,10)<=b).length;
-    return {p,done,diaSet,diaOk,semOk,semAll,ins,pts:done*PTS.done+diaOk*PTS.dia+semOk*PTS.sem+ins*PTS.ins};
+    return {p,diaSet,diaOk,semOk,semAll,pts:diaOk*PTS.dia+semOk*PTS.sem};
   }).sort((x,y)=>y.pts-x.pts||y.diaOk-x.diaOk);
 }
 function scoreHtml(a,b,label){
   const rows=scoreRows(a,b), top=rows[0]&&rows[0].pts>0?rows[0].pts:0;
-  return `<div class="card-s chart"><h3>Placar do mérito <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">${label}</span></h3>
+  return `<div class="card-s chart"><h3>Placar do mérito <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">inegociáveis ${label}</span></h3>
   <div class="rank" role="table" aria-label="Placar do mérito">
-    <div class="rk hd" role="row"><span>#</span><span>Pessoa</span><span title="Inegociáveis do dia cumpridos">Ineg. dia</span><span title="Itens dos inegociáveis da semana cumpridos">Ineg. semana</span><span>Tarefas</span><span>Insights</span><span>Pontos</span></div>
-    ${rows.map((r,k)=>`<div class="rk${r.pts&&r.pts===top?" lead":""}" role="row"><span class="pos">${k+1}</span><span class="rwho">${avatar(r.p.id,24)}${esc(r.p.name)}</span><span>${r.diaOk}/${r.diaSet}</span><span>${r.semOk}/${r.semAll}</span><span>${r.done}</span><span>${r.ins}</span><span class="pts">${r.pts}</span></div>`).join("")}
+    <div class="rk rk3 hd" role="row"><span>#</span><span>Pessoa</span><span title="Inegociáveis do dia cumpridos">Inegociável do dia</span><span title="Itens dos inegociáveis da semana cumpridos">Inegociáveis da semana</span><span>Pontos</span></div>
+    ${rows.map((r,k)=>`<div class="rk rk3${r.pts&&r.pts===top?" lead":""}" role="row"><span class="pos">${k===0&&r.pts?"🏆":k+1}</span><span class="rwho">${avatar(r.p.id,24)}${esc(r.p.name)}</span><span>${r.diaOk}/${r.diaSet}</span><span>${r.semOk}/${r.semAll}</span><span class="pts">${r.pts}</span></div>`).join("")}
   </div>
-  <p class="empty" style="padding:0">Pontos: inegociável do dia cumprido vale ${PTS.dia}; cada item do inegociável da semana, tarefa feita ou insight trazido vale ${PTS.done}. Os melhores levam as bonificações abaixo.</p></div>`;
+  <p class="empty" style="padding:0">Inegociável do dia cumprido vale ${PTS.dia} pontos; cada item do inegociável da semana cumprido vale ${PTS.sem}. Os melhores levam as bonificações.</p></div>`;
 }
 
-/* metas e bonificações por setor */
-const SETORES=[...AREAS.map(a=>({id:a.id,name:a.name,c:a.c})),{id:"geral",name:"Empresa toda",c:"gestao"}];
+/* metas: da empresa (todos veem) e individuais (cada um vê a sua; só os sócios editam) */
+function metaCard(m){
+  const pr=Math.max(0,Math.min(100,Number(m.progress)||0)), ed=isSocio();
+  return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt">${m.scope==="individual"?avatar(m.person||"time",22):""}<b>${esc(m.title)}</b>${m.prize?`<span class="prize">Bonificação: ${esc(m.prize)}</span>`:""}</div>
+  <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div>${ed?`<label class="mpct"><input type="number" min="0" max="100" step="5" value="${pr}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button>`:`<span class="mpct">${pr}%</span>`}</div></div>`;
+}
 function metasHtml(){
   const all=[...metas.values()].sort((x,y)=>(x.createdAt||"").localeCompare(y.createdAt||""));
-  const bySet=SETORES.map(st=>({st,items:all.filter(m=>(m.setor||"geral")===st.id)})).filter(g=>g.items.length);
-  return `<div class="card-s chart"><h3>Metas difíceis e bonificações</h3>
-  <p class="empty" style="padding:0">Sonho grande, com métrica clara e prêmio para quem bater. Cada setor tem as suas.</p>
-  ${bySet.length?bySet.map(g=>`<div class="mgroup"><div class="eyebrow" style="color:var(--ph-${g.st.c})">${esc(g.st.name)}</div>${g.items.map(m=>{const pr=Math.max(0,Math.min(100,Number(m.progress)||0));
-    return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt"><b>${esc(m.title)}</b>${m.prize?`<span class="prize">Prêmio: ${esc(m.prize)}</span>`:""}</div>
-    <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div><label class="mpct"><input type="number" min="0" max="100" step="5" value="${pr}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button></div></div>`}).join("")}</div>`).join(""):'<p class="empty">Nenhuma meta ainda. Cadastre a primeira abaixo.</p>'}
-  <form class="mform" id="metaForm" autocomplete="off">
-    <select class="sel" id="mtSetor" aria-label="Setor">${SETORES.map(st=>`<option value="${st.id}"${HOME_AREA[me]===st.id?" selected":""}>${esc(st.name)}</option>`).join("")}</select>
+  const emp=all.filter(m=>m.scope!=="individual"), ind=all.filter(m=>m.scope==="individual"&&canSeePerson(m.person));
+  const byP=visibleTeam().map(p=>({p,items:ind.filter(m=>m.person===p.id)})).filter(g=>g.items.length);
+  return `<div class="metas2">
+  <div class="card-s chart"><h3>Metas da empresa</h3><p class="empty" style="padding:0">Sonho grande com métrica clara. Todo mundo vê.</p>${emp.length?emp.map(metaCard).join(""):'<p class="empty">Nenhuma meta da empresa ainda.</p>'}</div>
+  <div class="card-s chart"><h3>${isSocio()?"Metas individuais e bonificações":"Minhas metas e bonificações"}</h3><p class="empty" style="padding:0">${isSocio()?"Cada pessoa só vê as próprias. Só os sócios alteram.":"Só você vê as suas. Bateu? Os sócios atualizam o progresso."}</p>${byP.length?byP.map(g=>`${isSocio()?`<div class="eyebrow">${esc(g.p.name)}</div>`:""}${g.items.map(metaCard).join("")}`).join(""):'<p class="empty">Nenhuma meta individual ainda.</p>'}</div>
+  </div>
+  ${isSocio()?`<form class="card-s box mform" id="metaForm" autocomplete="off"><h3 style="flex-basis:100%">Nova meta</h3>
+    <select class="sel" id="mtScope" aria-label="Tipo de meta"><option value="empresa">Da empresa</option><option value="individual">Individual</option></select>
+    <select class="sel" id="mtPerson" aria-label="Pessoa">${TEAM.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select>
     <input class="inp" id="mtTitle" required maxlength="140" placeholder="Meta (ex.: 300 vendas na Black)" aria-label="Meta">
     <input class="inp" id="mtPrize" maxlength="100" placeholder="Bonificação (ex.: R$ 1.000 + day off)" aria-label="Bonificação">
-    <button class="primary" type="submit">Adicionar meta</button>
-  </form></div>`;
+    <button class="primary" type="submit">Adicionar meta</button></form>`:""}`;
 }
 
-/* sonhos */
+/* equipe (só sócios) */
+const SETORES_P=[{id:"conteudo",name:"Conteúdo",c:"conteudo"},{id:"funil",name:"Funil de vendas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",c:"sucesso"},{id:"produto",name:"Produto",c:"produto"},{id:"gestao",name:"Gestão",c:"gestao"}];
+function equipeHtml(){
+  if(!isSocio())return "";
+  return `<div class="card-s chart"><h3>Equipe</h3><p class="empty" style="padding:0">Quem entra no Kaizen, com qual e-mail, setor e papel. <b>Sócio</b> vê tudo e edita inegociáveis, metas e bonificações. <b>Colaborador</b> vê e cria só as próprias tarefas. Depois de adicionar aqui, crie o login da pessoa no Supabase com o mesmo e-mail.</p>
+  <div class="eqlist">${TEAM.map(p=>`<div class="eqrow">${avatar(p.id,26)}<b>${esc(p.name)}</b><span class="eqmail">${esc(p.email||"sem e-mail")}</span>
+    <select class="sel" data-eqsetor="${p.id}" aria-label="Setor de ${esc(p.name)}">${SETORES_P.map(s=>`<option value="${s.id}"${p.setor===s.id?" selected":""}>${s.name}</option>`).join("")}</select>
+    <select class="sel" data-eqpapel="${p.id}" aria-label="Papel de ${esc(p.name)}"${p.id===me?" disabled":""}><option value="colab"${p.papel!=="socio"?" selected":""}>Colaborador</option><option value="socio"${p.papel==="socio"?" selected":""}>Sócio</option></select></div>`).join("")}</div>
+  <form class="mform" id="eqForm" autocomplete="off"><input class="inp" id="eqName" required maxlength="40" placeholder="Nome (ex.: Gilberto)" aria-label="Nome"><input class="inp" id="eqEmail" type="email" required maxlength="120" placeholder="E-mail de login" aria-label="E-mail">
+  <select class="sel" id="eqSetor" aria-label="Setor">${SETORES_P.map(s=>`<option value="${s.id}">${s.name}</option>`).join("")}</select><select class="sel" id="eqPapel" aria-label="Papel"><option value="colab">Colaborador</option><option value="socio">Sócio</option></select><button class="primary" type="submit">Adicionar pessoa</button></form></div>`;
+}
+
+/* sonhos e meta grande */
 const myDreams=()=>[...sonhos.values()].filter(d=>d.person===me).sort((x,y)=>(x.createdAt||"").localeCompare(y.createdAt||""));
 function dreamHtml(){
   const ds=myDreams();
-  if(!ds.length)return `<button type="button" class="card-s dreamcta" data-view="cult">${svg("dream")}<span><b>Qual é o seu sonho grande?</b> Coloque no mural de sonhos. Ele vai aparecer aqui todo dia para lembrar por que você está fazendo isso.</span></button>`;
-  const d=ds[Math.floor(Date.now()/864e5)%ds.length];
-  return `<div class="card-s dreamday"><div class="eyebrow">Seu sonho${ds.length>1?` · ${ds.indexOf(d)+1} de ${ds.length}`:""}</div><p class="dt">${esc(d.text)}</p>${d.why?`<p class="dw"><b>Por quê:</b> ${esc(d.why)}</p>`:""}</div>`;
+  if(!ds.length)return `<button type="button" class="card-s dreamcta" data-view="cult">${svg("dream")}<span><b>Qual é o seu sonho grande?</b> Coloque no mural de sonhos, com foto. Ele aparece aqui todo dia para lembrar por que você está fazendo isso.</span></button>`;
+  const d=ds[Math.floor(Date.now()/864e5)%ds.length], ph=safeImg(d.photo);
+  return `<div class="card-s dreamday${ph?" withph":""}">${ph?`<img src="${esc(ph)}" alt="">`:""}<div><div class="eyebrow">Seu sonho${ds.length>1?` · ${ds.indexOf(d)+1} de ${ds.length}`:""}</div><p class="dt">${esc(d.text)}</p>${d.why?`<p class="dw"><b>Por quê:</b> ${esc(d.why)}</p>`:""}</div></div>`;
 }
-let anonSent=false;
+function metaGrandeHtml(edit){
+  const m=cfg.get("metaGrande")||{}, ph=safeImg(m.photo), pr=Math.max(0,Math.min(100,Number(m.progress)||0));
+  if(!m.title&&!isSocio())return "";
+  return `<div class="card-s bigmeta"${ph?` style="--ph:url('${esc(ph)}')"`:""}><div class="bmin"><div class="eyebrow">Nossa meta grande</div><h2>${esc(m.title||"Defina a meta grande da empresa")}</h2>${m.sub?`<p>${esc(m.sub)}</p>`:""}<div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div><small>${pr}% do caminho</small>
+  ${isSocio()?(edit?`<form class="mform" id="mgForm" autocomplete="off"><input class="inp" id="mgTitle" maxlength="80" value="${esc(m.title||"")}" placeholder="Ex.: R$ 5 milhões em 2027" aria-label="Meta"><input class="inp" id="mgSub" maxlength="140" value="${esc(m.sub||"")}" placeholder="Frase de apoio (opcional)" aria-label="Frase"><label class="mpct"><input type="number" id="mgProg" min="0" max="100" value="${pr}" aria-label="Progresso">%</label><label class="ghost filebtn">Foto<input type="file" id="mgPhoto" accept="image/*" hidden></label><button class="primary" type="submit">Salvar</button></form>`:`<button type="button" class="mini" data-mgedit>Editar meta</button>`):""}</div></div>`;
+}
+
+/* lembretes da semana (cultura) */
+const chkId=()=>`${me}_${WS}`;
+function weekReminders(){
+  const l=cfg.get("livro")||{}, out=[];
+  if(l.title)out.push({k:"livro",t:`Ler a parte da semana do livro "${l.title}"`});
+  cfgItems("lembretes").forEach((x,i)=>out.push({k:"l"+i,t:x.title||x}));
+  return out;
+}
+function remindersHtml(){
+  const rs=weekReminders();if(!rs.length||!me)return "";
+  const c=(checks.get(chkId())||{}).done||{};
+  return `<div class="card-s box"><h3>Lembretes da semana</h3>${rs.map(r=>`<label class="negi${c[r.k]?" done":""}"><input type="checkbox" class="tick" data-chk="${r.k}"${c[r.k]?" checked":""}><span>${esc(r.t)}</span></label>`).join("")}</div>`;
+}
+
+/* cultura */
+let anonSent=false, mgEdit=false, dreamPhoto="";
+function listEditor(key,fields,ph){
+  if(!isSocio())return "";
+  return `<form class="mform" data-cfgform="${key}" autocomplete="off">${fields.map(f=>`<input class="inp${f.small?" sm":""}" name="${f.n}" maxlength="${f.max||120}" placeholder="${esc(f.ph)}" aria-label="${esc(f.ph)}"${f.req?" required":""}>`).join("")}<button class="ghost" type="submit">Adicionar</button></form>`;
+}
+const delBtn=(key,i)=>isSocio()?`<button type="button" class="x" data-cfgdel="${key}:${i}" aria-label="Remover">×</button>`:"";
 function renderCult(){
-  const list=[...anon.values()].sort((x,y)=>(y.at||"").localeCompare(x.at||""));
+  const list=[...anon.values()].filter(m=>isSocio()||m.vis!=="socios").sort((x,y)=>(y.at||"").localeCompare(x.at||""));
+  const vals=cfgItems("valores"), bens=cfgItems("beneficios"), livro=cfg.get("livro")||{};
+  const readers=TEAM.filter(p=>{const c=checks.get(`${p.id}_${WS}`);return c&&c.done&&c.done.livro});
   $("#vCult").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Cultura → organização → negócio</div><h1>Cultura do <em>time</em></h1><p class="lede">Sonho grande, clareza e conversa franca. Aqui fica o mural de sonhos de cada um e a caixa anônima do time.</p></div></div>
+  <div class="phead"><div><div class="eyebrow">Cultura → organização → negócio</div><h1>Cultura do <em>time</em></h1><p class="lede">Nossa meta grande, nossos valores, o que a empresa oferece e o que a gente lê junto.</p></div></div>
+  ${metaGrandeHtml(mgEdit)}
+  <div class="card-s chart"><h3>Nossos valores</h3>${vals.length?`<div class="vals">${vals.map((v,i)=>`<div class="val"><span class="vi">${esc(v.icon||"⭐")}</span><b>${esc(v.title)}</b>${v.text?`<p>${esc(v.text)}</p>`:""}${delBtn("valores",i)}</div>`).join("")}</div>`:`<p class="empty">${isSocio()?"Coloquem aqui os valores da empresa, com um ícone para cada um.":"Os valores da empresa aparecem aqui em breve."}</p>`}
+  ${listEditor("valores",[{n:"icon",ph:"Ícone (emoji)",max:4,small:1},{n:"title",ph:"Valor (ex.: Dono do resultado)",req:1,max:60},{n:"text",ph:"O que isso significa na prática",max:160}])}</div>
+  <div class="cult2">
+  <div class="card-s chart"><h3>Benefícios da empresa</h3>${bens.length?bens.map((v,i)=>`<div class="ben"><span class="vi">${esc(v.icon||"🎁")}</span><div><b>${esc(v.title)}</b>${v.text?`<p>${esc(v.text)}</p>`:""}</div>${safeUrl(v.url)?`<a class="mini" href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener noreferrer">Acessar</a>`:""}${delBtn("beneficios",i)}</div>`).join(""):'<p class="empty">Nenhum benefício cadastrado.</p>'}
+  ${listEditor("beneficios",[{n:"icon",ph:"Ícone",max:4,small:1},{n:"title",ph:"Benefício (ex.: TotalPass)",req:1,max:60},{n:"text",ph:"Como funciona",max:160},{n:"url",ph:"Link (https://...)",max:300}])}</div>
+  <div class="card-s chart"><h3>Livro do mês</h3>${livro.title?`<div class="book">${safeImg(livro.cover)?`<img src="${esc(safeImg(livro.cover))}" alt="">`:`<span class="vi">📚</span>`}<div><b>${esc(livro.title)}</b>${livro.author?`<p>${esc(livro.author)}</p>`:""}<small>${readers.length?`Leram a parte desta semana: ${readers.map(p=>esc(p.name)).join(", ")}`:"Ninguém marcou a leitura desta semana ainda."}</small></div></div>`:'<p class="empty">Nenhum livro escolhido.</p>'}
+  ${isSocio()?`<form class="mform" id="livroForm" autocomplete="off"><input class="inp" id="lvTitle" maxlength="100" value="${esc(livro.title||"")}" placeholder="Título do livro" aria-label="Título"><input class="inp" id="lvAuthor" maxlength="80" value="${esc(livro.author||"")}" placeholder="Autor" aria-label="Autor"><label class="ghost filebtn">Capa<input type="file" id="lvCover" accept="image/*" hidden></label><button class="ghost" type="submit">Salvar livro</button></form>`:""}
+  <p class="empty" style="padding:0">Cada um marca a leitura da semana em "Lembretes da semana", na Minha semana.</p></div>
+  </div>
+  ${isSocio()?`<div class="card-s chart"><h3>Lembretes da semana (aparecem para todos na Minha semana)</h3>${cfgItems("lembretes").map((x,i)=>`<div class="ben"><span class="vi">🔔</span><div><b>${esc(x.title||x)}</b></div>${delBtn("lembretes",i)}</div>`).join("")||'<p class="empty">Ex.: "Fazer o check-in na daily", "Postar o resultado da semana no grupo".</p>'}${listEditor("lembretes",[{n:"title",ph:"Novo lembrete",req:1,max:120}])}</div>`:""}
   <div class="card-s chart"><h3>Mural de sonhos</h3><p class="empty" style="padding:0">O que você quer conquistar e por que isso importa. O seu sonho aparece na sua tela inicial todo dia.</p>
   <div class="dreams">${TEAM.map(p=>{const ds=[...sonhos.values()].filter(d=>d.person===p.id).sort((x,y)=>(x.createdAt||"").localeCompare(y.createdAt||""));
-    return `<div class="dcard"><div class="hd">${avatar(p.id,30)}<b>${esc(p.name)}</b></div>${ds.length?ds.map(d=>`<div class="dream"><p>${esc(d.text)}</p>${d.why?`<small>${esc(d.why)}</small>`:""}${p.id===me?`<button type="button" class="x" data-ddel="${d.id}" aria-label="Remover sonho">×</button>`:""}</div>`).join(""):`<p class="empty">Ainda não colocou.</p>`}</div>`}).join("")}</div>
-  ${me&&me!=="time"?`<form class="mform" id="dreamForm" autocomplete="off"><input class="inp" id="dText" required maxlength="160" placeholder="Meu sonho (ex.: comprar a casa dos meus pais)" aria-label="Seu sonho"><input class="inp" id="dWhy" maxlength="200" placeholder="Por que isso importa para você" aria-label="Por quê"><button class="primary" type="submit">Colocar no mural</button></form>`:""}</div>
-  <div class="card-s chart"><h3>Caixa anônima</h3><p class="empty" style="padding:0">Sugestão, crítica, elogio, algo que está travando o time. <b>O Kaizen não guarda quem escreveu</b>: nem nome, nem login. Todo mundo do time lê.</p>
-  <form class="mform" id="anonForm" autocomplete="off"><select class="sel" id="aKind" aria-label="Tipo"><option value="sugestao">Sugestão</option><option value="critica">Crítica</option><option value="elogio">Elogio</option><option value="trava">Está travando</option></select><textarea class="inp" id="aText" required maxlength="1500" rows="3" placeholder="Escreva com franqueza. Ninguém vai saber que foi você." aria-label="Mensagem anônima"></textarea><button class="primary" type="submit">Enviar anônimo</button></form>
+    return `<div class="dcard"><div class="hd">${avatar(p.id,30)}<b>${esc(p.name)}</b></div>${ds.length?ds.map(d=>{const ph=safeImg(d.photo);return `<div class="dream">${ph?`<img src="${esc(ph)}" alt="">`:""}<p>${esc(d.text)}</p>${d.why?`<small>${esc(d.why)}</small>`:""}${p.id===me?`<button type="button" class="x" data-ddel="${d.id}" aria-label="Remover sonho">×</button>`:""}</div>`}).join(""):`<p class="empty">Ainda não colocou.</p>`}</div>`}).join("")}</div>
+  ${me&&me!=="time"?`<form class="mform" id="dreamForm" autocomplete="off"><input class="inp" id="dText" required maxlength="160" placeholder="Meu sonho (ex.: conhecer o Egito)" aria-label="Seu sonho"><input class="inp" id="dWhy" maxlength="200" placeholder="Por que isso importa para você" aria-label="Por quê"><label class="ghost filebtn" id="dPhotoLbl">Foto<input type="file" id="dPhoto" accept="image/*" hidden></label><button class="primary" type="submit">Colocar no mural</button></form>`:""}</div>
+  <div class="card-s chart"><h3>Caixa anônima</h3><p class="empty" style="padding:0">Sugestão, crítica, elogio, ideia, algo que está travando. <b>O Kaizen não guarda quem escreveu</b>: nem nome, nem login. Você escolhe se todo o time lê ou só os sócios.</p>
+  <form class="mform" id="anonForm" autocomplete="off"><select class="sel" id="aKind" aria-label="Tipo"><option value="sugestao">Sugestão</option><option value="ideia">Ideia</option><option value="critica">Crítica</option><option value="elogio">Elogio</option><option value="trava">Está travando</option></select><select class="sel" id="aVis" aria-label="Quem lê"><option value="todos">Todo o time lê</option><option value="socios">Só os sócios leem</option></select><textarea class="inp" id="aText" required maxlength="1500" rows="3" placeholder="Escreva com franqueza. Ninguém vai saber que foi você." aria-label="Mensagem anônima"></textarea><button class="primary" type="submit">Enviar anônimo</button></form>
   ${anonSent?'<p class="empty" style="padding:0;color:var(--accent)">Enviado sem identificação.</p>':""}
-  <div class="anon">${list.length?list.map(m=>`<div class="amsg${m.done?" done":""}"><span class="ph">${esc({sugestao:"Sugestão",critica:"Crítica",elogio:"Elogio",trava:"Está travando"}[m.kind]||"Mensagem")}</span><p>${esc(m.text)}</p><div class="ins-act"><small>${esc((m.at||"").slice(0,10)?short((m.at||"").slice(0,10)):"")}</small><button type="button" class="mini" data-adone="${m.id}">${m.done?"Reabrir":"Marcar como tratado"}</button></div></div>`).join(""):'<p class="empty">Nenhuma mensagem ainda.</p>'}</div></div>
+  <div class="anon">${list.length?list.map(m=>`<div class="amsg${m.done?" done":""}"><div class="ins-act"><span class="ph">${esc({sugestao:"Sugestão",ideia:"Ideia",critica:"Crítica",elogio:"Elogio",trava:"Está travando"}[m.kind]||"Mensagem")}</span>${m.vis==="socios"?'<span class="ph">só sócios</span>':""}</div><p>${esc(m.text)}</p><div class="ins-act"><small>${m.at?short(m.at.slice(0,10)):""}</small>${isSocio()?`<button type="button" class="mini" data-adone="${m.id}">${m.done?"Reabrir":"Marcar como tratado"}</button>`:(m.done?'<span class="mini">Tratado</span>':"")}</div></div>`).join(""):'<p class="empty">Nenhuma mensagem ainda.</p>'}</div></div>
   </div>`;
 }
 
 /* números */
+const MSTATUS={ok:"Bom",atencao:"Atenção",ruim:"Abaixo"};
 function renderNum(){
-  const c=cfg.get("dashboard")||{}, url=safeUrl(c.url);
+  const c=cfg.get("dashboard")||{}, url=safeUrl(c.url), nums=cfgItems("numeros");
+  const mets=[...metricas.values()].sort((x,y)=>(x.order??99)-(y.order??99)||(x.createdAt||"").localeCompare(y.createdAt||""));
+  const acts=[...acoes.values()].sort((x,y)=>(x.at||"").localeCompare(y.at||""));
   const list=[...dashIns.values()].sort((x,y)=>(y.at||"").localeCompare(x.at||""));
   $("#vNum").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Todos com clareza</div><h1>Nossos <em>números</em></h1><p class="lede">O painel da empresa, aberto para o time, e o que a gente aprende olhando para ele.</p></div>
+  <div class="phead"><div><div class="eyebrow">Todos com clareza</div><h1>Nossos <em>números</em></h1><p class="lede">Os números principais da empresa, o painel e, para cada métrica, as ações que podem melhorá-la.</p></div>
   <div class="actions">${url?`<a class="primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${svg("link")}Abrir painel</a>`:""}</div></div>
-  ${url?`<div class="card-s dash"><iframe src="${esc(url)}" title="Painel de números" loading="lazy" referrerpolicy="no-referrer"></iframe><p class="empty">Se o painel não aparecer acima, a ferramenta não deixa ser exibida dentro de outro site. Use o botão "Abrir painel".</p></div>`:'<div class="card-s box"><h3>Painel ainda não ligado</h3><p class="empty" style="padding:0">Cole abaixo o link do painel da VK Metrics (o link de compartilhamento/visualização).</p></div>'}
-  <form class="card-s box" id="dashForm" autocomplete="off"><h3>Link do painel</h3><div class="addrow"><input class="inp" id="dashUrl" type="url" value="${esc(c.url||"")}" placeholder="https://..." aria-label="Link do painel"><button class="ghost" type="submit">Salvar</button></div></form>
-  <div class="card-s chart"><h3>Insights dos números</h3><p class="empty" style="padding:0">Olhou o painel e percebeu algo? Anote aqui. Se for ação, mande para a Central de insights.</p>
+  <div class="card-s chart"><h3>Números principais <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">atualizados a cada trimestre</span></h3>
+  ${nums.length?`<div class="kpis">${nums.map((n,i)=>`<div class="kpi2"><div class="v">${esc(n.value)}</div><div class="l">${esc(n.label)}</div>${n.date?`<small>${esc(n.date)}</small>`:""}${delBtn("numeros",i)}</div>`).join("")}</div>`:'<p class="empty">Ex.: faturamento do trimestre, alunos ativos, seguidores no Instagram e no TikTok.</p>'}
+  ${listEditor("numeros",[{n:"label",ph:"Número (ex.: Seguidores no Instagram)",req:1,max:60},{n:"value",ph:"Valor (ex.: 152 mil)",req:1,max:30,small:1},{n:"date",ph:"Referência (ex.: 3º tri/2026)",max:30,small:1}])}</div>
+  <div class="card-s chart"><h3>Métricas e ações</h3><p class="empty" style="padding:0">Para cada métrica, as ações que podem melhorá-la. Quando uma métrica estiver abaixo, comece por aqui. Qualquer pessoa sugere ações; a boa vai para a Central de insights.</p>
+  <div class="mets">${mets.map(m=>{const as=acts.filter(a=>a.metric===m.id);return `<div class="met st-${m.status||"ok"}"><div class="mh"><b>${esc(m.name)}</b>${isSocio()?`<select class="sel sm" data-mstat="${m.id}" aria-label="Situação de ${esc(m.name)}">${Object.entries(MSTATUS).map(([k,v])=>`<option value="${k}"${(m.status||"ok")===k?" selected":""}>${v}</option>`).join("")}</select>`:`<span class="mst">${MSTATUS[m.status||"ok"]}</span>`}</div>
+    ${as.length?as.map(a=>`<div class="act"><span>${esc(a.text)}</span>${a.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-asend="${a.id}">Para a central</button>`}${isSocio()||a.by===me?`<button type="button" class="x" data-adel="${a.id}" aria-label="Remover">×</button>`:""}</div>`).join(""):'<p class="empty">Nenhuma ação ainda.</p>'}
+    <form class="addrow" data-actform="${m.id}" autocomplete="off"><input class="inp" maxlength="200" placeholder="Ação para melhorar ${esc(m.name.toLowerCase())}" aria-label="Nova ação para ${esc(m.name)}"><button class="ghost" type="submit">+</button></form></div>`}).join("")}</div>
+  ${isSocio()?`<form class="addrow" id="metForm" autocomplete="off"><input class="inp" id="metName" maxlength="40" placeholder="Nova métrica (ex.: Ticket médio)" aria-label="Nova métrica"><button class="ghost" type="submit">Adicionar métrica</button></form>`:""}</div>
+  ${url?`<div class="card-s dash"><iframe src="${esc(url)}" title="Painel de números" loading="lazy" referrerpolicy="no-referrer"></iframe><p class="empty">Se o painel não aparecer acima, a ferramenta não deixa ser exibida dentro de outro site. Use o botão "Abrir painel".</p></div>`:'<div class="card-s box"><h3>Painel ainda não ligado</h3><p class="empty" style="padding:0">Os sócios colam abaixo o link de visualização do painel.</p></div>'}
+  ${isSocio()?`<form class="card-s box" id="dashForm" autocomplete="off"><h3>Link do painel</h3><div class="addrow"><input class="inp" id="dashUrl" type="url" value="${esc(c.url||"")}" placeholder="https://..." aria-label="Link do painel"><button class="ghost" type="submit">Salvar</button></div></form>`:""}
+  <div class="card-s chart"><h3>Insights dos números</h3><p class="empty" style="padding:0">Olhou o painel e percebeu algo? Anote aqui.</p>
   <form class="mform" id="dinsForm" autocomplete="off"><textarea class="inp" id="diText" required maxlength="800" rows="2" placeholder="Ex.: ticket médio caiu 12% na semana; checkout mobile converte metade do desktop" aria-label="Insight dos números"></textarea><button class="primary" type="submit">Anotar</button></form>
   <div class="anon">${list.length?list.map(m=>`<div class="amsg"><p>${esc(m.text)}</p><div class="ins-act">${avatar(m.by||"time")}<small>${m.at?short(m.at.slice(0,10)):""}</small>${m.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-dsend="${m.id}">Mandar para a central</button>`}<button type="button" class="mini del" data-dxdel="${m.id}">Excluir</button></div></div>`).join(""):'<p class="empty">Nada anotado ainda.</p>'}</div></div>
   </div>`;
@@ -974,7 +1090,7 @@ function render(){
 
 /* gravação */
 async function write(col,obj,map){
-  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv}}
+  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv};if(prev&&prev.status!==obj.status)focus.forEach(f=>{if(f.taskId===obj.id&&!!f.done!==(obj.status==="done"))setTimeout(()=>write("focus",{...f,done:obj.status==="done"},focus),0)})}
   map.set(obj.id,obj);render();
   if(!db)return;
   try{const {id,...body}=obj;await db.collection(col).doc(id).set(body);if(col==="tasks")ttPush({id})}
@@ -996,17 +1112,18 @@ async function setMe(pid,silent){
   if(!silent)toast("Olá, "+pname(pid));
 }
 function guessMe(){const first=norm(myName).split(/\s+/)[0];if(!first)return "";const p=TEAM.find(p=>p.alias.includes(first));return p?p.id:""}
-function emailPerson(){return EMAIL_PERSON[myEmail]||guessMe()}
+function emailPerson(){const p=PEOPLE.find(x=>x.email&&x.email===myEmail);return p?p.id:""}
 function resolveMe(){
+  if(!peopleDocs.size)return;
   const p=emailPerson();
   if(!p){me="";store("pv-me","");render();return}
   if(p!==me||!members.get(uid)||members.get(uid).person!==p)setMe(p,true);
 }
-function setNegItems(items){write("inegociaveis",{id:negId(me,WS),person:me,week:WS,items},negs)}
+function setNegItems(items,p){p=p||me;write("inegociaveis",{id:negId(p,WS),person:p,week:WS,items},negs)}
 function toggleFocus(taskId){
   const id=focusId(me,TODAY), cur=focus.get(id);
   if(cur&&cur.taskId===taskId){del("focus",id,focus);toast("Inegociável do dia removido")}
-  else{write("focus",{id,person:me,date:TODAY,taskId},focus);toast("Inegociável do dia definido")}
+  else{const tk=tasks.get(taskId);write("focus",{id,person:me,date:TODAY,taskId,done:!!(tk&&tk.status==="done")},focus);toast("Inegociável do dia definido")}
 }
 
 /* modais */
@@ -1033,7 +1150,7 @@ function openModal(t,d={}){
   if(t||!d.fromIns)pendingIns=null;
   const v=t||{title:d.title||"",owner:d.owner||me||"time",phase:d.phase||"gestao",start:d.start||TODAY,end:"",time:"",status:d.status||"todo",milestone:false,notes:d.notes||"",link:""};
   $("#mTitle").textContent=t?"Editar tarefa":d.fromIns?"Transformar insight em tarefa":"Nova tarefa";
-  $("#fTitle").value=v.title;$("#fOwner").value=v.owner||"time";$("#fPhase").value=v.phase||"gestao";
+  $("#fTitle").value=v.title;$("#fOwner").value=isSocio()?(v.owner||"time"):(t?v.owner:me);$("#fOwner").disabled=!isSocio();$("#fPhase").value=v.phase||"gestao";
   $("#fStart").value=v.start;$("#fEnd").value=v.end||"";$("#fTime").value=v.time||"";$("#fStatus").value=v.status||"todo";
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
   const att=v.meeting?attOf(v):["all"];
@@ -1076,7 +1193,7 @@ $("#form").addEventListener("submit",e=>{
   const id=editing||newId("t"), prev=editing?tasks.get(editing):null, meeting=$("#fMeet").checked;
   if(meeting&&!$("#fTime").value){toast("Reunião precisa de horário.");$("#fTime").focus();return}
   let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);if(!att.length||att.includes("all"))att=["all"];
-  const t={id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value,phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
+  const t={id,title:$("#fTitle").value.trim(),owner:isSocio()?$("#fOwner").value:(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
   if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
   save(t);
@@ -1095,7 +1212,7 @@ $("#insForm").addEventListener("submit",e=>{
 $("#main").addEventListener("click",e=>{
   if(e.target.closest("[data-tick]")||e.target.closest("[data-negtick]"))return;
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
-  const nd=e.target.closest("[data-negdel]");if(nd){const items=[...negItems(me)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items);return}
+  const nd=e.target.closest("[data-negdel]");if(nd){const np=nd.closest("[data-negp]").dataset.negp;const items=[...negItems(np)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items,np);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
@@ -1108,6 +1225,11 @@ $("#main").addEventListener("click",e=>{
   const day=e.target.closest(".day[data-date]");if(day){openModal(null,{start:day.dataset.date});return}
   const tt=e.target.closest("[data-totask]");if(tt){const i=insights.get(tt.dataset.totask);if(!i)return;pendingIns=i.id;
     openModal(null,{fromIns:true,owner:i.owner,title:i.text.length>140?i.text.slice(0,137)+"…":i.text,phase:{conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto"}[i.area]||"gestao",notes:"Veio dos insights: "+i.text});return}
+  const cd=e.target.closest("[data-cfgdel]");if(cd){const [k,i]=cd.dataset.cfgdel.split(":");const it=[...cfgItems(k)];it.splice(Number(i),1);setCfg(k,{items:it});return}
+  if(e.target.closest("[data-mgedit]")){mgEdit=true;render();return}
+  const asd=e.target.closest("[data-asend]");if(asd){const a=acoes.get(asd.dataset.asend);if(!a)return;const m=metricas.get(a.metric);saveIns({id:newId("i"),text:(m?m.name+": ":"")+a.text,area:"funil",tag:"Números",owner:a.by||me||"time",by:a.by||me||"",status:"nova",createdAt:new Date().toISOString()});write("acoes",{...a,sent:true},acoes);toast("Mandado para a Central de insights");return}
+  const adl=e.target.closest("[data-adel]");if(adl){del("acoes",adl.dataset.adel,acoes);return}
+  const ts=e.target.closest("[data-tsetor]");if(ts){teamSetor=ts.dataset.tsetor;store("pv-tsetor",teamSetor);render();return}
   const dd=e.target.closest("[data-ddel]");if(dd){del("sonhos",dd.dataset.ddel,sonhos);toast("Sonho removido");return}
   const ad=e.target.closest("[data-adone]");if(ad){const m=anon.get(ad.dataset.adone);if(m)write("anonimo",{...m,done:!m.done},anon);return}
   const md=e.target.closest("[data-mdel]");if(md){const id=md.dataset.mdel;if(metaDelArmed!==id){metaDelArmed=id;render();return}metaDelArmed=null;del("metas",id,metas);toast("Meta excluída");return}
@@ -1118,7 +1240,12 @@ $("#main").addEventListener("click",e=>{
 $("#main").addEventListener("change",e=>{
   const t=e.target;
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
-  if(t.matches("[data-negtick]")){const items=negItems(me).map((it,k)=>k===Number(t.dataset.negtick)?{...it,done:t.checked}:it);setNegItems(items);return}
+  if(t.matches("[data-negtick]")){const np=t.closest("[data-negp]").dataset.negp;const items=negItems(np).map((it,k)=>k===Number(t.dataset.negtick)?{...it,done:t.checked}:it);setNegItems(items,np);return}
+  if(t.matches("[data-chk]")){const c=checks.get(chkId())||{id:chkId(),person:me,week:WS,done:{}};write("checks",{...c,done:{...(c.done||{}),[t.dataset.chk]:t.checked}},checks);if(t.checked)toast("Boa!");return}
+  if(t.matches("[data-mstat]")){const m=metricas.get(t.dataset.mstat);if(m)write("metricas",{...m,status:t.value},metricas);return}
+  if(t.matches("[data-eqsetor]")||t.matches("[data-eqpapel]")){const pid=t.dataset.eqsetor||t.dataset.eqpapel, cur=person(pid), d=peopleDocs.get(pid)||{id:pid,name:cur.name,email:cur.email||"",setor:cur.setor,papel:cur.papel};write("people",{...d,[t.dataset.eqsetor?"setor":"papel"]:t.value},peopleDocs);rebuildPeople();toast("Equipe atualizada");return}
+  if(t.id==="mgPhoto"||t.id==="lvCover"){const f=t.files&&t.files[0];if(!f)return;resizeImage(f,t.id==="lvCover"?320:900).then(u=>{if(t.id==="mgPhoto")setCfg("metaGrande",{photo:u});else setCfg("livro",{cover:u});toast("Imagem salva")}).catch(()=>toast("Não deu para ler essa imagem."));return}
+  if(t.id==="dPhoto"){const f=t.files&&t.files[0];if(!f)return;resizeImage(f,480).then(u=>{dreamPhoto=u;const l=$("#dPhotoLbl");if(l)l.firstChild.textContent="Foto ✓"}).catch(()=>toast("Não deu para ler essa imagem."));return}
   if(t.matches("[data-ist]")){const i=insights.get(t.dataset.ist);if(i)saveIns({...i,status:t.value});return}
   if(t.id==="calWho"||t.id==="boardWho"){who=t.value;store("pv-who",who);render();return}
   if(t.id==="insSt"){insSt=t.value;render();return}
@@ -1130,12 +1257,18 @@ $("#main").addEventListener("submit",e=>{
   if(e.target.id==="qins"){e.preventDefault();const text=$("#qText").value.trim();if(!text)return;
     saveIns({id:newId("i"),text,area:HOME_AREA[me]||"funil",tag:"",owner:me||"time",by:me||"",status:"nova",createdAt:new Date().toISOString()});
     toast("Guardado na caixa de entrada");return}
-  if(e.target.id==="dreamForm"){e.preventDefault();const text=$("#dText").value.trim();if(!text||!me)return;write("sonhos",{id:newId("s"),person:me,text,why:$("#dWhy").value.trim(),createdAt:new Date().toISOString()},sonhos);toast("Sonho no mural");return}
-  if(e.target.id==="anonForm"){e.preventDefault();const text=$("#aText").value.trim();if(!text)return;anonSent=true;write("anonimo",{id:newId("a"),kind:$("#aKind").value,text,at:new Date().toISOString(),done:false},anon);toast("Enviado sem identificação");return}
-  if(e.target.id==="metaForm"){e.preventDefault();const title=$("#mtTitle").value.trim();if(!title)return;write("metas",{id:newId("m"),setor:$("#mtSetor").value,title,prize:$("#mtPrize").value.trim(),progress:0,createdAt:new Date().toISOString()},metas);toast("Meta cadastrada");return}
+  if(e.target.id==="dreamForm"){e.preventDefault();const text=$("#dText").value.trim();if(!text||!me)return;write("sonhos",{id:newId("s"),person:me,text,why:$("#dWhy").value.trim(),photo:dreamPhoto||"",createdAt:new Date().toISOString()},sonhos);dreamPhoto="";toast("Sonho no mural");return}
+  if(e.target.id==="anonForm"){e.preventDefault();const text=$("#aText").value.trim();if(!text)return;anonSent=true;write("anonimo",{id:newId("a"),kind:$("#aKind").value,vis:$("#aVis").value,text,at:new Date().toISOString(),done:false},anon);toast("Enviado sem identificação");return}
+  if(e.target.id==="metaForm"){e.preventDefault();const title=$("#mtTitle").value.trim();if(!title)return;const sc=$("#mtScope").value;write("metas",{id:newId("m"),scope:sc,person:sc==="individual"?$("#mtPerson").value:"",title,prize:$("#mtPrize").value.trim(),progress:0,createdAt:new Date().toISOString()},metas);toast("Meta cadastrada");return}
   if(e.target.id==="dashForm"){e.preventDefault();const u=safeUrl($("#dashUrl").value);if(!u&&$("#dashUrl").value.trim()){toast("Cole um link começando com https://");return}write("config",{id:"dashboard",...(cfg.get("dashboard")||{}),url:u},cfg);toast(u?"Painel ligado":"Link removido");return}
   if(e.target.id==="dinsForm"){e.preventDefault();const text=$("#diText").value.trim();if(!text)return;write("dashins",{id:newId("d"),text,by:me||"",at:new Date().toISOString()},dashIns);toast("Anotado");return}
-  if(e.target.id==="negForm"){e.preventDefault();const text=$("#negText").value.trim();if(!text)return;setNegItems([...negItems(me),{text,done:false}]);setTimeout(()=>{const i=$("#negText");if(i)i.focus()},0)}
+  if(e.target.classList.contains("negForm")){e.preventDefault();const np=e.target.closest("[data-negp]").dataset.negp, inp=e.target.querySelector("input"), text=inp.value.trim();if(!text)return;setNegItems([...negItems(np),{text,done:false}],np);return}
+  const cf=e.target.closest("[data-cfgform]");if(cf){e.preventDefault();const k=cf.dataset.cfgform, o={};cf.querySelectorAll("input").forEach(x=>{o[x.name]=x.value.trim()});if(o.url)o.url=safeUrl(o.url);setCfg(k,{items:[...cfgItems(k),o]});toast("Adicionado");return}
+  if(e.target.id==="mgForm"){e.preventDefault();setCfg("metaGrande",{title:$("#mgTitle").value.trim(),sub:$("#mgSub").value.trim(),progress:Math.max(0,Math.min(100,Number($("#mgProg").value)||0))});mgEdit=false;toast("Meta salva");return}
+  if(e.target.id==="livroForm"){e.preventDefault();setCfg("livro",{title:$("#lvTitle").value.trim(),author:$("#lvAuthor").value.trim()});toast("Livro salvo");return}
+  if(e.target.id==="eqForm"){e.preventDefault();const name=$("#eqName").value.trim(), email=$("#eqEmail").value.trim().toLowerCase();if(!name||!email)return;let id=norm(name).split(/\s+/)[0].replace(/[^a-z0-9]/g,"")||newId("p");if(person(id).email&&person(id).email!==email)id=id+Math.random().toString(36).slice(2,5);write("people",{id,name,email,setor:$("#eqSetor").value,papel:$("#eqPapel").value},peopleDocs);rebuildPeople();toast(name+" adicionado. Crie o login com esse e-mail no Supabase.");return}
+  const af=e.target.closest("[data-actform]");if(af){e.preventDefault();const inp=af.querySelector("input"), text=inp.value.trim();if(!text)return;write("acoes",{id:newId("ac"),metric:af.dataset.actform,text,by:me||"",at:new Date().toISOString()},acoes);return}
+  if(e.target.id==="metForm"){e.preventDefault();const name=$("#metName").value.trim();if(!name)return;write("metricas",{id:newId("mt"),name,status:"ok",createdAt:new Date().toISOString()},metricas);return}
 });
 $("#main").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.classList.contains("card")){const t=tasks.get(e.target.dataset.id);if(t)openModal(t)}});
 
@@ -1179,7 +1312,7 @@ function startRealtime(){
 }
 function startApp(session){
   $("#login").hidden=true;
-  uid=session.user.id;myEmail=(session.user.email||"").trim().toLowerCase();myName=myEmail.split("@")[0].replace(/[._\-0-9]+/g," ");myAvatar="";me=emailPerson();store("pv-me",me);
+  uid=session.user.id;myEmail=(session.user.email||"").trim().toLowerCase();myName=myEmail.split("@")[0].replace(/[._\-0-9]+/g," ");myAvatar="";me=emailPerson()||load("pv-me","");
   db=makeDb();startRealtime();
   const sub=(col,setter,onErr)=>db.collection(col).onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});setter(m);render();if(!$("#modal").hidden&&editing)renderComments()},onErr||(()=>{}));
   sub("tasks",m=>{tasks=m;ready=true},()=>toast("Não deu para carregar. Recarregue a página."));
@@ -1187,6 +1320,7 @@ function startApp(session){
   sub("comments",m=>{comments=m});
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
+  sub("people",m=>{peopleDocs=m;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
   sub("sonhos",m=>{sonhos=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
