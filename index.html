@@ -345,6 +345,24 @@ label.negi{cursor:pointer}
 .met{display:flex;flex-direction:column;gap:6px;padding:12px;border-radius:12px;border:1px solid var(--line);border-top:4px solid var(--ok)}.met.st-atencao{border-top-color:#f59e0b}.met.st-ruim{border-top-color:var(--bad)}
 .mh{display:flex;align-items:center;justify-content:space-between;gap:8px}.mst{font-size:12px;font-weight:800;color:var(--muted)}.sel.sm{padding:4px 8px;font-size:12px}
 .act{display:flex;align-items:center;gap:6px;font-size:13px;padding:6px 8px;border-radius:8px;background:var(--surface-2)}.act span{flex:1}.act .x{all:unset;cursor:pointer;color:var(--muted)}
+.okt{font-size:11px;font-weight:800;color:var(--ok);background:color-mix(in srgb,var(--ok) 14%,transparent);padding:1px 6px;border-radius:6px}
+.ev.mt{border-left-style:double;border-left-width:4px;font-style:italic}.ev.blk{outline:1.5px dashed var(--bad);outline-offset:-1.5px}
+.dot.dmt{background:transparent;border:2px double var(--muted)}.dot.dblk{background:transparent;border:1.5px dashed var(--bad)}.lgx{opacity:.85}
+.depbox .deprow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.depbox .deprow .inp{flex:1 1 180px;width:auto}#depTask{max-width:260px}.depbox .deprow select{width:auto!important;flex:0 1 auto}
+.dep{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;background:var(--surface-2);margin-bottom:4px;font-size:13px}.dep.ok{opacity:.65}.dep .dt{flex:1;min-width:140px;font-weight:700}.dep .dst{font-size:12px;color:var(--muted);font-weight:700}.dep .x{all:unset;cursor:pointer;color:var(--muted)}
+.dec{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:var(--surface);border:1px solid var(--line);margin-bottom:4px;font-size:13px}.dec span{flex:1}.dec small{color:var(--muted);font-family:var(--f-mono)}
+.follow{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.follow>div{display:flex;flex-direction:column;gap:6px}
+.frow{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:var(--surface-2);font-size:13px;font-weight:700}.frow>span:not(.av){flex:1;min-width:0}.frow small{color:var(--muted);font-weight:600}.blkby{display:block;color:var(--bad)!important;font-size:11.5px}
+.mfx{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.mfx small{color:var(--muted);font-size:12px}.mlink{margin-left:auto}.mnota{color:#b45309;font-size:12px}
+.tl{min-width:900px;position:relative}.tlrow{display:grid;grid-template-columns:260px 1fr;align-items:center;min-height:30px;border-bottom:1px solid var(--line)}
+.tll{all:unset;box-sizing:border-box;cursor:pointer;display:flex;align-items:center;gap:6px;padding:4px 10px;font-size:12.5px;font-weight:700;overflow:hidden;white-space:nowrap}.tll span{overflow:hidden;text-overflow:ellipsis}.tll.empty{cursor:default;color:var(--muted);font-weight:500;white-space:normal}
+.tlt{position:relative;height:100%;min-height:30px}.tlws{display:grid;grid-template-columns:repeat(13,1fr)}.tlw{font-family:var(--f-mono);font-size:11px;color:var(--muted);padding:8px 4px;border-left:1px solid var(--line)}.tlw.cur{color:var(--accent);font-weight:800}
+.tlhead{position:sticky;top:0;background:var(--surface);z-index:2}
+.tlbody{position:relative}.tltoday{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);opacity:.5;pointer-events:none;z-index:1}
+.tlb{all:unset;position:absolute;top:7px;height:16px;border-radius:6px;background:var(--c);cursor:pointer;opacity:.9}.tlb.done{opacity:.35}.tlb.blk{background:repeating-linear-gradient(45deg,var(--bad) 0 4px,color-mix(in srgb,var(--bad) 40%,transparent) 4px 8px)}
+.tlm{all:unset;position:absolute;top:7px;width:14px;height:14px;background:var(--c);transform:translateX(-50%) rotate(45deg);cursor:pointer;border-radius:2px}.tlm.done{opacity:.4}
+.tlflag{position:absolute;top:6px;transform:translateX(-50%);font-size:11px;font-weight:800;color:#b45309;white-space:nowrap}
+.tlg{border-bottom:2px solid var(--line)}.tlgh{display:flex;gap:10px;align-items:baseline;padding:10px 10px 4px;background:var(--surface-2)}.tlgh b{font-family:var(--f-display)}.tlsub{font-size:12px;color:var(--muted)}
 .helpvid{width:100%;border-radius:12px;background:#000;aspect-ratio:16/9}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -468,6 +486,15 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
     </div>
     <div class="f"><label for="fLink">Link (Drive, documento, página)</label><input id="fLink" type="url" inputmode="url" placeholder="https://drive.google.com/..." maxlength="600"></div>
     <div id="fLinkOpen"></div>
+    <div class="row2">
+      <div class="f"><label for="fMeta">Meta / projeto</label><select id="fMeta"></select></div>
+      <div class="f"><label for="fCrit">Critério de conclusão</label><input id="fCrit" maxlength="200" placeholder="Como saber que está pronta"></div>
+    </div>
+    <div class="f depbox"><span class="lbl">Depende de</span><div id="fDeps"></div>
+      <div class="deprow"><select class="sel sm" id="depType" aria-label="Tipo de dependência"><option value="task">Outra tarefa</option><option value="pessoa">Uma pessoa</option><option value="aprovacao">Uma aprovação</option><option value="externa">Entrega externa</option><option value="info">Uma informação</option></select>
+      <select class="sel sm" id="depTask" aria-label="Tarefa da qual depende"></select><input class="inp" id="depText" maxlength="160" placeholder="O que é preciso" aria-label="O que é preciso" hidden>
+      <select class="sel sm" id="depWho" aria-label="Quem libera"></select><button type="button" class="ghost" id="depAdd">+ Adicionar</button></div>
+      <p class="hint" id="fBlocks"></p></div>
     <label class="chk" for="fMs"><input type="checkbox" id="fMs"> Marco importante (aparece em destaque)</label>
     <label class="chk" for="fMeet"><input type="checkbox" id="fMeet"> É reunião: mandar convite por e-mail para a agenda de cada participante</label>
     <div class="meetbox" id="meetBox" hidden>
@@ -477,6 +504,10 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
         <div class="f"><label for="fRec">Repetir</label><select id="fRec"><option value="">Não repete</option><option value="weekdays">Todo dia útil (seg a sex)</option><option value="weekly">Toda semana, mesmo dia</option><option value="monthly">Todo mês, mesmo dia</option></select></div>
       </div>
       <div class="f"><label for="fCall">Link da chamada (Meet, Zoom)</label><input id="fCall" type="url" inputmode="url" placeholder="https://meet.google.com/..." maxlength="600"></div>
+      <div class="f"><label for="fObj">Objetivo da reunião</label><input id="fObj" maxlength="240" placeholder="Para que serve esta reunião"></div>
+      <div class="row2"><div class="f"><label for="fPauta">Pauta</label><textarea id="fPauta" maxlength="1200" rows="3" placeholder="1. Indicadores  2. Entregas  3. Pendências"></textarea></div>
+      <div class="f"><label for="fPrep">Quem prepara</label><select id="fPrep"></select></div></div>
+      <div id="decBox"></div>
       <p class="hint" id="meetHint">Cada participante recebe o convite no e-mail e ele entra na agenda. Mudou a data ou cancelou? A agenda de todos se atualiza sozinha.</p>
     </div>
     <div class="f"><label for="fNotes">Notas</label><textarea id="fNotes" maxlength="2000"></textarea></div>
@@ -628,18 +659,24 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
-let checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
+let decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
 if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
-if(calMode!=="week")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
+if(calMode!=="week"&&calMode!=="timeline")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
 function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
 if(!["owner","status","phase"].includes(group))group="owner";
 if(!["week","month","all"].includes(period))period="week";
 
 function endOf(t){return t.end&&t.end>=t.start?t.end:t.start}
+const DEP_N={task:"Tarefa",pessoa:"Pessoa",aprovacao:"Aprovação",externa:"Entrega externa",info:"Informação"};
+const depOk=d=>d.type==="task"?!!(tasks.get(d.taskId)&&tasks.get(d.taskId).status==="done"):d.status==="resolvida";
+const isBlocked=t=>t.status!=="done"&&Array.isArray(t.deps)&&t.deps.some(d=>!depOk(d));
+const depTag=t=>!Array.isArray(t.deps)||!t.deps.length||t.status==="done"?"":isBlocked(t)?'<span class="late">bloqueada</span>':'<span class="okt">liberada</span>';
+function dependsOn(fromId,targetId,seen=new Set()){if(fromId===targetId)return true;if(seen.has(fromId))return false;seen.add(fromId);const t=tasks.get(fromId);return !!(t&&Array.isArray(t.deps)&&t.deps.some(d=>d.type==="task"&&dependsOn(d.taskId,targetId,seen)))}
+const evColor=t=>calColor==="pessoa"?`var(--ph-${person(t.owner).c})`:phc(t.phase);
 const REC_NAME={weekdays:"todo dia útil",weekly:"toda semana",monthly:"todo mês"};
 function occurs(t,ds){
   if(!t.start)return false;
@@ -684,7 +721,7 @@ function rowHtml(t,showDate,fid){
   return `<div class="wrow${t.status==="done"?" done":""}${isF?" isfocus":""}" style="--c:${phc(t.phase)}">
     <input type="checkbox" class="tick" data-tick="${t.id}" aria-label="Marcar como feita: ${esc(t.title)}"${t.status==="done"?" checked":""}>
     <button type="button" class="wbody" data-open="${t.id}"><span class="wt">${esc(t.title)}</span>
-    <span class="wm">${t.time?`<b>${esc(t.time)}</b>`:""}${when?`<span>${when}</span>`:""}<span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}</span>${t.owner==="time"?"<span>Time todo</span>":""}${t.status==="doing"?'<span class="doingtag">fazendo</span>':""}${late?'<span class="late">atrasada</span>':""}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico">${svg("link")}link</span>`:""}</span></button>
+    <span class="wm">${t.time?`<b>${esc(t.time)}</b>`:""}${when?`<span>${when}</span>`:""}<span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}</span>${t.owner==="time"?"<span>Time todo</span>":""}${t.status==="doing"?'<span class="doingtag">fazendo</span>':""}${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico">${svg("link")}link</span>`:""}</span></button>
     ${t.status!=="done"&&t.start<=TODAY?`<button type="button" class="star" data-focus="${t.id}" aria-pressed="${isF}" aria-label="${isF?"Tirar do inegociável do dia":"Marcar como inegociável do dia"}" title="Inegociável do dia">${svg(isF?"starOn":"star")}</button>`:""}</div>`;
 }
 function greet(){const h=new Date().getHours();return h<5?"Boa noite":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"}
@@ -759,10 +796,15 @@ async function doCopy(){
 }
 
 /* calendário */
+function calLegend(){
+  const items=calColor==="pessoa"?PEOPLE.map(p=>`<span><i class="dot" style="--c:var(--ph-${p.c})"></i>${esc(p.name)}</span>`):PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`);
+  return `<div class="legend">${items.join("")}<span class="lgx"><i class="dot dmt"></i>Reunião</span><span class="lgx"><i class="dot dblk"></i>Bloqueada</span></div>`;
+}
 function calTop(eyebrow,title){
   return `<div class="phead"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button></div>
-  <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="${calMode==="week"?"Semana anterior":"Mês anterior"}">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="${calMode==="week"?"Próxima semana":"Próximo mês"}">›</button></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button><button type="button" data-calmode="timeline" aria-pressed="${calMode==="timeline"}">Linha do tempo</button></div>
+  <div class="seg" role="group" aria-label="Cor por"><button type="button" data-calcolor="frente" aria-pressed="${calColor!=="pessoa"}">Cor por frente</button><button type="button" data-calcolor="pessoa" aria-pressed="${calColor==="pessoa"}">Cor por pessoa</button></div>
+  <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="Anterior">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calMode==="timeline"?tlStart===addDays(WS,-14):calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="Próximo">›</button></div>
   ${isSocio()?`<select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`:""}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>`;
 }
@@ -774,19 +816,40 @@ function renderCalWeek(list){
   for(let i=0;i<7;i++){
     const ds=addDays(a,i), d=parse(ds);
     const evs=list.filter(t=>occurs(t,ds)).sort((x,y)=>(x.time||"99").localeCompare(y.time||"99")||byTime(x,y)).map(t=>
-      `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner))}${t.rec?` <i class="rec">↻ ${REC_NAME[t.rec]}</i>`:""}</span>${esc(t.title)}</button>`).join("");
+      `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}${t.meeting?" mt":""}${isBlocked(t)?" blk":""}" style="--c:${evColor(t)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner))}${t.rec?` <i class="rec">↻ ${REC_NAME[t.rec]}</i>`:""}</span>${esc(t.title)}</button>`).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
     cols+=`<div class="day wkday${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><span>${WD[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></span>${tag}</div>${evs||'<span class="wkempty">livre</span>'}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">${calTop(`${dn} de ${wt.length} concluídas na semana · ${db.getFullYear()}`,title)}
-  <div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}</div>
+  ${calLegend()}
   <div class="scroll"><div class="grid wkgrid">${cols}</div></div>
   <p class="empty" style="padding:0">Clique num dia para criar uma tarefa. Arraste uma tarefa para outro dia para mudar a data.</p></div>`;
+}
+function renderTimeline(list){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(tlStart))tlStart=addDays(WS,-14);
+  const W=13, a=tlStart, b=addDays(a,W*7-1), days=W*7;
+  const pos=ds=>Math.max(0,Math.min(days,diff(a,ds)))/days*100;
+  const inR=t=>!t.rec&&t.start<=b&&endOf(t)>=a;
+  const bar=t=>{const l=pos(t.start), w=Math.max(100/days,pos(endOf(t))+100/days-l);
+    return `<div class="tlrow"><button type="button" class="tll" data-open="${t.id}">${avatar(t.owner,20)}<span>${esc(t.title)}</span>${depTag(t)}</button><div class="tlt">${t.milestone&&!t.end?`<button type="button" class="tlm${t.status==="done"?" done":""}" style="left:${l+100/days/2}%;--c:${evColor(t)}" data-open="${t.id}" title="${esc(t.title)} · ${short(t.start)}"></button>`:`<button type="button" class="tlb${t.status==="done"?" done":""}${isBlocked(t)?" blk":""}" style="left:${l}%;width:${w}%;--c:${evColor(t)}" data-open="${t.id}" title="${esc(t.title)} · ${short(t.start)}${t.end&&t.end!==t.start?" a "+short(t.end):""}"></button>`}</div></div>`};
+  const emp=[...metas.values()].filter(m=>m.scope!=="individual").sort((x,y)=>(x.createdAt||"").localeCompare(y.createdAt||""));
+  const groups=emp.map(m=>({m,items:list.filter(t=>t.meta===m.id&&inR(t)).sort(byTime)}));
+  const loose=list.filter(t=>!t.meta&&inR(t)&&(t.milestone||(t.end&&t.end>t.start))).sort(byTime);
+  let head="";for(let i=0;i<W;i++){const ws=addDays(a,i*7);head+=`<div class="tlw${ws===WS?" cur":""}">${short(ws)}</div>`}
+  const today=TODAY>=a&&TODAY<=b?`<div class="tltoday" style="left:calc(260px + (100% - 260px) * ${(pos(TODAY)+50/days)/100})"></div>`:"";
+  const gHtml=(title,sub,items,m)=>`<div class="tlg"><div class="tlgh"><b>${esc(title)}</b>${sub}</div>${items.length?items.map(bar).join(""):`<div class="tlrow"><span class="tll empty">Nenhuma tarefa ligada a esta meta neste período.</span><div class="tlt"></div></div>`}${m&&m.prazo&&m.prazo>=a&&m.prazo<=b?`<div class="tlrow"><span class="tll"><i>prazo da meta</i></span><div class="tlt"><span class="tlflag" style="left:${pos(m.prazo)}%">⚑ ${short(m.prazo)}</span></div></div>`:""}</div>`;
+  $("#vCal").innerHTML=`<div class="stack">${calTop(`${short(a)} a ${short(b)} · metas, projetos e marcos`,`Linha do <em>tempo</em>`)}
+  ${calLegend()}
+  <div class="scroll"><div class="tl"><div class="tlrow tlhead"><span class="tll"></span><div class="tlt tlws">${head}</div></div>
+  <div class="tlbody">${today}${groups.map(g=>gHtml(g.m.title,`<span class="tlsub">${g.m.resp?esc(pname(g.m.resp)):"responsável a definir"}${g.m.prazo?" · prazo "+short(g.m.prazo):""}</span>`,g.items,g.m)).join("")}
+  ${gHtml("Marcos e entregas longas sem meta","",loose,null)}</div></div></div>
+  <p class="empty" style="padding:0">Para uma tarefa aparecer numa meta, abra a tarefa e escolha a meta em "Meta / projeto". Barras vermelhas tracejadas estão bloqueadas por dependências.</p></div>`;
 }
 function renderCal(){
   const y=+calYM.slice(0,4), m=+calYM.slice(5,7), L=launchDate();
   const list=[...tasks.values()].filter(t=>t.start&&(who==="all"||t.owner===who)).sort((a,b)=>(b.milestone?1:0)-(a.milestone?1:0)||byTime(a,b));
   if(calMode==="week"){renderCalWeek(list);return}
+  if(calMode==="timeline"){renderTimeline(list);return}
   const first=new Date(y,m-1,1), last=new Date(y,m,0);
   const lead=(first.getDay()+6)%7, total=Math.ceil((lead+last.getDate())/7)*7;
   const monthT=list.filter(t=>!t.rec&&t.start<=iso(last)&&endOf(t)>=iso(first)), doneN=monthT.filter(t=>t.status==="done").length;
@@ -799,13 +862,14 @@ function renderCal(){
       const cls=["ev",t.status==="done"?"done":"",t.milestone?"ms":""];
       if(!head){cls.push("cont");if(e)cls.push("last")}
       const label=head?`<span class="tw">${s&&t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner).slice(0,3).toUpperCase())}</span>${esc(t.title)}`:"";
-      return `<button type="button" class="${cls.join(" ")}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}">${label}</button>`}).join("");
+      if(t.meeting)cls.push("mt");if(isBlocked(t))cls.push("blk");
+      return `<button type="button" class="${cls.join(" ")}" style="--c:${evColor(t)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}">${label}</button>`}).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
     cells+=`<div class="day${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${evs}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">
   ${calTop(`${doneN} de ${monthT.length} concluídas no mês`,`${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>${y}</em>`)}
-  <div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}</div>
+  ${calLegend()}
   <div class="scroll"><div class="grid">${cells}</div></div>
   <p class="empty" style="padding:0">Clique num dia para criar uma tarefa. Arraste uma tarefa para mudar a data.</p></div>`;
 }
@@ -833,7 +897,7 @@ function renderBoard(){
       return `<div class="card${t.status==="done"?" done":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" tabindex="0">
         <span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}${t.milestone?" · marco":""}</span>
         <div class="ct">${esc(t.title)}</div>
-        <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}</span>${late?'<span class="late">atrasada</span>':""}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
+        <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
         <button type="button" class="st ${t.status||"todo"}" data-cycle="${t.id}">${{todo:"A fazer",doing:"Fazendo",done:"Feito"}[t.status||"todo"]}</button></div></div>`}).join("")
     }<button type="button" class="add-col" data-addcol="${c.id}">+ tarefa</button></div>`}).join("")}</div></div>`;
 }
@@ -904,6 +968,7 @@ function renderTeam(){
     <div class="ckey"><span><i style="background:color-mix(in srgb,var(--accent) 28%,transparent)"></i>Previstas</span><span><i style="background:var(--accent)"></i>Feitas</span></div>
     ${rows.map(r=>`<div class="crow"><span>${esc(r.p.name)}</span><div class="ctrack" role="img" aria-label="${esc(r.p.name)}: ${r.done} de ${r.total} feitas"><div class="p" style="width:${(r.total/max*100).toFixed(1)}%"></div><div class="d" style="width:${(r.done/max*100).toFixed(1)}%"></div></div><span class="cval">${r.done}/${r.total}</span></div>`).join("")}
   </div>
+  ${followHtml()}
   ${scoreHtml(a,b,label)}
   ${metasHtml()}
   ${vis.length>1?`<div class="seg" role="group" aria-label="Setor"><button type="button" data-tsetor="all" aria-pressed="${teamSetor==="all"}">Todos os setores</button>${setores.map(st=>`<button type="button" data-tsetor="${st}" aria-pressed="${teamSetor===st}">${esc(SETOR_N[st]||st)}</button>`).join("")}</div>`:""}
@@ -956,6 +1021,7 @@ function scoreHtml(a,b,label){
 function metaCard(m){
   const pr=Math.max(0,Math.min(100,Number(m.progress)||0)), ed=isSocio();
   return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt">${m.scope==="individual"?avatar(m.person||"time",22):""}<b>${esc(m.title)}</b>${m.prize?`<span class="prize">Bonificação: ${esc(m.prize)}</span>`:""}</div>
+  ${m.scope!=="individual"?`<div class="mfx">${ed?`<select class="sel sm" data-mf="${m.id}:resp" aria-label="Responsável"><option value="">Responsável a definir</option>${TEAM.map(p=>`<option value="${p.id}"${m.resp===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}</select><input type="date" class="sel sm" data-mf="${m.id}:prazo" value="${esc(m.prazo||"")}" aria-label="Prazo"><input class="inp sm" data-mf="${m.id}:indicador" value="${esc(m.indicador||"")}" placeholder="Indicador" aria-label="Indicador">`:`<small>${m.resp?esc(pname(m.resp)):"responsável a definir"}${m.prazo?" · prazo "+short(m.prazo):""}${m.indicador?" · "+esc(m.indicador):""}</small>`}<small class="mlink">${[...tasks.values()].filter(t=>t.meta===m.id).length} tarefa(s)</small></div>${m.nota?`<small class="mnota">${esc(m.nota)}</small>`:""}`:""}
   <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div>${ed?`<label class="mpct"><input type="number" min="0" max="100" step="5" value="${pr}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button>`:`<span class="mpct">${pr}%</span>`}</div></div>`;
 }
 function metasHtml(){
@@ -972,6 +1038,20 @@ function metasHtml(){
     <input class="inp" id="mtTitle" required maxlength="140" placeholder="Meta (ex.: 300 vendas na Black)" aria-label="Meta">
     <input class="inp" id="mtPrize" maxlength="100" placeholder="Bonificação (ex.: R$ 1.000 + day off)" aria-label="Bonificação">
     <button class="primary" type="submit">Adicionar meta</button></form>`:""}`;
+}
+
+/* acompanhamento: atrasos, bloqueios e metas com pendência (João consolida) */
+function followHtml(){
+  if(!isSocio())return "";
+  const all=[...tasks.values()].filter(t=>t.start&&!t.rec);
+  const late=all.filter(t=>t.status!=="done"&&endOf(t)<TODAY).sort((x,y)=>endOf(x).localeCompare(endOf(y)));
+  const blk=all.filter(isBlocked);
+  const pend=[...metas.values()].filter(m=>m.scope!=="individual"&&(!m.resp||!m.prazo));
+  const li=t=>`<button type="button" class="frow" data-open="${t.id}">${avatar(t.owner,20)}<span>${esc(t.title)}</span><small>${short(endOf(t))}</small></button>`;
+  return `<div class="card-s chart"><h3>Acompanhamento <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">para a reunião de sexta · o João consolida e cobra</span></h3>
+  <div class="follow"><div><div class="eyebrow">Atrasadas (${late.length})</div>${late.slice(0,8).map(li).join("")||'<p class="empty">Nada atrasado.</p>'}${late.length>8?`<p class="empty">e mais ${late.length-8}</p>`:""}</div>
+  <div><div class="eyebrow">Bloqueadas (${blk.length})</div>${blk.slice(0,8).map(t=>{const d=t.deps.find(x=>!depOk(x));const what=d.type==="task"?((tasks.get(d.taskId)||{}).title||"outra tarefa"):d.text;return `<button type="button" class="frow" data-open="${t.id}">${avatar(t.owner,20)}<span>${esc(t.title)}<small class="blkby">espera: ${esc(what||"")}${d.who?" · "+esc(pname(d.who)):""}</small></span></button>`}).join("")||'<p class="empty">Nada bloqueado.</p>'}</div>
+  <div><div class="eyebrow">Metas com pendência (${pend.length})</div>${pend.map(m=>`<div class="frow"><span>${esc(m.title)}<small class="blkby">falta: ${[!m.resp?"responsável":"",!m.prazo?"prazo":""].filter(Boolean).join(" e ")}</small></span></div>`).join("")||'<p class="empty">Todas as metas têm responsável e prazo.</p>'}</div></div></div>`;
 }
 
 /* equipe (só sócios) */
@@ -1090,7 +1170,8 @@ function render(){
 
 /* gravação */
 async function write(col,obj,map){
-  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv};if(prev&&prev.status!==obj.status)focus.forEach(f=>{if(f.taskId===obj.id&&!!f.done!==(obj.status==="done"))setTimeout(()=>write("focus",{...f,done:obj.status==="done"},focus),0)})}
+  if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv};if(prev&&prev.status!=="done"&&obj.status==="done"){const o=obj;setTimeout(()=>{const rel=[...tasks.values()].filter(x=>x.status!=="done"&&Array.isArray(x.deps)&&x.deps.some(d=>d.type==="task"&&d.taskId===o.id)&&!isBlocked(x));if(rel.length)toast(`Liberada para avançar: ${rel.map(x=>x.title).slice(0,2).join(", ")}`)},50)}
+  if(prev&&prev.status!==obj.status)focus.forEach(f=>{if(f.taskId===obj.id&&!!f.done!==(obj.status==="done"))setTimeout(()=>write("focus",{...f,done:obj.status==="done"},focus),0)})}
   map.set(obj.id,obj);render();
   if(!db)return;
   try{const {id,...body}=obj;await db.collection(col).doc(id).set(body);if(col==="tasks")ttPush({id})}
@@ -1156,7 +1237,39 @@ function openModal(t,d={}){
   const att=v.meeting?attOf(v):["all"];
   $("#fMeet").checked=!!v.meeting;$("#meetBox").hidden=!v.meeting;$("#fDur").value=String(v.dur||60);$("#fRec").value=v.rec||"";$("#fCall").value=v.call||"";
   $("#fAtt").innerHTML=`<label><input type="checkbox" value="all"${att.includes("all")?" checked":""}> Todos</label>`+TEAM.map(p=>`<label><input type="checkbox" value="${p.id}"${!att.includes("all")&&att.includes(p.id)?" checked":""}> ${esc(p.name)}</label>`).join("");
+  pendingDec=d.fromDec||null;
+  const emp=[...metas.values()].filter(m=>m.scope!=="individual");
+  $("#fMeta").innerHTML=`<option value="">Nenhuma</option>`+emp.map(m=>`<option value="${m.id}"${v.meta===m.id?" selected":""}>${esc(m.title)}</option>`).join("");
+  $("#fCrit").value=v.criterio||d.criterio||"";
+  editDeps=Array.isArray(v.deps)?v.deps.map(x=>({...x})):[];
+  const others=[...tasks.values()].filter(x=>x.id!==editing&&x.start&&!x.rec).sort(byTime);
+  $("#depTask").innerHTML=others.map(x=>`<option value="${x.id}">${short(x.start)} · ${esc(x.title.slice(0,60))}${x.status==="done"?" ✓":""}</option>`).join("");
+  $("#depWho").innerHTML=`<option value="">Quem libera…</option>`+TEAM.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+  $("#depType").value="task";$("#depTask").hidden=false;$("#depText").hidden=true;$("#depText").value="";
+  renderDeps();
+  $("#fObj").value=v.objetivo||"";$("#fPauta").value=v.pauta||"";
+  $("#fPrep").innerHTML=`<option value="">A definir</option>`+TEAM.map(p=>`<option value="${p.id}"${v.prep===p.id?" selected":""}>${esc(p.name)}</option>`).join("");
+  renderDecs();
   $("#delBtn").hidden=!t;$("#cmBox").innerHTML="";renderComments();$("#modal").hidden=false;setTimeout(()=>$("#fTitle").focus(),0);
+}
+function renderDeps(){
+  const box=$("#fDeps");if(!box)return;
+  const st=$("#fStart").value;
+  box.innerHTML=editDeps.length?editDeps.map((d,i)=>{const tk=d.type==="task"?tasks.get(d.taskId):null, ok=depOk(d);
+    const label=d.type==="task"?(tk?esc(tk.title):"Tarefa de outra pessoa"):esc(d.text||"");
+    const risk=tk&&tk.status!=="done"&&st&&endOf(tk)>=st?`<span class="late">termina ${short(endOf(tk))}: prazo em risco</span>`:"";
+    return `<div class="dep${ok?" ok":""}"><span class="ph">${DEP_N[d.type]||"Dependência"}</span><span class="dt">${label}${d.who?` · libera: ${esc(pname(d.who))}`:""}</span>${risk}
+    ${d.type==="task"?`<span class="dst">${ok?"concluída ✓":"pendente"}</span>`:`<select class="sel sm" data-depst="${i}" aria-label="Situação"><option value="pendente"${!ok?" selected":""}>Pendente</option><option value="resolvida"${ok?" selected":""}>Resolvida</option></select>`}
+    <button type="button" class="x" data-depdel="${i}" aria-label="Remover dependência">×</button></div>`}).join(""):'<p class="hint">Nenhuma. Se esta tarefa precisa de outra coisa antes, adicione abaixo.</p>';
+  const blocks=editing?[...tasks.values()].filter(x=>Array.isArray(x.deps)&&x.deps.some(d=>d.type==="task"&&d.taskId===editing)):[];
+  $("#fBlocks").innerHTML=blocks.length?`<b>Esta tarefa libera:</b> ${blocks.map(x=>esc(x.title)).join(" · ")}`:"";
+}
+function renderDecs(){
+  const box=$("#decBox");if(!box)return;
+  if(!editing||!$("#fMeet").checked){box.innerHTML="";return}
+  const ds=[...decisoes.values()].filter(x=>x.meeting===editing).sort((x,y)=>(y.at||"").localeCompare(x.at||""));
+  box.innerHTML=`<div class="f"><span class="lbl">Decisões e encaminhamentos</span>${ds.map(x=>{const tk=x.taskId&&tasks.get(x.taskId);return `<div class="dec"><small>${x.date?short(x.date):""}</small><span>${esc(x.text)}</span>${tk?`<button type="button" class="mini" data-open="${tk.id}">${tk.status==="done"?"✓ ":""}Ver tarefa</button>`:`<button type="button" class="mini" data-dectask="${x.id}">Virar tarefa</button>`}</div>`}).join("")||'<p class="hint">Nenhuma decisão registrada ainda.</p>'}
+  <div class="addrow"><input class="inp" id="decText" maxlength="240" placeholder="Decisão tomada na reunião de hoje" aria-label="Nova decisão"><button type="button" class="ghost" id="decAdd">Registrar</button></div></div>`;
 }
 function openIns(){
   $("#iText").value="";$("#iTag").value="";$("#iOwner").value=me||"time";$("#iArea").value=HOME_AREA[me]||"funil";
@@ -1185,7 +1298,23 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.id==="cmText"){e.preventDefault();sendComment()}
 });
 $("#fLink").addEventListener("input",renderLinkOpen);
-$("#fMeet").addEventListener("change",()=>{$("#meetBox").hidden=!$("#fMeet").checked});
+$("#fMeet").addEventListener("change",()=>{$("#meetBox").hidden=!$("#fMeet").checked;renderDecs()});
+$("#fStart").addEventListener("change",renderDeps);
+$("#depType").addEventListener("change",()=>{const tk=$("#depType").value==="task";$("#depTask").hidden=!tk;$("#depText").hidden=tk});
+$("#depAdd").addEventListener("click",()=>{
+  const type=$("#depType").value, who=$("#depWho").value;
+  if(type==="task"){const tid=$("#depTask").value;if(!tid)return;if(editDeps.some(d=>d.type==="task"&&d.taskId===tid)){toast("Essa dependência já está na lista.");return}
+    if(editing&&dependsOn(tid,editing)){toast("Não dá: a outra tarefa já depende desta (dependência circular).");return}
+    const tk=tasks.get(tid);editDeps.push({id:newId("d"),type,taskId:tid,who:who||(tk&&tk.owner!=="time"?tk.owner:""),status:"pendente"})}
+  else{const text=$("#depText").value.trim();if(!text){$("#depText").focus();return}editDeps.push({id:newId("d"),type,text,who,status:"pendente"});$("#depText").value=""}
+  renderDeps()});
+$("#fDeps").addEventListener("click",e=>{const x=e.target.closest("[data-depdel]");if(x){editDeps.splice(Number(x.dataset.depdel),1);renderDeps()}});
+$("#fDeps").addEventListener("change",e=>{const x=e.target.closest("[data-depst]");if(x){editDeps[Number(x.dataset.depst)].status=x.value;renderDeps()}});
+$("#decBox").addEventListener("click",e=>{
+  if(e.target.closest("#decAdd")){const inp=$("#decText"), text=inp.value.trim();if(!text||!editing)return;write("decisoes",{id:newId("dc"),meeting:editing,date:TODAY,text,by:me||"",at:new Date().toISOString()},decisoes);inp.value="";renderDecs();return}
+  const dt=e.target.closest("[data-dectask]");if(dt){const x=decisoes.get(dt.dataset.dectask), mt=tasks.get(editing);if(!x)return;closeAll();openModal(null,{title:x.text.slice(0,160),notes:`Decisão da reunião "${mt?mt.title:""}" (${short(x.date||TODAY)}).`,phase:mt?mt.phase:"gestao",fromDec:x.id});return}
+  const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t){closeAll();openModal(t)}}
+});
 $("#fAtt").addEventListener("change",e=>{const all=$("#fAtt input[value=all]");if(e.target.value==="all"&&e.target.checked)$("#fAtt").querySelectorAll("input:not([value=all])").forEach(i=>i.checked=false);else if(e.target.checked)all.checked=false});
 $("#form").addEventListener("submit",e=>{
   e.preventDefault();
@@ -1196,6 +1325,9 @@ $("#form").addEventListener("submit",e=>{
   const t={id,title:$("#fTitle").value.trim(),owner:isSocio()?$("#fOwner").value:(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
   if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
+  t.meta=$("#fMeta").value||"";t.criterio=$("#fCrit").value.trim();t.deps=editDeps;
+  if(meeting)Object.assign(t,{objetivo:$("#fObj").value.trim(),pauta:$("#fPauta").value.trim(),prep:$("#fPrep").value||""});
+  if(pendingDec){const dc=decisoes.get(pendingDec);if(dc)write("decisoes",{...dc,taskId:id},decisoes);pendingDec=null}
   save(t);
   if(meeting||(prev&&prev.inv))setTimeout(()=>invPush({action:"push",id}),700);
   const pi=pendingIns&&insights.get(pendingIns);if(pi)saveIns({...pi,status:"tarefa",taskId:id});
@@ -1214,8 +1346,9 @@ $("#main").addEventListener("click",e=>{
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
   const nd=e.target.closest("[data-negdel]");if(nd){const np=nd.closest("[data-negp]").dataset.negp;const items=[...negItems(np)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items,np);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
+  const cc=e.target.closest("[data-calcolor]");if(cc){calColor=cc.dataset.calcolor;store("pv-calcolor",calColor);render();return}
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
-  const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
+  const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
   const pe=e.target.closest("[data-period]");if(pe){period=pe.dataset.period;store("pv-period",period);render();return}
   const cy=e.target.closest("[data-cycle]");if(cy){const t=tasks.get(cy.dataset.cycle);if(t)save({...t,status:{todo:"doing",doing:"done",done:"todo"}[t.status||"todo"]});return}
@@ -1242,6 +1375,7 @@ $("#main").addEventListener("change",e=>{
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
   if(t.matches("[data-negtick]")){const np=t.closest("[data-negp]").dataset.negp;const items=negItems(np).map((it,k)=>k===Number(t.dataset.negtick)?{...it,done:t.checked}:it);setNegItems(items,np);return}
   if(t.matches("[data-chk]")){const c=checks.get(chkId())||{id:chkId(),person:me,week:WS,done:{}};write("checks",{...c,done:{...(c.done||{}),[t.dataset.chk]:t.checked}},checks);if(t.checked)toast("Boa!");return}
+  if(t.matches("[data-mf]")){const [mid,f]=t.dataset.mf.split(":");const m=metas.get(mid);if(m)write("metas",{...m,[f]:t.value.trim()},metas);return}
   if(t.matches("[data-mstat]")){const m=metricas.get(t.dataset.mstat);if(m)write("metricas",{...m,status:t.value},metricas);return}
   if(t.matches("[data-eqsetor]")||t.matches("[data-eqpapel]")){const pid=t.dataset.eqsetor||t.dataset.eqpapel, cur=person(pid), d=peopleDocs.get(pid)||{id:pid,name:cur.name,email:cur.email||"",setor:cur.setor,papel:cur.papel};write("people",{...d,[t.dataset.eqsetor?"setor":"papel"]:t.value},peopleDocs);rebuildPeople();toast("Equipe atualizada");return}
   if(t.id==="mgPhoto"||t.id==="lvCover"){const f=t.files&&t.files[0];if(!f)return;resizeImage(f,t.id==="lvCover"?320:900).then(u=>{if(t.id==="mgPhoto")setCfg("metaGrande",{photo:u});else setCfg("livro",{cover:u});toast("Imagem salva")}).catch(()=>toast("Não deu para ler essa imagem."));return}
@@ -1320,7 +1454,7 @@ function startApp(session){
   sub("comments",m=>{comments=m});
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
-  sub("people",m=>{peopleDocs=m;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
+  sub("people",m=>{peopleDocs=m;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
   sub("sonhos",m=>{sonhos=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
