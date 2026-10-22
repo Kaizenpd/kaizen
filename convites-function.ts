@@ -132,6 +132,41 @@ async function send(to: string[], t: any, id: string, seq: number, kind: "novo" 
   if (!r.ok) throw new Error(`resend ${r.status} ${(await r.text()).slice(0, 300)}`);
 }
 
+/* ---------- Google Agenda + Meet (quando a conta da empresa estiver conectada) ---------- */
+const GCID = Deno.env.get("GOOGLE_CLIENT_ID") ?? "";
+const GCSECRET = Deno.env.get("GOOGLE_CLIENT_SECRET") ?? "";
+async function gToken(): Promise<string | null> {
+  if (!GCID || !GCSECRET) return null;
+  const { data } = await db.from("g_auth").select("refresh_token").eq("id", "org").maybeSingle();
+  if (!data?.refresh_token) return null;
+  const r = await fetch("https://oauth2.googleapis.com/token", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ client_id: GCID, client_secret: GCSECRET, refresh_token: data.refresh_token, grant_type: "refresh_token" }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok || !j.access_token) { console.error("google token", r.status, JSON.stringify(j)); return null; }
+  return j.access_token;
+}
+const isoLocal = (date: string, time: string, add = 0) => { const L = local(date, time, add); return `${L.slice(0, 4)}-${L.slice(4, 6)}-${L.slice(6, 8)}T${L.slice(9, 11)}:${L.slice(11, 13)}:00`; };
+function gBody(t: any, to: string[], withMeet: boolean, id: string, seq: number) {
+  const desc = [t.objetivo ? `Objetivo: ${t.objetivo}` : "", t.pauta ? `Pauta:\n${t.pauta}` : "", t.notes || "", `Marcada no Kaizen: ${APP_URL}`].filter(Boolean).join("\n\n");
+  const b: any = {
+    summary: t.title || "Reunião", description: desc,
+    start: { dateTime: isoLocal(t.start, t.time), timeZone: "America/Sao_Paulo" },
+    end: { dateTime: isoLocal(t.start, t.time, Number(t.dur) || 60), timeZone: "America/Sao_Paulo" },
+    attendees: to.map((email) => ({ email })),
+    reminders: { useDefault: true },
+  };
+  const rr = rrule(t); if (rr) b.recurrence = [rr];
+  if (t.call) b.location = t.call;
+  if (withMeet) b.conferenceData = { createRequest: { requestId: `kz-${id}-${seq}-${Date.now()}`, conferenceSolutionKey: { type: "hangoutsMeet" } } };
+  return b;
+}
+async function gCall(tok: string, method: string, path: string, body?: unknown) {
+  const r = await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events${path}`, { method, headers: { Authorization: `Bearer ${tok}`, "Content-Type": "application/json" }, body: body ? JSON.stringify(body) : undefined });
+  const txt = await r.text();
+  if (!r.ok && !(method === "DELETE" && (r.status === 404 || r.status === 410))) throw new Error(`google ${r.status} ${txt.slice(0, 300)}`);
+  return txt ? JSON.parse(txt) : null;
+}
+
 const sig = (t: any, to: string[]) => JSON.stringify([t.title, t.start, t.time, Number(t.dur) || 60, t.rec || "", t.call || "", t.notes || "", [...to].sort()]);
 
 Deno.serve(async (req) => {
@@ -148,6 +183,7 @@ Deno.serve(async (req) => {
 
     if (body.action === "cancel") {
       const t = body.task; const inv = t?.inv;
+      if (inv?.gid) { const gt = await gToken(); if (gt) await gCall(gt, "DELETE", `/${inv.gid}?sendUpdates=all`); return json({ ok: true, sent: inv.to?.length || 0, google: true }); }
       if (!inv?.to?.length) return json({ ok: true, sent: 0 });
       await send(inv.to, t, id, (inv.seq || 0) + 1, "cancelado");
       return json({ ok: true, sent: inv.to.length });
@@ -158,11 +194,19 @@ Deno.serve(async (req) => {
       if (!t) return json({ ok: true, sent: 0 });
       const inv = t.inv || null;
       // deixou de ser reunião: cancela para todos
+      if (!t.meeting && inv?.gid) {
+        const gt = await gToken();
+        if (gt) await gCall(gt, "DELETE", `/${inv.gid}?sendUpdates=all`);
+        const next = { ...t }; delete next.inv; await putDoc("tasks", id, next);
+        return json({ ok: true, sent: inv?.to?.length || 0, google: true });
+      }
       if (!t.meeting) {
         if (inv?.to?.length) { await send(inv.to, { ...t, dur: inv.dur || 60 }, id, (inv.seq || 0) + 1, "cancelado"); }
         const next = { ...t }; delete next.inv; await putDoc("tasks", id, next);
         return json({ ok: true, sent: inv?.to?.length || 0 });
       }
+      // reunião que já está no Google Agenda: atualiza ou cancela por lá
+      const gtok = inv?.gid || !inv ? await gToken() : null;
       const map = await people();
       const att: string[] = Array.isArray(t.att) && t.att.length ? t.att : ["all"];
       const ids = att.includes("all") ? [...map.keys()] : [...new Set([...att, t.owner])];
@@ -170,6 +214,17 @@ Deno.serve(async (req) => {
       const s = sig(t, to);
       if (inv && inv.sig === s) return json({ ok: true, sent: 0, unchanged: true });
       const seq = inv ? (inv.seq || 0) + 1 : 0;
+      if (gtok && (!inv || inv.gid)) {
+        const auto = !t.call || (inv?.meet && t.call === inv.meet);
+        let ev: any;
+        if (inv?.gid) ev = await gCall(gtok, "PATCH", `/${inv.gid}?sendUpdates=all&conferenceDataVersion=1`, gBody(t, to, false, id, seq));
+        else ev = await gCall(gtok, "POST", `?sendUpdates=all&conferenceDataVersion=1`, gBody(t, to, auto, id, seq));
+        const meet = ev?.hangoutLink || inv?.meet || "";
+        const cur = (await getDoc("tasks", id)) || t;
+        const call = auto && meet ? meet : cur.call || "";
+        await putDoc("tasks", id, { ...cur, call, inv: { seq, sig: sig({ ...t, call }, to), to, dur: Number(t.dur) || 60, gid: ev?.id || inv?.gid, meet } });
+        return json({ ok: true, sent: to.length, google: true, meet });
+      }
       const removed = (inv?.to || []).filter((e: string) => !to.includes(e));
       if (removed.length) await send(removed, t, id, seq, "cancelado");
       await send(to, t, id, seq, inv ? "atualizado" : "novo");

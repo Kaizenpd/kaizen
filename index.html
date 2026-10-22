@@ -363,6 +363,12 @@ label.negi{cursor:pointer}
 .tlm{all:unset;position:absolute;top:7px;width:14px;height:14px;background:var(--c);transform:translateX(-50%) rotate(45deg);cursor:pointer;border-radius:2px}.tlm.done{opacity:.4}
 .tlflag{position:absolute;top:6px;transform:translateX(-50%);font-size:11px;font-weight:800;color:#b45309;white-space:nowrap}
 .tlg{border-bottom:2px solid var(--line)}.tlgh{display:flex;gap:10px;align-items:baseline;padding:10px 10px 4px;background:var(--surface-2)}.tlgh b{font-family:var(--f-display)}.tlsub{font-size:12px;color:var(--muted)}
+.day.fase{background:color-mix(in srgb,var(--fc) 9%,var(--surface));box-shadow:inset 0 3px 0 color-mix(in srgb,var(--fc) 70%,transparent)}.day.fase.weekend{background:color-mix(in srgb,var(--fc) 6%,var(--surface-2))}
+.fflag{display:block;margin:0 4px 2px;font-size:10.5px;font-weight:800;color:#fff;background:var(--fc);border-radius:6px;padding:2px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fases{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.fase-chip{font-size:12.5px;padding:5px 10px;border-radius:999px;background:color-mix(in srgb,var(--fc) 14%,transparent);border:1px solid color-mix(in srgb,var(--fc) 45%,transparent)}.fase-chip.now{outline:2px solid var(--fc)}
+.faseed{gap:8px}.faserow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.faserow .inp{flex:1 1 180px;width:auto}.faserow input[type=color]{width:38px;height:32px;border:0;background:none;padding:0}.faserow .x{all:unset;cursor:pointer;color:var(--muted);font-size:18px}
+.tlfases .tlt{min-height:28px}.tlfase{position:absolute;top:5px;height:20px;border-radius:6px;background:color-mix(in srgb,var(--fc) 22%,transparent);border:1px solid var(--fc);font-size:11px;font-weight:800;padding:1px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-sizing:border-box}
+.lalt{all:unset;cursor:pointer;color:var(--accent);font-weight:700;font-size:13px;text-align:center}
 .helpvid{width:100%;border-radius:12px;background:#000;aspect-ratio:16/9}
 .sheet ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px}
 .f{display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -508,7 +514,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
       <div class="row2"><div class="f"><label for="fPauta">Pauta</label><textarea id="fPauta" maxlength="1200" rows="3" placeholder="1. Indicadores  2. Entregas  3. Pendências"></textarea></div>
       <div class="f"><label for="fPrep">Quem prepara</label><select id="fPrep"></select></div></div>
       <div id="decBox"></div>
-      <p class="hint" id="meetHint">Cada participante recebe o convite no e-mail e ele entra na agenda. Mudou a data ou cancelou? A agenda de todos se atualiza sozinha.</p>
+      <p class="hint" id="meetHint">Cada participante recebe o convite no e-mail e ele entra na agenda. Mudou a data ou cancelou? A agenda de todos se atualiza sozinha. Com o Google Agenda conectado, deixe o link da chamada vazio que o Meet é criado sozinho.</p>
     </div>
     <div class="f"><label for="fNotes">Notas</label><textarea id="fNotes" maxlength="2000"></textarea></div>
     <div class="comments" id="cmBox"></div>
@@ -593,11 +599,12 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
   <form class="lcard" id="loginForm" autocomplete="on">
     <div class="brand"><div class="mark">改</div><div><b>Kaizen</b><small>Central do time · 改善</small></div></div>
     <h2>Entrar</h2>
-    <p class="sub">Use o e-mail e a senha que o Gabriel criou para você.</p>
+    <p class="sub">Use o seu e-mail e a sua senha do Kaizen.</p>
     <div class="f"><label for="lEmail">E-mail</label><input id="lEmail" type="email" autocomplete="username" required></div>
     <div class="f"><label for="lPass">Senha</label><input id="lPass" type="password" autocomplete="current-password" required></div>
     <p class="lerr" id="lErr" hidden></p>
     <button type="submit" class="primary" id="lBtn" style="justify-content:center">Entrar</button>
+    <button type="button" class="lalt" id="lFirst">Primeiro acesso? Criar minha senha</button>
     <p class="sub" style="font-size:12px">Esqueceu a senha? Fale com o Gabriel para redefinir.</p>
   </form>
 </div>
@@ -606,7 +613,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
 const BASE_PEOPLE=[{id:"gabriel",papel:"socio",setor:"funil",name:"Gabriel",c:"comercial",role:"Funil de vendas",alias:["gabriel"]},{id:"matheus",papel:"socio",setor:"conteudo",name:"Matheus",c:"conteudo",role:"Conteúdo",alias:["matheus","mateus"]},{id:"nicolas",papel:"socio",setor:"funil",name:"Nicholas",c:"trafego",role:"Funil e tráfego",alias:["nicolas","nicholas"]},{id:"joao",papel:"socio",setor:"sucesso",name:"João",c:"sucesso",role:"Sucesso do cliente",alias:["joao"]},{id:"lucas",papel:"colab",setor:"produto",name:"Lucas",c:"produto",role:"Produto",alias:["lucas"]},{id:"time",name:"Time todo",c:"gestao",role:"",alias:[]}];
 let PEOPLE=BASE_PEOPLE.slice();
 let TEAM=PEOPLE.filter(p=>p.id!=="time"), peopleDocs=new Map();
-const SETOR_C={conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto",gestao:"gestao"}, SETOR_N={conteudo:"Conteúdo",funil:"Funil de vendas",sucesso:"Sucesso do cliente",produto:"Produto",gestao:"Gestão"};
+const SETOR_C={conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto",gestao:"gestao"}, SETOR_N={conteudo:"Conteúdo",funil:"Funil de vendas",sucesso:"Sucesso do cliente",produto:"Produto",gestao:"Gestão",adef:"Setor a definir"};
 function rebuildPeople(){const map=new Map(BASE_PEOPLE.map(p=>[p.id,{...p}]));peopleDocs.forEach(d=>{const b=map.get(d.id)||{id:d.id,alias:[norm(d.name||d.id).split(" ")[0]],c:SETOR_C[d.setor]||"gestao"};const setor=d.setor||b.setor;map.set(d.id,{...b,name:d.name||b.name,email:String(d.email||b.email||"").toLowerCase(),setor,papel:d.papel||b.papel||"colab",role:b.id&&BASE_PEOPLE.some(x=>x.id===b.id)&&!d.setor?b.role:(SETOR_N[setor]||b.role||""),off:!!d.off})});const t=map.get("time");map.delete("time");PEOPLE=[...[...map.values()].filter(x=>!x.off),t];TEAM=PEOPLE.filter(x=>x.id!=="time");fillSelects()}
 const AREAS=[{id:"conteudo",name:"Conteúdo",lead:"Líder: Matheus",c:"conteudo"},{id:"funil",name:"Funil de vendas",lead:"Líderes: Gabriel e Nicholas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",lead:"Líder: João",c:"sucesso"},{id:"produto",name:"Produto",lead:"Líder: Lucas",c:"produto"}];
 const INS_ST=[{id:"nova",name:"Caixa de entrada"},{id:"agora",name:"Para o lançamento"},{id:"novembro",name:"Novembro"},{id:"dezembro",name:"Dezembro"},{id:"depois",name:"Algum dia"},{id:"tarefa",name:"Virou tarefa"}];
@@ -659,7 +666,7 @@ const WS=weekStart(TODAY), WE=addDays(WS,6);
 let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
-let decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
+let peopleLoaded=false, decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
@@ -676,7 +683,12 @@ const depOk=d=>d.type==="task"?!!(tasks.get(d.taskId)&&tasks.get(d.taskId).statu
 const isBlocked=t=>t.status!=="done"&&Array.isArray(t.deps)&&t.deps.some(d=>!depOk(d));
 const depTag=t=>!Array.isArray(t.deps)||!t.deps.length||t.status==="done"?"":isBlocked(t)?'<span class="late">bloqueada</span>':'<span class="okt">liberada</span>';
 function dependsOn(fromId,targetId,seen=new Set()){if(fromId===targetId)return true;if(seen.has(fromId))return false;seen.add(fromId);const t=tasks.get(fromId);return !!(t&&Array.isArray(t.deps)&&t.deps.some(d=>d.type==="task"&&dependsOn(d.taskId,targetId,seen)))}
-const evColor=t=>calColor==="pessoa"?`var(--ph-${person(t.owner).c})`:phc(t.phase);
+const evColor=t=>phc(t.phase);
+const FASE_CORES=["#8b5cf6","#f59e0b","#0ea5e9","#ef4444","#10b981","#ec4899","#64748b"];
+const fases=()=>cfgItems("fases").filter(f=>f.start&&f.end).map((f,i)=>({...f,i,color:f.color||FASE_CORES[i%FASE_CORES.length]})).sort((a,b)=>a.start.localeCompare(b.start));
+function faseOf(ds){const fs=fases().filter(f=>f.start<=ds&&f.end>=ds);if(!fs.length)return null;return fs.sort((a,b)=>a.end.localeCompare(b.end))[0]}
+function faseDay(ds){const f=faseOf(ds);if(!f)return {style:"",flag:""};const ends=fases().filter(x=>x.end===ds);
+  return {style:` style="--fc:${f.color}"`,cls:" fase",flag:ends.map(x=>`<span class="fflag" style="--fc:${x.color}">⚑ prazo: ${esc(x.name)}</span>`).join("")}}
 const REC_NAME={weekdays:"todo dia útil",weekly:"toda semana",monthly:"todo mês"};
 function occurs(t,ds){
   if(!t.start)return false;
@@ -797,13 +809,21 @@ async function doCopy(){
 
 /* calendário */
 function calLegend(){
-  const items=calColor==="pessoa"?PEOPLE.map(p=>`<span><i class="dot" style="--c:var(--ph-${p.c})"></i>${esc(p.name)}</span>`):PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`);
-  return `<div class="legend">${items.join("")}<span class="lgx"><i class="dot dmt"></i>Reunião</span><span class="lgx"><i class="dot dblk"></i>Bloqueada</span></div>`;
+  const fs=fases();
+  const faseBar=`<div class="fases">${fs.length?fs.map(f=>`<span class="fase-chip${f.start<=TODAY&&f.end>=TODAY?" now":""}" style="--fc:${f.color}"><b>${esc(f.name)}</b> ${short(f.start)} → <b>prazo ${short(f.end)}</b></span>`).join(""):'<span class="empty">Nenhuma fase definida.</span>'}${isSocio()?`<button type="button" class="mini" data-fasesedit>${faseEdit?"Fechar":"Editar fases"}</button>`:""}</div>${faseEdit&&isSocio()?fasesEditorHtml():""}`;
+  return `${faseBar}<div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}<span class="lgx"><i class="dot dmt"></i>Reunião</span><span class="lgx"><i class="dot dblk"></i>Bloqueada</span></div>`;
+}
+let faseEdit=false;
+function fasesEditorHtml(){
+  const it=cfgItems("fases");
+  return `<div class="card-s box faseed"><h3>Fases da linha do tempo</h3><p class="empty" style="padding:0">Cada fase pinta os dias do calendário até o prazo máximo combinado. Mudou o prazo? Ajuste aqui e o calendário inteiro muda.</p>
+  ${it.map((f,i)=>`<div class="faserow"><input class="inp" data-fase="${i}:name" value="${esc(f.name||"")}" maxlength="40" aria-label="Nome da fase"><input type="date" class="sel sm" data-fase="${i}:start" value="${esc(f.start||"")}" aria-label="Início"><span>→</span><input type="date" class="sel sm" data-fase="${i}:end" value="${esc(f.end||"")}" aria-label="Prazo máximo"><input type="color" data-fase="${i}:color" value="${esc(f.color||FASE_CORES[i%FASE_CORES.length])}" aria-label="Cor"><button type="button" class="x" data-cfgdel="fases:${i}" aria-label="Remover fase">×</button></div>`).join("")}
+  <button type="button" class="ghost" data-faseadd>+ Nova fase</button></div>`;
 }
 function calTop(eyebrow,title){
   return `<div class="phead"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>
   <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button><button type="button" data-calmode="timeline" aria-pressed="${calMode==="timeline"}">Linha do tempo</button></div>
-  <div class="seg" role="group" aria-label="Cor por"><button type="button" data-calcolor="frente" aria-pressed="${calColor!=="pessoa"}">Cor por frente</button><button type="button" data-calcolor="pessoa" aria-pressed="${calColor==="pessoa"}">Cor por pessoa</button></div>
+
   <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="Anterior">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calMode==="timeline"?tlStart===addDays(WS,-14):calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="Próximo">›</button></div>
   ${isSocio()?`<select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`:""}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>`;
@@ -818,7 +838,8 @@ function renderCalWeek(list){
     const evs=list.filter(t=>occurs(t,ds)).sort((x,y)=>(x.time||"99").localeCompare(y.time||"99")||byTime(x,y)).map(t=>
       `<button type="button" class="ev wk${t.status==="done"?" done":""}${t.milestone?" ms":""}${t.meeting?" mt":""}${isBlocked(t)?" blk":""}" style="--c:${evColor(t)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}"><span class="tw">${t.time?esc(t.time)+" · ":""}${t.meeting?"📅 ":""}${esc(pname(t.owner))}${t.rec?` <i class="rec">↻ ${REC_NAME[t.rec]}</i>`:""}</span>${esc(t.title)}</button>`).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
-    cols+=`<div class="day wkday${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><span>${WD[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></span>${tag}</div>${evs||'<span class="wkempty">livre</span>'}</div>`;
+    const fd=faseDay(ds);
+    cols+=`<div class="day wkday${fd.cls||""}${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"${fd.style}><div class="dnum"><span>${WD[d.getDay()].slice(0,3)} <b>${d.getDate()}</b></span>${tag}</div>${fd.flag}${evs||'<span class="wkempty">livre</span>'}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">${calTop(`${dn} de ${wt.length} concluídas na semana · ${db.getFullYear()}`,title)}
   ${calLegend()}
@@ -841,6 +862,7 @@ function renderTimeline(list){
   $("#vCal").innerHTML=`<div class="stack">${calTop(`${short(a)} a ${short(b)} · metas, projetos e marcos`,`Linha do <em>tempo</em>`)}
   ${calLegend()}
   <div class="scroll"><div class="tl"><div class="tlrow tlhead"><span class="tll"></span><div class="tlt tlws">${head}</div></div>
+  <div class="tlrow tlfases"><span class="tll"><i>Fases</i></span><div class="tlt">${fases().filter(f=>f.end>=a&&f.start<=b).map(f=>{const l=pos(f.start<a?a:f.start), w=Math.max(1,pos(f.end)+100/days-l);return `<span class="tlfase" style="left:${l}%;width:${w}%;--fc:${f.color}" title="${esc(f.name)}: ${short(f.start)} a ${short(f.end)}">${esc(f.name)} · prazo ${short(f.end)}</span>`}).join("")}</div></div>
   <div class="tlbody">${today}${groups.map(g=>gHtml(g.m.title,`<span class="tlsub">${g.m.resp?esc(pname(g.m.resp)):"responsável a definir"}${g.m.prazo?" · prazo "+short(g.m.prazo):""}</span>`,g.items,g.m)).join("")}
   ${gHtml("Marcos e entregas longas sem meta","",loose,null)}</div></div></div>
   <p class="empty" style="padding:0">Para uma tarefa aparecer numa meta, abra a tarefa e escolha a meta em "Meta / projeto". Barras vermelhas tracejadas estão bloqueadas por dependências.</p></div>`;
@@ -865,7 +887,8 @@ function renderCal(){
       if(t.meeting)cls.push("mt");if(isBlocked(t))cls.push("blk");
       return `<button type="button" class="${cls.join(" ")}" style="--c:${evColor(t)}" draggable="true" data-id="${t.id}" title="${esc(t.title)} · ${esc(pname(t.owner))}">${label}</button>`}).join("");
     const tag=ds===BF?"<i>Black Friday</i>":ds===L?"<i>Lançamento</i>":"";
-    cells+=`<div class="day${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${evs}</div>`;
+    const fd=faseDay(ds);
+    cells+=`<div class="day${fd.cls||""}${wd>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}"${fd.style}><div class="dnum"><b>${d.getDate()}</b>${tag}</div>${fd.flag}${evs}</div>`;
   }
   $("#vCal").innerHTML=`<div class="stack">
   ${calTop(`${doneN} de ${monthT.length} concluídas no mês`,`${MNAME[m-1][0].toUpperCase()+MNAME[m-1].slice(1)} <em>${y}</em>`)}
@@ -984,7 +1007,7 @@ function meetTodayHtml(){
   if(!ms.length)return "";
   return `<div class="card-s box"><h3>Reuniões de hoje</h3>${ms.map(t=>{const u=safeUrl(t.call);return `<div class="meetrow"><b>${esc(t.time||"--:--")}</b><span>${esc(t.title)}</span>${u?`<a class="mini" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Entrar</a>`:""}<button type="button" class="mini" data-open="${t.id}">Ver</button></div>`}).join("")}</div>`;
 }
-function invPush(body){if(!db)return;sb.functions.invoke("convites",{body}).then(({data,error})=>{if(error){toast("Tarefa salva, mas o convite não foi enviado. Tente salvar de novo.");return}if(data&&data.sent)toast(`Convite enviado para ${data.sent} pessoa${data.sent>1?"s":""}`)}).catch(()=>{})}
+function invPush(body){if(!db)return;sb.functions.invoke("convites",{body}).then(({data,error})=>{if(error){toast("Tarefa salva, mas o convite não foi enviado. Tente salvar de novo.");return}if(data&&data.sent)toast(`Convite enviado para ${data.sent} pessoa${data.sent>1?"s":""}${data.meet?" com link do Meet":""}`)}).catch(()=>{})}
 
 /* papéis */
 const isSocio=()=>person(me).papel==="socio";
@@ -1055,10 +1078,13 @@ function followHtml(){
 }
 
 /* equipe (só sócios) */
-const SETORES_P=[{id:"conteudo",name:"Conteúdo",c:"conteudo"},{id:"funil",name:"Funil de vendas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",c:"sucesso"},{id:"produto",name:"Produto",c:"produto"},{id:"gestao",name:"Gestão",c:"gestao"}];
+const SETORES_P=[{id:"conteudo",name:"Conteúdo",c:"conteudo"},{id:"funil",name:"Funil de vendas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",c:"sucesso"},{id:"produto",name:"Produto",c:"produto"},{id:"gestao",name:"Gestão",c:"gestao"},{id:"adef",name:"Setor a definir",c:"gestao"}];
 function equipeHtml(){
   if(!isSocio())return "";
-  return `<div class="card-s chart"><h3>Equipe</h3><p class="empty" style="padding:0">Quem entra no Kaizen, com qual e-mail, setor e papel. <b>Sócio</b> vê tudo e edita inegociáveis, metas e bonificações. <b>Colaborador</b> vê e cria só as próprias tarefas. Depois de adicionar aqui, crie o login da pessoa no Supabase com o mesmo e-mail.</p>
+  const g=cfg.get("google")||{};
+  return `<div class="card-s chart"><h3>Google Agenda e Meet</h3><p class="empty" style="padding:0">${g.connected?`Conectado com <b>${esc(g.email||"a conta da empresa")}</b>. Toda reunião salva no Kaizen vira evento no Google Agenda com link do Meet automático, e os participantes recebem o convite.`:"Conecte a conta Google da empresa para que cada reunião crie o link do Meet sozinha e mande o convite pelo Google Agenda."}</p>
+  <div class="addrow">${g.connected?`<button type="button" class="ghost" data-gdisc>Desconectar</button>`:`<button type="button" class="primary" data-gconn>Conectar conta Google</button>`}</div></div>
+  <div class="card-s chart"><h3>Equipe</h3><p class="empty" style="padding:0">Quem entra no Kaizen, com qual e-mail, setor e papel. <b>Sócio</b> vê tudo e edita inegociáveis, metas e bonificações. <b>Colaborador</b> vê e cria só as próprias tarefas. Depois de adicionar, a pessoa entra no Kaizen, clica em "Primeiro acesso" e cria a própria senha com esse e-mail.</p>
   <div class="eqlist">${TEAM.map(p=>`<div class="eqrow">${avatar(p.id,26)}<b>${esc(p.name)}</b><span class="eqmail">${esc(p.email||"sem e-mail")}</span>
     <select class="sel" data-eqsetor="${p.id}" aria-label="Setor de ${esc(p.name)}">${SETORES_P.map(s=>`<option value="${s.id}"${p.setor===s.id?" selected":""}>${s.name}</option>`).join("")}</select>
     <select class="sel" data-eqpapel="${p.id}" aria-label="Papel de ${esc(p.name)}"${p.id===me?" disabled":""}><option value="colab"${p.papel!=="socio"?" selected":""}>Colaborador</option><option value="socio"${p.papel==="socio"?" selected":""}>Sócio</option></select></div>`).join("")}</div>
@@ -1195,7 +1221,7 @@ async function setMe(pid,silent){
 function guessMe(){const first=norm(myName).split(/\s+/)[0];if(!first)return "";const p=TEAM.find(p=>p.alias.includes(first));return p?p.id:""}
 function emailPerson(){const p=PEOPLE.find(x=>x.email&&x.email===myEmail);return p?p.id:""}
 function resolveMe(){
-  if(!peopleDocs.size)return;
+  if(!peopleLoaded)return;
   const p=emailPerson();
   if(!p){me="";store("pv-me","");render();return}
   if(p!==me||!members.get(uid)||members.get(uid).person!==p)setMe(p,true);
@@ -1346,7 +1372,10 @@ $("#main").addEventListener("click",e=>{
   const fo=e.target.closest("[data-focus]");if(fo){toggleFocus(fo.dataset.focus);return}
   const nd=e.target.closest("[data-negdel]");if(nd){const np=nd.closest("[data-negp]").dataset.negp;const items=[...negItems(np)];items.splice(Number(nd.dataset.negdel),1);setNegItems(items,np);return}
   const op=e.target.closest("[data-open]");if(op){const t=tasks.get(op.dataset.open);if(t)openModal(t);return}
-  const cc=e.target.closest("[data-calcolor]");if(cc){calColor=cc.dataset.calcolor;store("pv-calcolor",calColor);render();return}
+  if(e.target.closest("[data-gconn]")){sb.functions.invoke("google",{body:{action:"start"}}).then(({data,error})=>{if(!error&&data&&data.url)location.href=data.url;else toast("A conexão com o Google ainda não foi configurada.")});return}
+  if(e.target.closest("[data-gdisc]")){sb.functions.invoke("google",{body:{action:"disconnect"}}).then(()=>toast("Google desconectado"));return}
+  if(e.target.closest("[data-fasesedit]")){faseEdit=!faseEdit;render();return}
+  if(e.target.closest("[data-faseadd]")){const it=cfgItems("fases");const last=it.length?it[it.length-1].end:TODAY;setCfg("fases",{items:[...it,{name:"Nova fase",start:last?addDays(last,1):TODAY,end:addDays(last||TODAY,14),color:FASE_CORES[it.length%FASE_CORES.length]}]});return}
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
@@ -1375,6 +1404,7 @@ $("#main").addEventListener("change",e=>{
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
   if(t.matches("[data-negtick]")){const np=t.closest("[data-negp]").dataset.negp;const items=negItems(np).map((it,k)=>k===Number(t.dataset.negtick)?{...it,done:t.checked}:it);setNegItems(items,np);return}
   if(t.matches("[data-chk]")){const c=checks.get(chkId())||{id:chkId(),person:me,week:WS,done:{}};write("checks",{...c,done:{...(c.done||{}),[t.dataset.chk]:t.checked}},checks);if(t.checked)toast("Boa!");return}
+  if(t.matches("[data-fase]")){const [i,f]=t.dataset.fase.split(":");const it=cfgItems("fases").map(x=>({...x}));if(it[i]){it[i][f]=t.value;setCfg("fases",{items:it})}return}
   if(t.matches("[data-mf]")){const [mid,f]=t.dataset.mf.split(":");const m=metas.get(mid);if(m)write("metas",{...m,[f]:t.value.trim()},metas);return}
   if(t.matches("[data-mstat]")){const m=metricas.get(t.dataset.mstat);if(m)write("metricas",{...m,status:t.value},metricas);return}
   if(t.matches("[data-eqsetor]")||t.matches("[data-eqpapel]")){const pid=t.dataset.eqsetor||t.dataset.eqpapel, cur=person(pid), d=peopleDocs.get(pid)||{id:pid,name:cur.name,email:cur.email||"",setor:cur.setor,papel:cur.papel};write("people",{...d,[t.dataset.eqsetor?"setor":"papel"]:t.value},peopleDocs);rebuildPeople();toast("Equipe atualizada");return}
@@ -1400,7 +1430,7 @@ $("#main").addEventListener("submit",e=>{
   const cf=e.target.closest("[data-cfgform]");if(cf){e.preventDefault();const k=cf.dataset.cfgform, o={};cf.querySelectorAll("input").forEach(x=>{o[x.name]=x.value.trim()});if(o.url)o.url=safeUrl(o.url);setCfg(k,{items:[...cfgItems(k),o]});toast("Adicionado");return}
   if(e.target.id==="mgForm"){e.preventDefault();setCfg("metaGrande",{title:$("#mgTitle").value.trim(),sub:$("#mgSub").value.trim(),progress:Math.max(0,Math.min(100,Number($("#mgProg").value)||0))});mgEdit=false;toast("Meta salva");return}
   if(e.target.id==="livroForm"){e.preventDefault();setCfg("livro",{title:$("#lvTitle").value.trim(),author:$("#lvAuthor").value.trim()});toast("Livro salvo");return}
-  if(e.target.id==="eqForm"){e.preventDefault();const name=$("#eqName").value.trim(), email=$("#eqEmail").value.trim().toLowerCase();if(!name||!email)return;let id=norm(name).split(/\s+/)[0].replace(/[^a-z0-9]/g,"")||newId("p");if(person(id).email&&person(id).email!==email)id=id+Math.random().toString(36).slice(2,5);write("people",{id,name,email,setor:$("#eqSetor").value,papel:$("#eqPapel").value},peopleDocs);rebuildPeople();toast(name+" adicionado. Crie o login com esse e-mail no Supabase.");return}
+  if(e.target.id==="eqForm"){e.preventDefault();const name=$("#eqName").value.trim(), email=$("#eqEmail").value.trim().toLowerCase();if(!name||!email)return;let id=norm(name).split(/\s+/)[0].replace(/[^a-z0-9]/g,"")||newId("p");if(person(id).email&&person(id).email!==email)id=id+Math.random().toString(36).slice(2,5);write("people",{id,name,email,setor:$("#eqSetor").value,papel:$("#eqPapel").value},peopleDocs);rebuildPeople();toast(name+" adicionado. Avise para entrar em \"Primeiro acesso\" com esse e-mail.");return}
   const af=e.target.closest("[data-actform]");if(af){e.preventDefault();const inp=af.querySelector("input"), text=inp.value.trim();if(!text)return;write("acoes",{id:newId("ac"),metric:af.dataset.actform,text,by:me||"",at:new Date().toISOString()},acoes);return}
   if(e.target.id==="metForm"){e.preventDefault();const name=$("#metName").value.trim();if(!name)return;write("metricas",{id:newId("mt"),name,status:"ok",createdAt:new Date().toISOString()},metricas);return}
 });
@@ -1454,14 +1484,26 @@ function startApp(session){
   sub("comments",m=>{comments=m});
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
-  sub("people",m=>{peopleDocs=m;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
+  sub("people",m=>{peopleDocs=m;peopleLoaded=true;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
   sub("sonhos",m=>{sonhos=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
 }
 function showLogin(){ $("#login").hidden=false; setTimeout(()=>$("#lEmail").focus(),0) }
+let firstMode=false;
+$("#lFirst").addEventListener("click",()=>{firstMode=!firstMode;$("#loginForm h2").textContent=firstMode?"Primeiro acesso":"Entrar";$("#loginForm .sub").textContent=firstMode?"Use o e-mail que os sócios cadastraram para você e crie uma senha com pelo menos 8 caracteres.":"Use o seu e-mail e a sua senha do Kaizen.";$("#lBtn").textContent=firstMode?"Criar minha senha":"Entrar";$("#lFirst").textContent=firstMode?"Já tenho senha: entrar":"Primeiro acesso? Criar minha senha";$("#lPass").autocomplete=firstMode?"new-password":"current-password";$("#lErr").hidden=true});
 $("#loginForm").addEventListener("submit",async e=>{
+  if(firstMode){e.preventDefault();const btn=$("#lBtn"),er=$("#lErr"),email=$("#lEmail").value.trim().toLowerCase(),pw=$("#lPass").value;er.hidden=true;
+    if(pw.length<8){er.textContent="Use pelo menos 8 caracteres.";er.hidden=false;return}
+    btn.disabled=true;btn.textContent="Criando…";
+    const {data,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});
+    btn.disabled=false;btn.textContent="Criar minha senha";
+    if(error){er.textContent=/registered|exists/i.test(error.message)?"Esse e-mail já tem senha. Use \"Já tenho senha: entrar\".":"Não deu para criar agora. Tente de novo em alguns minutos.";er.hidden=false;return}
+    if(data&&data.session){$("#lPass").value="";startApp(data.session);return}
+    er.textContent="Pronto! Enviamos um e-mail de confirmação para "+email+". Clique no link e depois entre com a sua senha.";er.hidden=false;return}
+});
+$("#loginForm").addEventListener("submit",async e=>{if(firstMode)return;
   e.preventDefault();const btn=$("#lBtn");btn.disabled=true;btn.textContent="Entrando…";$("#lErr").hidden=true;
   const {data,error}=await sb.auth.signInWithPassword({email:$("#lEmail").value.trim(),password:$("#lPass").value});
   btn.disabled=false;btn.textContent="Entrar";
@@ -1495,7 +1537,8 @@ async function ttPick(){
     body.innerHTML='<p class="sub">Qual lista do TickTick vai ficar ligada ao Kaizen?</p><div class="ttl">'+(projects||[]).map(p=>`<button type="button" data-ttp="${esc(p.id)}" data-ttn="${esc(p.name)}">${esc(p.name)}</button>`).join("")+"</div>";
   }catch(e){body.innerHTML='<p class="sub">Não deu para carregar suas listas. Tente conectar de novo.</p>'}
 }
-function ttReturn(){
+function gReturn(){const q=new URLSearchParams(location.search).get("g");if(!q)return;history.replaceState(null,"",location.pathname);toast(q==="ok"?"Google Agenda conectado: as reuniões já criam link do Meet":"Não deu para conectar ao Google. Tente de novo.")}
+function ttReturn(){gReturn();
   const q=new URLSearchParams(location.search).get("tt");if(!q)return;
   history.replaceState(null,"",location.pathname);
   if(q==="erro")toast("Não deu para conectar ao TickTick. Tente de novo.");
