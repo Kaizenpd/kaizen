@@ -321,6 +321,14 @@ h1 em{font-style:normal;color:var(--accent)}
 .meetrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:13px}.meetrow b{font-family:var(--f-mono);font-size:12px}.meetrow span{flex:1;min-width:0;font-weight:700}
 .ev .rec{opacity:.7}
 .rk.rk3{grid-template-columns:34px minmax(140px,1.6fr) repeat(2,minmax(120px,1fr)) 70px;min-width:480px}
+.clist{display:flex;flex-direction:column;gap:14px}
+.cadd{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.cadd .inp{flex:1 1 260px}
+.cdl{display:flex;flex-direction:column;gap:2px}.cdl small{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cgroup{display:flex;flex-direction:column;gap:6px}.cgroup h3{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:15px}.cgroup h3 .n{color:var(--muted);font-size:12px}
+.crow2{display:grid;grid-template-columns:minmax(220px,1fr) 140px 140px 140px 130px 56px;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.crow2.done{opacity:.6}.ctitle{all:unset;cursor:pointer;font-weight:700;display:flex;flex-direction:column;gap:2px}.ctitle .ctag{font-size:10px;letter-spacing:.05em;text-transform:uppercase}
+.crow2 .sel.sm{width:100%}.cst-postar{border-color:var(--accent)!important}.cst-postado{border-color:var(--ok)!important}
+@media (max-width:900px){.crow2{grid-template-columns:1fr 1fr}.crow2 .ctitle{grid-column:1/-1}}
 .cbox{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:12px}
 .ctag{font-size:11px;font-weight:700;color:var(--muted)}
 .areasel{min-width:170px}
@@ -335,6 +343,14 @@ h1 em{font-style:normal;color:var(--accent)}
 .blog .lg{display:flex;gap:8px;align-items:center}.blog .lg.rej{opacity:.5;text-decoration:line-through}
 .badd{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}.badd .inp{flex:1 1 180px}
 @media (max-width:760px){.brule{grid-template-columns:1fr 1fr}.brule .bt{grid-column:1/-1}}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-items:start}.mt-edit .inp,.mt-edit .sel{flex:none;min-height:0;height:auto;width:100%}
+.mtile{display:flex;flex-direction:column;gap:8px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface-2)}
+.mtile.hit{border-color:var(--accent)}.mt-top{display:flex;gap:8px;align-items:flex-start;justify-content:space-between}.mt-top b{font-size:15px;line-height:1.3}
+.mt-ind{font-size:12px;color:var(--muted)}.mt-pr{display:flex;align-items:center;gap:10px}.mt-pr .bar{flex:1}.mt-pr b{font-size:18px}
+.mt-foot{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted)}
+.mt-edit{display:flex;flex-direction:column;gap:6px;padding-top:8px;border-top:1px dashed var(--line)}.mt-edit small{color:var(--muted)}
+.mstrip{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.ms{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:var(--surface-2);font-size:13px;font-weight:700}.ms small{color:var(--muted);font-weight:600}
 .metas2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
 .sgroup{display:flex;flex-direction:column;gap:10px}.sgh{margin:6px 0 0;font-family:var(--f-display);font-size:16px}
 .eqlist{display:flex;flex-direction:column;gap:6px}.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}.eqrow b{min-width:90px}.eqmail{flex:1;min-width:160px;color:var(--muted);font-size:13px}
@@ -349,6 +365,8 @@ label.negi{cursor:pointer}
 .bigmeta h2{margin:0;font-family:var(--f-display);font-size:30px}.bigmeta p{margin:0;color:#d1fae5}.bigmeta .eyebrow{color:#a7f3d0}.bigmeta .bar{background:rgba(255,255,255,.2)}.bigmeta small{color:#d1fae5;font-weight:700}
 .bigmeta .mini{color:#fff;border-color:rgba(255,255,255,.4);align-self:flex-start}.bigmeta .inp{background:rgba(0,0,0,.35);color:#fff}
 .vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.val{position:relative;padding:14px;border-radius:12px;background:var(--surface-2)}.val b{display:block;margin-top:6px}.val p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.vas{display:flex;flex-direction:column;gap:4px;margin:8px 4px 0;font-size:11px;font-weight:700;color:var(--muted)}.vas select{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 8px;font:inherit;font-size:13px}.vas option{color:#111}
+.viewbanner{position:sticky;top:0;z-index:30;background:var(--accent);color:#fff;padding:8px 14px;border-radius:10px;margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}.viewbanner .mini{background:#fff;color:#111}
 .ritual .rt-h{font-weight:800;margin-bottom:4px}.ritual .rt-d{display:flex;gap:8px;padding:2px 0}.ritual .rt-d b{min-width:30px}.ritual .rt-d.now{color:var(--accent)}.ritual .rt-f{margin-top:6px;opacity:.8}
 .benlogo{max-height:44px;max-width:150px;object-fit:contain}.ben.logo{justify-content:center;padding:14px 26px}
 .vi{font-size:26px;line-height:1}.val .x,.ben .x,.kpi2 .x{all:unset;cursor:pointer;position:absolute;top:6px;right:8px;color:var(--muted)}
@@ -459,7 +477,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
       <button class="help-btn" id="ttBtn" type="button">Conectar TickTick</button>
       <button class="help-btn" id="pwBtn" type="button">Trocar minha senha</button>
       <button class="help-btn" id="logoutBtn" type="button">Sair</button>
-      <div class="who" id="whoBox"></div>
+      <div class="who" id="whoBox"></div><div id="viewAs"></div>
     </div>
   </aside>
 
@@ -470,6 +488,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
   </header>
 
   <main class="main" id="main">
+    <div class="viewbanner" id="viewBanner" hidden></div>
     <div class="notice" id="notice" hidden></div>
     <div class="card-s box" id="importBox" hidden>
       <h3>O banco de dados está vazio</h3>
@@ -637,7 +656,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
 const BASE_PEOPLE=[{id:"gabriel",papel:"socio",setor:"funil",name:"Gabriel",c:"comercial",role:"Funil de vendas",alias:["gabriel"]},{id:"matheus",papel:"socio",setor:"conteudo",name:"Matheus",c:"conteudo",role:"Conteúdo",alias:["matheus","mateus"]},{id:"nicolas",papel:"socio",setor:"funil",name:"Nicholas",c:"trafego",role:"Funil e tráfego",alias:["nicolas","nicholas"]},{id:"joao",papel:"socio",setor:"sucesso",name:"João",c:"sucesso",role:"Sucesso do cliente",alias:["joao"]},{id:"lucas",papel:"colab",setor:"produto",name:"Lucas",c:"produto",role:"Produto",alias:["lucas"]},{id:"time",name:"Time todo",c:"gestao",role:"",alias:[]}];
 let PEOPLE=BASE_PEOPLE.slice();
 let TEAM=PEOPLE.filter(p=>p.id!=="time"), peopleDocs=new Map();
-const SETOR_C={conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto",gestao:"gestao"}, SETOR_N={conteudo:"Conteúdo",funil:"Funil de vendas",sucesso:"Sucesso do cliente",produto:"Produto",gestao:"Gestão",adef:"Setor a definir"};
+const SETOR_C={conteudo:"conteudo",funil:"comercial",comercial:"comercial",sucesso:"sucesso",produto:"produto",gestao:"gestao"}, SETOR_N={conteudo:"Conteúdo",funil:"Funil de vendas",comercial:"Comercial",sucesso:"Sucesso do cliente",produto:"Produto",gestao:"Gestão",adef:"Setor a definir"};
 function rebuildPeople(){const map=new Map(BASE_PEOPLE.map(p=>[p.id,{...p}]));peopleDocs.forEach(d=>{const b=map.get(d.id)||{id:d.id,alias:[norm(d.name||d.id).split(" ")[0]],c:SETOR_C[d.setor]||"gestao"};const setor=d.setor||b.setor;map.set(d.id,{...b,name:d.name||b.name,email:String(d.email||b.email||"").toLowerCase(),setor,papel:d.papel||b.papel||"colab",role:b.id&&BASE_PEOPLE.some(x=>x.id===b.id)&&!d.setor?b.role:(SETOR_N[setor]||b.role||""),off:!!d.off})});const t=map.get("time");map.delete("time");PEOPLE=[...[...map.values()].filter(x=>!x.off),t];TEAM=PEOPLE.filter(x=>x.id!=="time");fillSelects()}
 const AREAS=[{id:"conteudo",name:"Conteúdo",lead:"Líder: Matheus",c:"conteudo"},{id:"funil",name:"Funil de vendas",lead:"Líderes: Gabriel e Nicholas",c:"comercial"},{id:"sucesso",name:"Sucesso do cliente",lead:"Líder: João",c:"sucesso"},{id:"produto",name:"Produto",lead:"Líder: Lucas",c:"produto"}];
 const INS_ST=[{id:"nova",name:"Caixa de entrada"},{id:"agora",name:"Para o lançamento"},{id:"novembro",name:"Novembro"},{id:"dezembro",name:"Dezembro"},{id:"depois",name:"Algum dia"},{id:"tarefa",name:"Virou tarefa"}];
@@ -748,6 +767,8 @@ function renderShell(){
   const pic=size=>myAvatar?`<img src="${esc(myAvatar)}" alt="">`:(me?avatar(me,size):`<span class="av" style="--c:var(--ph-gestao);width:${size}px;height:${size}px">?</span>`);
   $("#whoBox").innerHTML=`${pic(34)}<div><div class="nm">${me?esc(pname(me)):"Sem perfil ligado"}</div><div class="sub">${me?esc(person(me).role||"no Kaizen"):esc(myEmail)}</div></div>`;
   $("#meBtnM").innerHTML=pic(30);
+  const va=$("#viewAs");if(va)va.innerHTML=viewAsHtml();
+  const vb=$("#viewBanner");if(vb){vb.hidden=!realMe;vb.innerHTML=realMe?`Você está vendo o Kaizen como <b>${esc(pname(me))}</b>. O que fizer aqui conta como ${esc(pname(me))}. <button type="button" class="mini" data-viewback>Voltar para mim</button>`:""}
   $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";
 }
 function ritualHtml(){
@@ -805,6 +826,7 @@ function renderWeek(){
   <div class="card-s focus"><div class="k" aria-hidden="true">改善</div><h3>Inegociável do dia</h3>${f?`<div class="ft"><input type="checkbox" class="tick" data-tick="${f.id}" aria-label="Marcar inegociável como feito"${f.status==="done"?" checked":""}><b>${esc(f.title)}</b></div><p>${f.status==="done"?"Cumprido. Inegociável é inegociável.":"Isso não pode passar de hoje. Se não fez, está errado."}</p>`:`<p>Escolha a tarefa que não pode deixar de ser feita hoje. Clique na estrela ao lado dela.</p>`}</div>
   <div class="card-s box negmain"><h3>Meus inegociáveis da semana</h3>${negHtml(me,isSocio(),true)}</div>
   ${myBonusCard()}
+  ${metasStrip()}
   <div class="kpis">
     <div class="card-s kpi${late.length?" bad":""}"><div class="v">${late.length}</div><div class="l">atrasadas</div></div>
     <div class="card-s kpi"><div class="v">${today.filter(t=>t.status!=="done").length}</div><div class="l">para hoje</div></div>
@@ -852,14 +874,14 @@ let faseEdit=false;
 /* áreas e etapas (substitui os quadros do Monday) */
 const PH2AREA={conteudo:"conteudo",comercial:"funil",vsl:"funil",trafego:"funil",oferta:"funil",lancamento:"funil",parcerias:"funil",sucesso:"sucesso",produto:"produto"};
 const BAREAS=[{id:"all",name:"Todas as áreas"},{id:"conteudo",name:"Conteúdo"},{id:"funil",name:"Funil de vendas"},{id:"sucesso",name:"Sucesso do cliente"},{id:"produto",name:"Produto"},{id:"gestao",name:"Gestão"}];
-const areaOf=t=>PH2AREA[t.phase]||(t.phase&&t.phase!=="gestao"?"gestao":({conteudo:"conteudo",funil:"funil",sucesso:"sucesso",produto:"produto"}[person(t.owner).setor]||"gestao"));
+const areaOf=t=>PH2AREA[t.phase]||(t.phase&&t.phase!=="gestao"?"gestao":({conteudo:"conteudo",funil:"funil",comercial:"funil",sucesso:"sucesso",produto:"produto"}[person(t.owner).setor]||"gestao"));
 const ETAPAS=[{id:"neg",name:"Ação inegociável",c:"var(--danger,#e5484d)"},{id:"semana",name:"Esta semana",c:"var(--accent)"},{id:"proximas",name:"Próximas",c:"var(--doing)"},{id:"processos",name:"Processos (recorrentes)",c:"var(--muted)"},{id:"feitas",name:"Feitas",c:"var(--ok)"}];
 const CSTS=[{id:"producao",name:"Em produção",c:"var(--doing)"},{id:"postar",name:"Para postar",c:"var(--accent)"},{id:"postado",name:"Postado",c:"var(--ok)"}];
 const CTIPO={conversao:"Conversão",aula:"Aula",organico:"Orgânico",outro:"Outro"};
 const isNegTask=t=>{for(const f of focus.values()){if(f.taskId===t.id&&f.date>=WS&&f.date<=WE)return true}return false};
 function etapaOf(t){if(t.status==="done")return "feitas";if(t.rec)return "processos";if(isNegTask(t))return "neg";return t.start<=WE?"semana":"proximas"}
 const nextMon=()=>addDays(WE,1);
-let bArea=load("pv-barea",""), cTab=load("pv-ctab","all");
+let bArea=load("pv-barea",""), cTab=load("pv-ctab","all"), cLay=load("pv-clay","lista");
 function fasesEditorHtml(){
   const it=cfgItems("fases");
   return `<div class="card-s box faseed"><h3>Fases da linha do tempo</h3><p class="empty" style="padding:0">Cada fase pinta os dias do calendário até o prazo máximo combinado. Mudou o prazo? Ajuste aqui e o calendário inteiro muda.</p>
@@ -953,19 +975,42 @@ function boardCols(){
 }
 const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="etapa"?etapaOf(t):group==="conteudo"?(t.cst||"producao"):group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
-function curArea(){if(!bArea){const st=person(me).setor;bArea=isSocio()?"all":({conteudo:"conteudo",funil:"funil",sucesso:"sucesso",produto:"produto"}[st]||"all")}return group==="conteudo"?"conteudo":bArea}
+function curArea(){if(!bArea){const st=person(me).setor;bArea=isSocio()?"all":({conteudo:"conteudo",funil:"funil",comercial:"funil",sucesso:"sucesso",produto:"produto"}[st]||"all")}return group==="conteudo"?"conteudo":bArea}
+function contentList(){
+  const ctab=cTab==="all"?"":cTab, monthAgo=addDays(TODAY,-30);
+  const all=[...tasks.values()].filter(t=>t.phase==="conteudo"&&t.start&&!t.rec&&!t.meeting&&(!ctab||(t.ctipo||"conversao")===ctab)&&(who==="all"||t.owner===who));
+  const ord=(a,b)=>(a.cpost||a.start).localeCompare(b.cpost||b.start)||a.title.localeCompare(b.title);
+  const own=TEAM.filter(p=>isSocio()||p.id===me);
+  const row=t=>{const late=t.status!=="done"&&t.start<TODAY&&(t.cst||"producao")==="producao", u=safeUrl(t.link), mine=isSocio()||t.owner===me;
+    return `<div class="crow2${(t.cst||"producao")==="postado"?" done":""}">
+    <button type="button" class="ctitle" data-open="${t.id}"><span class="ctag">${esc(CTIPO[t.ctipo||"conversao"])}</span>${esc(t.title)}${late?' <span class="late">atrasado</span>':""}</button>
+    <select class="sel sm" data-cf="${t.id}:owner" aria-label="Responsável"${isSocio()?"":" disabled"}>${TEAM.map(p=>`<option value="${p.id}"${t.owner===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}${t.owner==="time"?'<option value="time" selected>Time todo</option>':""}</select>
+    <label class="cdl"><small>Entrega</small><input type="date" class="sel sm" data-cf="${t.id}:start" value="${esc(t.start)}"${mine?"":" disabled"}></label>
+    <label class="cdl"><small>Postagem</small><input type="date" class="sel sm" data-cf="${t.id}:cpost" value="${esc(t.cpost||"")}"${mine?"":" disabled"}></label>
+    <select class="sel sm cst-${t.cst||"producao"}" data-cf="${t.id}:cst" aria-label="Etapa"${mine?"":" disabled"}>${CSTS.map(c=>`<option value="${c.id}"${(t.cst||"producao")===c.id?" selected":""}>${c.name}</option>`).join("")}</select>
+    ${u?`<a class="mini" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Abrir</a>`:`<span></span>`}</div>`};
+  const groups=CSTS.map(c=>({c,items:all.filter(t=>(t.cst||"producao")===c.id&&!(c.id==="postado"&&(t.cpost||t.start)<monthAgo)).sort(ord)}));
+  return `<form class="cadd" id="cAdd" autocomplete="off"><input class="inp" id="caTitle" required maxlength="160" placeholder="Novo conteúdo (ex.: Carrossel 70: hook de autoridade)" aria-label="Novo conteúdo">
+    <select class="sel" id="caTipo" aria-label="Tipo">${Object.entries(CTIPO).map(([k,v])=>`<option value="${k}"${(ctab||"conversao")===k?" selected":""}>${v}</option>`).join("")}</select>
+    <select class="sel" id="caOwner" aria-label="Responsável"${isSocio()?"":" disabled"}>${own.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}</option>`).join("")}</select>
+    <label class="cdl"><small>Entrega</small><input type="date" class="sel" id="caStart" value="${TODAY}" required></label>
+    <label class="cdl"><small>Postagem</small><input type="date" class="sel" id="caPost"></label>
+    <button class="primary" type="submit">Adicionar</button></form>
+  ${groups.map(g=>`<div class="cgroup"><h3><i class="dot" style="--c:${g.c.c}"></i>${g.c.name}<span class="n">${g.items.length}</span></h3>${g.items.length?g.items.map(row).join(""):'<p class="empty">Nada aqui.</p>'}</div>`).join("")}`;
+}
 function renderBoard(){
   if(!["etapa","conteudo","owner"].includes(group))group="etapa";
   const ar=curArea(), monthAgo=addDays(TODAY,-30);
   const all=[...tasks.values()].filter(t=>t.start&&(ar==="all"||areaOf(t)===ar)&&(group==="owner"||who==="all"||t.owner===who)&&!(group==="etapa"&&t.status==="done"&&endOf(t)<monthAgo)&&!(group==="conteudo"&&(t.rec||t.meeting||(cTab!=="all"&&(t.ctipo||"conversao")!==cTab)))&&!(group!=="etapa"&&group!=="owner"&&t.rec)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
-  const sub=group==="etapa"?"As tarefas entram sozinhas na etapa certa pela data. Arraste para mudar.":group==="conteudo"?"Do roteiro ao post: arraste o cartão quando mudar de etapa.":"Arraste os cartões entre as colunas";
+  const sub=group==="etapa"?"As tarefas entram sozinhas na etapa certa pela data. Arraste para mudar.":group==="conteudo"?(cLay==="lista"?"Do roteiro ao post: mude a etapa, as datas e o responsável direto na lista.":"Do roteiro ao post: arraste o cartão quando mudar de etapa."):"Arraste os cartões entre as colunas";
   $("#vBoard").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">${sub}</div><h1>Quadro ${ar==="all"?"do <em>time</em>":"de <em>"+esc((BAREAS.find(x=>x.id===ar)||{}).name||"")+"</em>"}</h1></div>
   <div class="actions"><div class="seg" role="group" aria-label="Ver por"><button type="button" data-group="etapa" aria-pressed="${group==="etapa"}">Por etapa</button><button type="button" data-group="conteudo" aria-pressed="${group==="conteudo"}">Conteúdos</button><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button></div>
   ${group==="conteudo"?`<div class="seg" role="group" aria-label="Tipo de conteúdo"><button type="button" data-ctab="all" aria-pressed="${cTab==="all"}">Todos</button>${Object.entries(CTIPO).map(([k,v])=>`<button type="button" data-ctab="${k}" aria-pressed="${cTab===k}">${v}</button>`).join("")}</div>`:`<select class="sel areasel" id="boardArea" aria-label="Área">${BAREAS.map(x=>`<option value="${x.id}"${ar===x.id?" selected":""}>${x.name}</option>`).join("")}</select>`}
   ${group==="owner"||!isSocio()?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
-  <div class="kanban">${boardCols().map(c=>{
+  ${group==="conteudo"?`<div class="seg" role="group" aria-label="Formato" style="width:fit-content"><button type="button" data-clay="lista" aria-pressed="${cLay==="lista"}">Lista</button><button type="button" data-clay="quadro" aria-pressed="${cLay==="quadro"}">Quadro</button></div>`:""}
+  ${group==="conteudo"&&cLay==="lista"?`<div class="clist">${contentList()}</div></div>`:`<div class="kanban">${boardCols().map(c=>{
     const items=all.filter(t=>groupKey(t)===c.id), dn=items.filter(t=>t.status==="done").length, pct=items.length?Math.round(dn/items.length*100):0;
     const head=c.av?avatar(c.av,24):`<i class="dot" style="--c:${c.c}"></i>`, plain=group==="status"||group==="etapa"||group==="conteudo";
     return `<div class="col" data-col="${c.id}"><h3>${head}${esc(c.name)}<span class="n">${plain?items.length:dn+"/"+items.length}</span></h3>${plain?"":`<div class="prog"><i style="width:${pct}%"></i></div>`}${
@@ -975,7 +1020,7 @@ function renderBoard(){
         <div class="ct">${esc(t.title)}</div>
         <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${isC?"entrega ":""}${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}${isC&&t.cpost?" · posta "+short(t.cpost):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
         <button type="button" class="st ${t.status||"todo"}" data-cycle="${t.id}">${{todo:"A fazer",doing:"Fazendo",done:"Feito"}[t.status||"todo"]}</button></div></div>`}).join("")
-    }${c.id==="processos"?`<p class="empty" style="padding:4px 2px">Tarefas e reuniões que se repetem.</p>`:`<button type="button" class="add-col" data-addcol="${c.id}">+ tarefa</button>`}</div>`}).join("")}</div></div>`;
+    }${c.id==="processos"?`<p class="empty" style="padding:4px 2px">Tarefas e reuniões que se repetem.</p>`:`<button type="button" class="add-col" data-addcol="${c.id}">+ tarefa</button>`}</div>`}).join("")}</div></div>`}`;
 }
 
 /* insights */
@@ -1095,18 +1140,31 @@ function scoreHtml(a,b,label){
 }
 
 /* metas: da empresa (todos veem) e individuais (cada um vê a sua; só os sócios editam) */
+function metaStats(m){const ts=[...tasks.values()].filter(t=>t.meta===m.id&&!t.meeting), dn=ts.filter(t=>t.status==="done").length;const man=Number(m.progress)||0;const auto=ts.length?Math.round(dn/ts.length*100):0;return {ts,dn,pr:Math.max(0,Math.min(100,m.manual?man:(man||auto))),auto,man}}
+let metaEdit=null;
 function metaCard(m){
-  const pr=Math.max(0,Math.min(100,Number(m.progress)||0)), ed=isSocio();
-  return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt">${m.scope==="individual"?avatar(m.person||"time",22):""}<b>${esc(m.title)}</b>${m.prize?`<span class="prize">Bonificação: ${esc(m.prize)}</span>`:""}</div>
-  ${m.scope!=="individual"?`<div class="mfx">${ed?`<select class="sel sm" data-mf="${m.id}:resp" aria-label="Responsável"><option value="">Responsável a definir</option>${TEAM.map(p=>`<option value="${p.id}"${m.resp===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}</select><input type="date" class="sel sm" data-mf="${m.id}:prazo" value="${esc(m.prazo||"")}" aria-label="Prazo"><input class="inp sm" data-mf="${m.id}:indicador" value="${esc(m.indicador||"")}" placeholder="Indicador" aria-label="Indicador">`:`<small>${m.resp?esc(pname(m.resp)):"responsável a definir"}${m.prazo?" · prazo "+short(m.prazo):""}${m.indicador?" · "+esc(m.indicador):""}</small>`}<small class="mlink">${[...tasks.values()].filter(t=>t.meta===m.id).length} tarefa(s)</small></div>${m.nota?`<small class="mnota">${esc(m.nota)}</small>`:""}`:""}
-  <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div>${ed?`<label class="mpct"><input type="number" min="0" max="100" step="5" value="${pr}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button>`:`<span class="mpct">${pr}%</span>`}</div></div>`;
+  const st=metaStats(m), pr=st.pr, ed=isSocio(), left=m.prazo?diff(TODAY,m.prazo):null;
+  if(m.scope!=="individual"){
+    const editing=ed&&metaEdit===m.id;
+    return `<div class="mtile${pr>=100?" hit":""}">
+    <div class="mt-top"><b>${esc(m.title)}</b>${ed?`<button type="button" class="mini" data-medit="${m.id}">${editing?"Fechar":"Editar"}</button>`:""}</div>
+    ${m.indicador?`<div class="mt-ind">${esc(m.indicador)}</div>`:""}
+    <div class="mt-pr"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div><b>${pr}%</b></div>
+    <div class="mt-foot"><span>${st.ts.length?`${st.dn} de ${st.ts.length} tarefas`:"sem tarefas ligadas"}</span><span>${m.prazo?(left<0?`prazo passou (${short(m.prazo)})`:`${short(m.prazo)} · ${left===0?"hoje":"faltam "+left+" dias"}`):"sem prazo"}</span><span>Responsável: todos</span></div>
+    ${editing?`<div class="mt-edit"><input class="inp sm" data-mf="${m.id}:indicador" value="${esc(m.indicador||"")}" placeholder="Indicador (como medimos)" aria-label="Indicador"><input type="date" class="sel sm" data-mf="${m.id}:prazo" value="${esc(m.prazo||"")}" aria-label="Prazo"><label class="mpct">Progresso manual <input type="number" min="0" max="100" step="5" value="${st.man}" data-mprog="${m.id}" aria-label="Progresso manual em %">%</label><small>Deixe 0 para o progresso sair sozinho das tarefas ligadas.</small><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar exclusão":"Excluir meta"}</button></div>`:""}
+    </div>`;
+  }
+  return `<div class="mcard${pr>=100?" hit":""}"><div class="mtt">${avatar(m.person||"time",22)}<b>${esc(m.title)}</b>${m.prize?`<span class="prize">Bonificação: ${esc(m.prize)}</span>`:""}</div>
+  <div class="mrow"><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div>${ed?`<label class="mpct"><input type="number" min="0" max="100" step="5" value="${st.man}" data-mprog="${m.id}" aria-label="Progresso de ${esc(m.title)} em %">%</label><button type="button" class="mini del${metaDelArmed===m.id?" armed":""}" data-mdel="${m.id}">${metaDelArmed===m.id?"Confirmar":"Excluir"}</button>`:`<span class="mpct">${pr}%</span>`}</div></div>`;
 }
+function metasStrip(){const emp=[...metas.values()].filter(m=>m.scope!=="individual").sort((a,b)=>(a.prazo||"9").localeCompare(b.prazo||"9"));if(!emp.length)return "";
+  return `<div class="card-s box"><h3>Metas da empresa</h3><div class="mstrip">${emp.slice(0,8).map(m=>{const pr=metaStats(m).pr;return `<button type="button" class="ms" data-view="team"><span>${esc(m.title)}</span><div class="bar" aria-hidden="true"><i style="width:${pr}%"></i></div><small>${pr}%${m.prazo?" · até "+short(m.prazo):""}</small></button>`}).join("")}</div></div>`}
 function metasHtml(){
   const all=[...metas.values()].sort((x,y)=>(x.createdAt||"").localeCompare(y.createdAt||""));
   const emp=all.filter(m=>m.scope!=="individual"), ind=all.filter(m=>m.scope==="individual"&&canSeePerson(m.person));
   const byP=visibleTeam().map(p=>({p,items:ind.filter(m=>m.person===p.id)})).filter(g=>g.items.length);
   return `<div class="metas2">
-  <div class="card-s chart"><h3>Metas da empresa</h3><p class="empty" style="padding:0">Sonho grande com métrica clara. Todo mundo vê.</p>${emp.length?emp.map(metaCard).join(""):'<p class="empty">Nenhuma meta da empresa ainda.</p>'}</div>
+  <div class="card-s chart" style="grid-column:1/-1"><h3>Metas da empresa <span style="font-weight:600;color:var(--muted);font-size:12px">· responsabilidade de todos · o progresso sai das tarefas ligadas a cada meta</span></h3>${emp.length?`<div class="mgrid">${emp.sort((a,b)=>(a.prazo||"9").localeCompare(b.prazo||"9")).map(metaCard).join("")}</div>`:'<p class="empty">Nenhuma meta da empresa ainda.</p>'}</div>
   <div class="card-s chart"><h3>${isSocio()?"Metas individuais e bonificações":"Minhas metas e bonificações"}</h3><p class="empty" style="padding:0">${isSocio()?"Cada pessoa só vê as próprias. Só os sócios alteram.":"Só você vê as suas. Bateu? Os sócios atualizam o progresso."}</p>${byP.length?byP.map(g=>`${isSocio()?`<div class="eyebrow">${esc(g.p.name)}</div>`:""}${g.items.map(metaCard).join("")}`).join(""):'<p class="empty">Nenhuma meta individual ainda.</p>'}</div>
   </div>
   ${isSocio()?`<form class="card-s box mform" id="metaForm" autocomplete="off"><h3 style="flex-basis:100%">Nova meta</h3>
@@ -1323,9 +1381,14 @@ function emailPerson(){const p=PEOPLE.find(x=>x.email&&x.email===myEmail);return
 function resolveMe(){
   if(!peopleLoaded)return;
   const p=emailPerson();
+  if(realMe){realMe=p;render();return}
   if(!p){me="";store("pv-me","");render();return}
   if(p!==me||!members.get(uid)||members.get(uid).person!==p)setMe(p,true);
 }
+let realMe="";
+const isAdmin=()=>(realMe||me)==="gabriel";
+function viewAs(p){if(!isAdmin())return;if(!p||p===(realMe||me)){if(realMe){me=realMe;realMe=""}}else{if(!realMe)realMe=me;me=p}bArea="";render();try{window.scrollTo({top:0})}catch(e){}}
+function viewAsHtml(){if(!isAdmin())return "";return `<label class="vas"><span>Ver como</span><select id="viewAsSel" aria-label="Ver o Kaizen como">${TEAM.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}${p.id===(realMe||me)?" (eu)":""}</option>`).join("")}</select></label>`}
 function setNegItems(items,p){p=p||me;write("inegociaveis",{id:negId(p,WS),person:p,week:WS,items},negs)}
 function toggleFocus(taskId){
   const id=focusId(me,TODAY), cur=focus.get(id);
@@ -1486,6 +1549,9 @@ $("#main").addEventListener("click",e=>{
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group2",group);render();return}
+  const me2=e.target.closest("[data-medit]");if(me2){metaEdit=metaEdit===me2.dataset.medit?null:me2.dataset.medit;render();return}
+  if(e.target.closest("[data-viewback]")){viewAs("");return}
+  const cl=e.target.closest("[data-clay]");if(cl){cLay=cl.dataset.clay;store("pv-clay",cLay);render();return}
   const ctb=e.target.closest("[data-ctab]");if(ctb){cTab=ctb.dataset.ctab;store("pv-ctab",cTab);render();return}
   const bm=e.target.closest("[data-bmes]");if(bm){const n=Number(bm.dataset.bmes);bMes=n?mesAdd(bMes,n):TODAY.slice(0,7);render();return}
   const ba=e.target.closest("[data-badd]");if(ba){bAdd=bAdd===ba.dataset.badd?null:ba.dataset.badd;render();setTimeout(()=>{const i=document.querySelector("[data-baddf] input");if(i)i.focus()},0);return}
@@ -1516,8 +1582,13 @@ $("#main").addEventListener("click",e=>{
   const dx=e.target.closest("[data-dxdel]");if(dx){del("dashins",dx.dataset.dxdel,dashIns);return}
   const dl=e.target.closest("[data-idel]");if(dl){const id=dl.dataset.idel;if(insDelArmed!==id){insDelArmed=id;render();return}insDelArmed=null;del("insights",id,insights);toast("Insight excluído")}
 });
+document.addEventListener("change",e=>{if(e.target&&e.target.id==="viewAsSel")viewAs(e.target.value)});
 $("#main").addEventListener("change",e=>{
   const t=e.target;
+  if(t.matches("[data-cf]")){const [id,k]=t.dataset.cf.split(":"), x=tasks.get(id);if(!x)return;const v=t.value;const nx={...x,[k]:v};
+    if(k==="start"){if(!v){render();return}const len=x.end?diff(x.start,x.end):0;nx.end=len?addDays(v,len):""}
+    if(k==="cst"){nx.status=v==="postado"?"done":(x.status==="done"?"todo":x.status);if(v==="postado")toast("Postado!")}
+    save(nx);return}
   if(t.id==="boardArea"){bArea=t.value;store("pv-barea",bArea);render();return}
   if(t.matches("[data-bf]")){const [id,k]=t.dataset.bf.split(":"), b=bonus.get(id);if(!b)return;const v=t.value===""?null:Number(t.value);write("bonus",{...b,[k]:v},bonus);return}
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
@@ -1582,6 +1653,9 @@ $("#main").addEventListener("drop",e=>{
 
 $("#main").addEventListener("submit",e=>{
   const f=e.target;
+  if(f.id==="cAdd"){e.preventDefault();const title=$("#caTitle").value.trim();if(!title)return;const st=$("#caStart").value||TODAY;
+    save({id:newId("t"),title,owner:isSocio()?$("#caOwner").value:me,phase:"conteudo",start:st,end:"",time:"",status:"todo",milestone:false,notes:"",link:"",ctipo:$("#caTipo").value,cst:"producao",cpost:$("#caPost").value||"",meta:"",criterio:"",deps:[]});
+    $("#caTitle").value="";toast("Conteúdo adicionado");return}
   if(f.id==="bonForm"){e.preventDefault();const item=$("#bfItem").value.trim();if(!item)return;const modo=$("#bfModo").value;
     write("bonus",{id:newId("bn"),person:$("#bfP").value,mes:bMes,item,modo,regra:modo==="extra"?">=":$("#bfRegra").value,meta:modo==="extra"?null:Number($("#bfMeta").value)||0,un:$("#bfUn").value.trim(),valor:Number($("#bfVal").value)||0,real:null,ord:Date.now()},bonus);toast("Regra de bônus criada");return}
   if(f.matches("[data-baddf]")){e.preventDefault();const b=bonus.get(f.dataset.baddf);if(!b)return;const nota=f.nota.value.trim();if(!nota)return;

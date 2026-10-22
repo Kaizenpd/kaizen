@@ -37,11 +37,14 @@ async function people(): Promise<Map<string, string>> {
   const { data: mem } = await db.from("docs").select("id,data").eq("collection", "members");
   const byUid = new Map((mem ?? []).map((r: any) => [r.id, r.data?.person]));
   const out = new Map<string, string>();
+  // e-mails cadastrados pelos sócios (vale mesmo para quem ainda não fez o primeiro acesso)
+  const { data: ppl } = await db.from("docs").select("id,data").eq("collection", "people");
+  for (const r of ppl ?? []) { const e = String((r as any).data?.email || "").trim().toLowerCase(); if (e && !(r as any).data?.off) out.set((r as any).id, e); }
   let page = 1;
   for (;;) {
     const { data, error } = await db.auth.admin.listUsers({ page, perPage: 200 });
     if (error || !data?.users?.length) break;
-    for (const u of data.users) { const p = byUid.get(u.id); if (p && u.email) out.set(p, u.email.toLowerCase()); }
+    for (const u of data.users) { const p = byUid.get(u.id); if (p && u.email && !out.has(p)) out.set(p, u.email.toLowerCase()); }
     if (data.users.length < 200) break;
     page++;
   }
