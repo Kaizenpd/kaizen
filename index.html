@@ -755,7 +755,7 @@ function ritualHtml(){
   [...tasks.values()].filter(t=>t.meeting&&t.rec&&t.start&&inMeet(t,me)).forEach(t=>{const days=t.rec==="weekdays"?[1,2,3,4,5]:t.rec==="weekly"?[parse(t.start).getDay()]:[];days.forEach(d=>(by[d]=by[d]||[]).push(t))});
   const today=parse(TODAY).getDay(), order=[1,2,3,4,5,6,0].filter(d=>by[d]);
   if(!order.length)return "Uma coisa fechada por dia.";
-  const nm=t=>esc(t.title.replace(/^(Reunião|Reuniao)\s*(de|do|da)?\s*/i,"").slice(0,26));
+  const nm=t=>{let x=t.title.replace(/^(Reunião|Reuniao)\s*(de|do|da)?\s*(setor:?)?\s*/i,"").replace(/\s*\(.*$/,"").trim();x=x.charAt(0).toUpperCase()+x.slice(1);return esc(x.slice(0,22))};
   return `<div class="rt-h">Reuniões da semana</div>`+order.map(d=>`<div class="rt-d${d===today?" now":""}"><b>${DS[d]}</b><span>${by[d].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(t=>`${esc((t.time||"").replace(":00","h").replace(":","h"))} ${nm(t)}`).join("<br>")}</span></div>`).join("")+`<div class="rt-f">Uma coisa fechada por dia.</div>`;
 }
 function setView(v){view=v;store("pv-view",v);render();try{window.scrollTo({top:0})}catch(e){}}
