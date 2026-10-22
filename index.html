@@ -321,6 +321,20 @@ h1 em{font-style:normal;color:var(--accent)}
 .meetrow{display:flex;gap:10px;align-items:center;padding:8px 10px;border-radius:10px;background:var(--surface-2);font-size:13px}.meetrow b{font-family:var(--f-mono);font-size:12px}.meetrow span{flex:1;min-width:0;font-weight:700}
 .ev .rec{opacity:.7}
 .rk.rk3{grid-template-columns:34px minmax(140px,1.6fr) repeat(2,minmax(120px,1fr)) 70px;min-width:480px}
+.cbox{display:flex;flex-direction:column;gap:10px;padding:12px;border:1px dashed var(--line);border-radius:12px}
+.ctag{font-size:11px;font-weight:700;color:var(--muted)}
+.areasel{min-width:170px}
+.bon{display:flex;flex-direction:column;gap:10px}
+.bon .bp{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.bon .bp b{font-size:15px}.bon .bp .tot{margin-left:auto;font-weight:800}
+.brule{display:grid;grid-template-columns:minmax(160px,1.6fr) 90px 110px 110px 120px auto;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:10px}
+.brule.hit{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,transparent)}
+.brule .bt{font-weight:700}.brule small{color:var(--muted);display:block;font-weight:500}
+.brule .ok{color:var(--accent);font-weight:800}.brule .no{color:var(--muted);font-weight:700}
+.brule input.inp{width:100%;padding:6px 8px}
+.blog{grid-column:1/-1;display:flex;flex-direction:column;gap:4px;font-size:13px}
+.blog .lg{display:flex;gap:8px;align-items:center}.blog .lg.rej{opacity:.5;text-decoration:line-through}
+.badd{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}.badd .inp{flex:1 1 180px}
+@media (max-width:760px){.brule{grid-template-columns:1fr 1fr}.brule .bt{grid-column:1/-1}}
 .metas2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
 .sgroup{display:flex;flex-direction:column;gap:10px}.sgh{margin:6px 0 0;font-family:var(--f-display);font-size:16px}
 .eqlist{display:flex;flex-direction:column;gap:6px}.eqrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:var(--surface-2)}.eqrow b{min-width:90px}.eqmail{flex:1;min-width:160px;color:var(--muted);font-size:13px}
@@ -501,6 +515,14 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
       <select class="sel sm" id="depTask" aria-label="Tarefa da qual depende"></select><input class="inp" id="depText" maxlength="160" placeholder="O que é preciso" aria-label="O que é preciso" hidden>
       <select class="sel sm" id="depWho" aria-label="Quem libera"></select><button type="button" class="ghost" id="depAdd">+ Adicionar</button></div>
       <p class="hint" id="fBlocks"></p></div>
+    <div class="cbox" id="cBox" hidden><span class="lbl">Conteúdo</span>
+      <div class="row2">
+        <div class="f"><label for="fCTipo">Tipo</label><select id="fCTipo"><option value="conversao">Conteúdo de conversão</option><option value="aula">Aula</option><option value="organico">Orgânico</option><option value="outro">Outro</option></select></div>
+        <div class="f"><label for="fCSt">Etapa do conteúdo</label><select id="fCSt"><option value="producao">Em produção</option><option value="postar">Para postar</option><option value="postado">Postado</option></select></div>
+      </div>
+      <div class="f"><label for="fCPost">Data de postagem</label><input type="date" id="fCPost" min="2026-01-01" max="2027-12-31"></div>
+      <p class="hint">A "Data" acima é a data de entrega. Marcar "Postado" conclui a tarefa.</p>
+    </div>
     <label class="chk" for="fMs"><input type="checkbox" id="fMs"> Marco importante (aparece em destaque)</label>
     <label class="chk" for="fMeet"><input type="checkbox" id="fMeet"> É reunião: mandar convite por e-mail para a agenda de cada participante</label>
     <div class="meetbox" id="meetBox" hidden>
@@ -667,14 +689,15 @@ let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let peopleLoaded=false, decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
+let bonus=new Map(), blog=new Map(), bMes=TODAY.slice(0,7), bAdd=null, bDelArmed=null;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
-let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group","owner"), who=load("pv-who","all"), period=load("pv-period","week");
+let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group2","etapa"), who=load("pv-who","all"), period=load("pv-period","week");
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
 if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
 if(calMode!=="week"&&calMode!=="timeline")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
 function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
-if(!["owner","status","phase"].includes(group))group="owner";
+if(!["etapa","conteudo","owner","status"].includes(group))group="etapa";
 if(!["week","month","all"].includes(period))period="week";
 
 function endOf(t){return t.end&&t.end>=t.start?t.end:t.start}
@@ -770,6 +793,7 @@ function renderWeek(){
   ${dreamHtml()}
   <div class="card-s focus"><div class="k" aria-hidden="true">改善</div><h3>Inegociável do dia</h3>${f?`<div class="ft"><input type="checkbox" class="tick" data-tick="${f.id}" aria-label="Marcar inegociável como feito"${f.status==="done"?" checked":""}><b>${esc(f.title)}</b></div><p>${f.status==="done"?"Cumprido. Inegociável é inegociável.":"Isso não pode passar de hoje. Se não fez, está errado."}</p>`:`<p>Escolha a tarefa que não pode deixar de ser feita hoje. Clique na estrela ao lado dela.</p>`}</div>
   <div class="card-s box negmain"><h3>Meus inegociáveis da semana</h3>${negHtml(me,isSocio(),true)}</div>
+  ${myBonusCard()}
   <div class="kpis">
     <div class="card-s kpi${late.length?" bad":""}"><div class="v">${late.length}</div><div class="l">atrasadas</div></div>
     <div class="card-s kpi"><div class="v">${today.filter(t=>t.status!=="done").length}</div><div class="l">para hoje</div></div>
@@ -814,6 +838,17 @@ function calLegend(){
   return `${faseBar}<div class="legend">${PHASES.map(p=>`<span><i class="dot" style="--c:${phc(p.id)}"></i>${p.name}</span>`).join("")}<span class="lgx"><i class="dot dmt"></i>Reunião</span><span class="lgx"><i class="dot dblk"></i>Bloqueada</span></div>`;
 }
 let faseEdit=false;
+/* áreas e etapas (substitui os quadros do Monday) */
+const PH2AREA={conteudo:"conteudo",comercial:"funil",vsl:"funil",trafego:"funil",oferta:"funil",lancamento:"funil",parcerias:"funil",sucesso:"sucesso",produto:"produto"};
+const BAREAS=[{id:"all",name:"Todas as áreas"},{id:"conteudo",name:"Conteúdo"},{id:"funil",name:"Funil de vendas"},{id:"sucesso",name:"Sucesso do cliente"},{id:"produto",name:"Produto"},{id:"gestao",name:"Gestão"}];
+const areaOf=t=>PH2AREA[t.phase]||(t.phase&&t.phase!=="gestao"?"gestao":({conteudo:"conteudo",funil:"funil",sucesso:"sucesso",produto:"produto"}[person(t.owner).setor]||"gestao"));
+const ETAPAS=[{id:"neg",name:"Ação inegociável",c:"var(--danger,#e5484d)"},{id:"semana",name:"Esta semana",c:"var(--accent)"},{id:"proximas",name:"Próximas",c:"var(--doing)"},{id:"processos",name:"Processos (recorrentes)",c:"var(--muted)"},{id:"feitas",name:"Feitas",c:"var(--ok)"}];
+const CSTS=[{id:"producao",name:"Em produção",c:"var(--doing)"},{id:"postar",name:"Para postar",c:"var(--accent)"},{id:"postado",name:"Postado",c:"var(--ok)"}];
+const CTIPO={conversao:"Conversão",aula:"Aula",organico:"Orgânico",outro:"Outro"};
+const isNegTask=t=>{for(const f of focus.values()){if(f.taskId===t.id&&f.date>=WS&&f.date<=WE)return true}return false};
+function etapaOf(t){if(t.status==="done")return "feitas";if(t.rec)return "processos";if(isNegTask(t))return "neg";return t.start<=WE?"semana":"proximas"}
+const nextMon=()=>addDays(WE,1);
+let bArea=load("pv-barea",""), cTab=load("pv-ctab","all");
 function fasesEditorHtml(){
   const it=cfgItems("fases");
   return `<div class="card-s box faseed"><h3>Fases da linha do tempo</h3><p class="empty" style="padding:0">Cada fase pinta os dias do calendário até o prazo máximo combinado. Mudou o prazo? Ajuste aqui e o calendário inteiro muda.</p>
@@ -899,30 +934,37 @@ function renderCal(){
 
 /* quadro */
 function boardCols(){
+  if(group==="etapa")return ETAPAS;
+  if(group==="conteudo")return CSTS;
   if(group==="status")return STATUSES.map(s=>({id:s.id,name:s.name,c:s.id==="done"?"var(--ok)":s.id==="doing"?"var(--doing)":"var(--muted)"}));
   if(group==="phase")return PHASES.map(p=>({id:p.id,name:p.name,c:phc(p.id)}));
   return PEOPLE.filter(p=>isSocio()||p.id===me||p.id==="time").map(p=>({id:p.id,name:p.name,av:p.id}));
 }
 const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
-const groupKey=t=>group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
+const groupKey=t=>group==="etapa"?etapaOf(t):group==="conteudo"?(t.cst||"producao"):group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
+function curArea(){if(!bArea){const st=person(me).setor;bArea=isSocio()?"all":({conteudo:"conteudo",funil:"funil",sucesso:"sucesso",produto:"produto"}[st]||"all")}return group==="conteudo"?"conteudo":bArea}
 function renderBoard(){
-  const all=[...tasks.values()].filter(t=>t.start&&(group==="owner"||who==="all"||t.owner===who)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
+  if(!["etapa","conteudo","owner","status"].includes(group))group="etapa";
+  const ar=curArea(), monthAgo=addDays(TODAY,-30);
+  const all=[...tasks.values()].filter(t=>t.start&&(ar==="all"||areaOf(t)===ar)&&(group==="owner"||who==="all"||t.owner===who)&&!(group==="etapa"&&t.status==="done"&&endOf(t)<monthAgo)&&!(group==="conteudo"&&(t.rec||t.meeting||(cTab!=="all"&&(t.ctipo||"conversao")!==cTab)))&&!(group!=="etapa"&&group!=="owner"&&t.rec)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
+  const sub=group==="etapa"?"As tarefas entram sozinhas na etapa certa pela data. Arraste para mudar.":group==="conteudo"?"Do roteiro ao post: arraste o cartão quando mudar de etapa.":"Arraste os cartões entre as colunas";
   $("#vBoard").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Arraste os cartões entre as colunas</div><h1>Quadro do <em>time</em></h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Agrupar por"><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button><button type="button" data-group="phase" aria-pressed="${group==="phase"}">Por frente</button></div>
+  <div class="phead"><div><div class="eyebrow">${sub}</div><h1>Quadro ${ar==="all"?"do <em>time</em>":"de <em>"+esc((BAREAS.find(x=>x.id===ar)||{}).name||"")+"</em>"}</h1></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Ver por"><button type="button" data-group="etapa" aria-pressed="${group==="etapa"}">Por etapa</button><button type="button" data-group="conteudo" aria-pressed="${group==="conteudo"}">Conteúdos</button><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button></div>
+  ${group==="conteudo"?`<div class="seg" role="group" aria-label="Tipo de conteúdo"><button type="button" data-ctab="all" aria-pressed="${cTab==="all"}">Todos</button>${Object.entries(CTIPO).map(([k,v])=>`<button type="button" data-ctab="${k}" aria-pressed="${cTab===k}">${v}</button>`).join("")}</div>`:`<select class="sel areasel" id="boardArea" aria-label="Área">${BAREAS.map(x=>`<option value="${x.id}"${ar===x.id?" selected":""}>${x.name}</option>`).join("")}</select>`}
   ${group==="owner"||!isSocio()?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
   <div class="kanban">${boardCols().map(c=>{
     const items=all.filter(t=>groupKey(t)===c.id), dn=items.filter(t=>t.status==="done").length, pct=items.length?Math.round(dn/items.length*100):0;
-    const head=c.av?avatar(c.av,24):`<i class="dot" style="--c:${c.c}"></i>`;
-    return `<div class="col" data-col="${c.id}"><h3>${head}${esc(c.name)}<span class="n">${group==="status"?items.length:dn+"/"+items.length}</span></h3>${group==="status"?"":`<div class="prog"><i style="width:${pct}%"></i></div>`}${
-      items.map(t=>{const late=t.status!=="done"&&endOf(t)<TODAY, n=cmCount(t.id), link=safeUrl(t.link);
-      return `<div class="card${t.status==="done"?" done":""}" style="--c:${phc(t.phase)}" draggable="true" data-id="${t.id}" tabindex="0">
-        <span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}${t.milestone?" · marco":""}</span>
+    const head=c.av?avatar(c.av,24):`<i class="dot" style="--c:${c.c}"></i>`, plain=group==="status"||group==="etapa"||group==="conteudo";
+    return `<div class="col" data-col="${c.id}"><h3>${head}${esc(c.name)}<span class="n">${plain?items.length:dn+"/"+items.length}</span></h3>${plain?"":`<div class="prog"><i style="width:${pct}%"></i></div>`}${
+      items.map(t=>{const late=t.status!=="done"&&endOf(t)<TODAY, n=cmCount(t.id), link=safeUrl(t.link), isC=t.phase==="conteudo";
+      return `<div class="card${t.status==="done"?" done":""}" style="--c:${phc(t.phase)}" draggable="${c.id==="processos"?"false":"true"}" data-id="${t.id}" tabindex="0">
+        <span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}${isC&&t.ctipo?" · "+esc(CTIPO[t.ctipo]||""):""}${t.milestone?" · marco":""}${group!=="etapa"&&isNegTask(t)&&t.status!=="done"?" · inegociável":""}</span>
         <div class="ct">${esc(t.title)}</div>
-        <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
+        <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${isC?"entrega ":""}${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}${isC&&t.cpost?" · posta "+short(t.cpost):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
         <button type="button" class="st ${t.status||"todo"}" data-cycle="${t.id}">${{todo:"A fazer",doing:"Fazendo",done:"Feito"}[t.status||"todo"]}</button></div></div>`}).join("")
-    }<button type="button" class="add-col" data-addcol="${c.id}">+ tarefa</button></div>`}).join("")}</div></div>`;
+    }${c.id==="processos"?`<p class="empty" style="padding:4px 2px">Tarefas e reuniões que se repetem.</p>`:`<button type="button" class="add-col" data-addcol="${c.id}">+ tarefa</button>`}</div>`}).join("")}</div></div>`;
 }
 
 /* insights */
@@ -993,6 +1035,7 @@ function renderTeam(){
   </div>
   ${followHtml()}
   ${scoreHtml(a,b,label)}
+  ${bonusHtml()}
   ${metasHtml()}
   ${vis.length>1?`<div class="seg" role="group" aria-label="Setor"><button type="button" data-tsetor="all" aria-pressed="${teamSetor==="all"}">Todos os setores</button>${setores.map(st=>`<button type="button" data-tsetor="${st}" aria-pressed="${teamSetor===st}">${esc(SETOR_N[st]||st)}</button>`).join("")}</div>`:""}
   ${groups.map(g=>`<div class="sgroup">${vis.length>1?`<h3 class="sgh">${esc(SETOR_N[g.st]||g.st)}</h3>`:""}<div class="team">${g.rows.map(card).join("")}</div></div>`).join("")}
@@ -1062,6 +1105,51 @@ function metasHtml(){
     <input class="inp" id="mtPrize" maxlength="100" placeholder="Bonificação (ex.: R$ 1.000 + day off)" aria-label="Bonificação">
     <button class="primary" type="submit">Adicionar meta</button></form>`:""}`;
 }
+
+/* bonificação automática (ex.: suporte) */
+const brl=n=>"R$ "+Number(n||0).toLocaleString("pt-BR",{maximumFractionDigits:0});
+const mesN=m=>{const [y,mm]=m.split("-").map(Number);return MNAME[mm-1]+" de "+y};
+const mesAdd=(m,n)=>{const [y,mm]=m.split("-").map(Number);const d=new Date(y,mm-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)};
+function bReal(b){if(b.modo==="conta")return (b.base||0)+[...blog.values()].filter(l=>l.bonus===b.id&&!l.rej).length;return b.real==null?null:Number(b.real)}
+function bCalc(person,mes){
+  const rules=[...bonus.values()].filter(b=>b.person===person&&b.mes===mes).sort((a,b)=>(a.ord||0)-(b.ord||0)||(a.item||"").localeCompare(b.item||""));
+  const base=rules.filter(b=>b.modo!=="extra").map(b=>{const r=bReal(b), m=Number(b.meta)||0;const hit=r!=null&&(b.regra==="<"?r<m:r>=m);const pc=r==null?0:b.regra==="<"?(hit?100:0):m?Math.min(100,Math.round(r/m*100)):100;return {b,r,hit,pc}});
+  const allHit=base.length>0&&base.every(x=>x.hit);
+  const ex=rules.filter(b=>b.modo==="extra").map(b=>({b,r:null,hit:allHit,pc:allHit?100:Math.round(base.filter(x=>x.hit).length/Math.max(1,base.length)*100)}));
+  const rows=[...base,...ex];
+  return {rows,ganho:rows.filter(x=>x.hit).reduce((s,x)=>s+(Number(x.b.valor)||0),0),max:rows.reduce((s,x)=>s+(Number(x.b.valor)||0),0),hits:base.filter(x=>x.hit).length,n:base.length};
+}
+function bonusHtml(){
+  const ed=isSocio();
+  const people=visibleTeam().filter(p=>ed?[...bonus.values()].some(b=>b.person===p.id&&b.mes===bMes):p.id===me);
+  const prevHas=[...bonus.values()].some(b=>b.mes===mesAdd(bMes,-1));
+  const rule=x=>{const b=x.b, unit=b.un||"";const logs=b.modo==="conta"?[...blog.values()].filter(l=>l.bonus===b.id).sort((a,c)=>(a.date||"").localeCompare(c.date||"")):[];
+    const mine=b.person===me;
+    return `<div class="brule${x.hit?" hit":""}"><div class="bt">${esc(b.item)}<small>${b.modo==="extra"?"se bater todas as metas":b.modo==="conta"?"conta sozinho pelos registros":"número informado pelos sócios"}</small></div>
+    <div>${b.modo==="extra"?"":`<small>Meta</small>${ed?`<input class="inp" type="number" step="any" data-bf="${b.id}:meta" value="${esc(b.meta)}" aria-label="Meta">`:`<b>${b.regra==="<"?"menos de ":""}${esc(b.meta)}${esc(unit)}</b>`}`}</div>
+    <div><small>Realizado</small>${b.modo==="extra"?`<b>${x.pc}%</b>`:b.modo==="manual"&&ed?`<input class="inp" type="number" step="any" data-bf="${b.id}:real" value="${b.real==null?"":esc(b.real)}" placeholder="—" aria-label="Realizado">`:`<b>${x.r==null?"—":esc(x.r)+esc(unit)}</b>`}</div>
+    <div><small>Bônus</small>${ed?`<input class="inp" type="number" step="50" data-bf="${b.id}:valor" value="${esc(b.valor)}" aria-label="Valor do bônus">`:`<b>${brl(b.valor)}</b>`}</div>
+    <div>${x.hit?`<span class="ok">Atingido ✓</span>`:`<span class="no">${b.modo==="manual"&&x.r==null?"aguardando número":"Não atingido"}</span>`}</div>
+    <div>${b.modo==="conta"&&(mine||ed)?`<button type="button" class="mini" data-badd="${b.id}">+ Registrar</button>`:""}${ed?`<button type="button" class="mini del${bDelArmed===b.id?" armed":""}" data-bdel="${b.id}">${bDelArmed===b.id?"Confirmar":"×"}</button>`:""}</div>
+    ${bAdd===b.id?`<form class="badd" data-baddf="${b.id}"><input class="inp" name="nota" maxlength="140" placeholder="O que foi (cliente, caso)" required><input class="inp" name="link" type="url" placeholder="Link da prova (print, vídeo)" maxlength="600"><button class="primary" type="submit">Salvar</button></form>`:""}
+    ${logs.length?`<details class="blog"><summary>${logs.filter(l=>!l.rej).length} registro(s) valendo${logs.some(l=>l.rej)?` · ${logs.filter(l=>l.rej).length} não valeram`:""}</summary>${logs.map(l=>{const u=safeUrl(l.link);return `<div class="lg${l.rej?" rej":""}"><small>${short(l.date)}</small><span>${esc(l.nota||"")}</span>${u?`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">prova</a>`:""}${ed?`<button type="button" class="mini" data-brej="${l.id}">${l.rej?"Voltar a valer":"Não vale"}</button>`:""}${!ed&&mine&&!l.rej?`<button type="button" class="mini" data-blogdel="${l.id}">Apagar</button>`:""}</div>`}).join("")}</details>`:""}
+    </div>`};
+  const blocks=people.map(p=>{const c=bCalc(p.id,bMes);if(!c.rows.length)return "";return `<div class="bon"><div class="bp">${avatar(p.id,26)}<b>${esc(p.name)}</b><small>${c.hits} de ${c.n} metas</small><span class="tot">${brl(c.ganho)} <small>de ${brl(c.max)}</small></span></div>${c.rows.map(rule).join("")}</div>`}).join("");
+  if(!ed&&!blocks)return "";
+  return `<div class="card-s chart"><h3>Bonificação do mês <span style="font-weight:600;color:var(--muted);font-size:12px">· ${mesN(bMes)}</span></h3>
+  <div class="actions" style="justify-content:flex-start"><button type="button" class="mini" data-bmes="-1">‹ Mês anterior</button><button type="button" class="mini" data-bmes="0">Este mês</button><button type="button" class="mini" data-bmes="1">Próximo ›</button>${ed&&prevHas?`<button type="button" class="mini" data-bcopy>Copiar regras de ${mesN(mesAdd(bMes,-1))}</button>`:""}</div>
+  <p class="empty" style="padding:0">${ed?"Regras de bônus por pessoa. As metas \"por registro\" contam sozinhas: a pessoa registra cada caso com a prova e vocês marcam o que não vale.":"Cada caso que você resolver, registre aqui com a prova. O bônus calcula sozinho."}</p>
+  ${blocks||'<p class="empty">Nenhuma regra de bônus neste mês.</p>'}
+  ${ed?`<form class="mform" id="bonForm" autocomplete="off"><select class="sel" id="bfP" aria-label="Pessoa">${TEAM.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select>
+    <input class="inp" id="bfItem" required maxlength="120" placeholder="Meta (ex.: Reembolsos revertidos)" aria-label="Meta">
+    <select class="sel" id="bfModo" aria-label="Como conta"><option value="conta">Conta por registro</option><option value="manual">Número informado</option><option value="extra">Bônus extra (todas as metas)</option></select>
+    <select class="sel" id="bfRegra" aria-label="Regra"><option value=">=">no mínimo</option><option value="<">menos de</option></select>
+    <input class="inp" id="bfMeta" type="number" step="any" placeholder="Meta" aria-label="Número da meta" style="flex:0 1 90px">
+    <input class="inp" id="bfUn" maxlength="4" placeholder="un (ex.: %)" aria-label="Unidade" style="flex:0 1 80px">
+    <input class="inp" id="bfVal" type="number" step="50" placeholder="Bônus R$" aria-label="Valor do bônus" style="flex:0 1 110px">
+    <button class="primary" type="submit">Adicionar</button></form>`:""}</div>`;
+}
+function myBonusCard(){const c=bCalc(me,TODAY.slice(0,7));if(!c.rows.length)return "";return `<div class="card-s box"><h3>Minha bonificação de ${MNAME[parse(TODAY).getMonth()]}</h3><p><b>${brl(c.ganho)}</b> de ${brl(c.max)} · ${c.hits} de ${c.n} metas batidas</p><button type="button" class="mini" data-view="team" style="align-self:flex-start;width:auto">Ver e registrar</button></div>`}
 
 /* acompanhamento: atrasos, bloqueios e metas com pendência (João consolida) */
 function followHtml(){
@@ -1259,6 +1347,7 @@ function openModal(t,d={}){
   $("#mTitle").textContent=t?"Editar tarefa":d.fromIns?"Transformar insight em tarefa":"Nova tarefa";
   $("#fTitle").value=v.title;$("#fOwner").value=isSocio()?(v.owner||"time"):(t?v.owner:me);$("#fOwner").disabled=!isSocio();$("#fPhase").value=v.phase||"gestao";
   $("#fStart").value=v.start;$("#fEnd").value=v.end||"";$("#fTime").value=v.time||"";$("#fStatus").value=v.status||"todo";
+  $("#fCTipo").value=v.ctipo||d.ctipo||"conversao";$("#fCSt").value=v.cst||d.cst||"producao";$("#fCPost").value=v.cpost||"";cToggle();pendingNeg=!!d.negNow;
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
   const att=v.meeting?attOf(v):["all"];
   $("#fMeet").checked=!!v.meeting;$("#meetBox").hidden=!v.meeting;$("#fDur").value=String(v.dur||60);$("#fRec").value=v.rec||"";$("#fCall").value=v.call||"";
@@ -1326,6 +1415,10 @@ document.addEventListener("keydown",e=>{
 $("#fLink").addEventListener("input",renderLinkOpen);
 $("#fMeet").addEventListener("change",()=>{$("#meetBox").hidden=!$("#fMeet").checked;renderDecs()});
 $("#fStart").addEventListener("change",renderDeps);
+let pendingNeg=false;
+function cToggle(){const on=$("#fPhase").value==="conteudo";$("#cBox").hidden=!on;$("label[for=fStart]").textContent=on?"Data de entrega":"Data"}
+$("#fPhase").addEventListener("change",cToggle);
+$("#fCSt").addEventListener("change",()=>{if($("#fCSt").value==="postado")$("#fStatus").value="done"});
 $("#depType").addEventListener("change",()=>{const tk=$("#depType").value==="task";$("#depTask").hidden=!tk;$("#depText").hidden=tk});
 $("#depAdd").addEventListener("click",()=>{
   const type=$("#depType").value, who=$("#depWho").value;
@@ -1352,6 +1445,8 @@ $("#form").addEventListener("submit",e=>{
   if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
   t.meta=$("#fMeta").value||"";t.criterio=$("#fCrit").value.trim();t.deps=editDeps;
+  if(t.phase==="conteudo"){t.ctipo=$("#fCTipo").value;t.cst=$("#fCSt").value;t.cpost=$("#fCPost").value||"";if(t.cst==="postado")t.status="done";else if(t.status==="done"&&prev&&prev.cst==="postado")t.cst="postado"}
+  if(pendingNeg){const p=t.owner&&t.owner!=="time"?t.owner:me;if(p===me||isSocio())setTimeout(()=>write("focus",{id:focusId(p,TODAY),person:p,date:TODAY,taskId:id,done:false},focus),300);pendingNeg=false}
   if(meeting)Object.assign(t,{objetivo:$("#fObj").value.trim(),pauta:$("#fPauta").value.trim(),prep:$("#fPrep").value||""});
   if(pendingDec){const dc=decisoes.get(pendingDec);if(dc)write("decisoes",{...dc,taskId:id},decisoes);pendingDec=null}
   save(t);
@@ -1378,10 +1473,20 @@ $("#main").addEventListener("click",e=>{
   if(e.target.closest("[data-faseadd]")){const it=cfgItems("fases");const last=it.length?it[it.length-1].end:TODAY;setCfg("fases",{items:[...it,{name:"Nova fase",start:last?addDays(last,1):TODAY,end:addDays(last||TODAY,14),color:FASE_CORES[it.length%FASE_CORES.length]}]});return}
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
-  const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group",group);render();return}
+  const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group2",group);render();return}
+  const ctb=e.target.closest("[data-ctab]");if(ctb){cTab=ctb.dataset.ctab;store("pv-ctab",cTab);render();return}
+  const bm=e.target.closest("[data-bmes]");if(bm){const n=Number(bm.dataset.bmes);bMes=n?mesAdd(bMes,n):TODAY.slice(0,7);render();return}
+  const ba=e.target.closest("[data-badd]");if(ba){bAdd=bAdd===ba.dataset.badd?null:ba.dataset.badd;render();setTimeout(()=>{const i=document.querySelector("[data-baddf] input");if(i)i.focus()},0);return}
+  const bd=e.target.closest("[data-bdel]");if(bd){const id=bd.dataset.bdel;if(bDelArmed!==id){bDelArmed=id;render();return}bDelArmed=null;del("bonus",id,bonus);return}
+  const br=e.target.closest("[data-brej]");if(br){const l=blog.get(br.dataset.brej);if(l)write("bonuslog",{...l,rej:!l.rej},blog);return}
+  const bld=e.target.closest("[data-blogdel]");if(bld){del("bonuslog",bld.dataset.blogdel,blog);return}
+  if(e.target.closest("[data-bcopy]")){const pm=mesAdd(bMes,-1);const src=[...bonus.values()].filter(b=>b.mes===pm);const have=new Set([...bonus.values()].filter(b=>b.mes===bMes).map(b=>b.person+"|"+b.item));let n=0;src.forEach(b=>{if(have.has(b.person+"|"+b.item))return;const {id,real,base,...rest}=b;write("bonus",{...rest,id:newId("bn"),mes:bMes,real:null},bonus);n++});toast(n?`${n} regra(s) copiadas`:"As regras já estão neste mês");return}
   const pe=e.target.closest("[data-period]");if(pe){period=pe.dataset.period;store("pv-period",period);render();return}
   const cy=e.target.closest("[data-cycle]");if(cy){const t=tasks.get(cy.dataset.cycle);if(t)save({...t,status:{todo:"doing",doing:"done",done:"todo"}[t.status||"todo"]});return}
-  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol;openModal(null,group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k});return}
+  const ac=e.target.closest("[data-addcol]");if(ac){const k=ac.dataset.addcol, ar=curArea(), ph=ar==="all"||ar==="gestao"?{}:{phase:{conteudo:"conteudo",funil:"comercial",sucesso:"sucesso",produto:"produto"}[ar]};
+  if(group==="etapa"){openModal(null,{...ph,start:k==="proximas"?nextMon():TODAY,status:k==="feitas"?"done":"todo",negNow:k==="neg"});return}
+  if(group==="conteudo"){openModal(null,{phase:"conteudo",cst:k,ctipo:cTab==="all"?"conversao":cTab,status:k==="postado"?"done":"todo"});return}
+  openModal(null,{...ph,...(group==="status"?{status:k}:group==="phase"?{phase:k}:{owner:k})});return}
   const ev=e.target.closest(".ev");if(ev){const t=tasks.get(ev.dataset.id);if(t)openModal(t);return}
   const card=e.target.closest(".card");if(card){const t=tasks.get(card.dataset.id);if(t)openModal(t);return}
   const day=e.target.closest(".day[data-date]");if(day){openModal(null,{start:day.dataset.date});return}
@@ -1401,6 +1506,8 @@ $("#main").addEventListener("click",e=>{
 });
 $("#main").addEventListener("change",e=>{
   const t=e.target;
+  if(t.id==="boardArea"){bArea=t.value;store("pv-barea",bArea);render();return}
+  if(t.matches("[data-bf]")){const [id,k]=t.dataset.bf.split(":"), b=bonus.get(id);if(!b)return;const v=t.value===""?null:Number(t.value);write("bonus",{...b,[k]:v},bonus);return}
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
   if(t.matches("[data-negtick]")){const np=t.closest("[data-negp]").dataset.negp;const items=negItems(np).map((it,k)=>k===Number(t.dataset.negtick)?{...it,done:t.checked}:it);setNegItems(items,np);return}
   if(t.matches("[data-chk]")){const c=checks.get(chkId())||{id:chkId(),person:me,week:WS,done:{}};write("checks",{...c,done:{...(c.done||{}),[t.dataset.chk]:t.checked}},checks);if(t.checked)toast("Boa!");return}
@@ -1445,8 +1552,27 @@ $("#main").addEventListener("drop",e=>{
   if(!dragId)return;const z=e.target.closest(".day[data-date],.col[data-col]");if(!z)return;e.preventDefault();z.classList.remove("drop");
   const t=tasks.get(dragId);dragId=null;if(!t)return;
   if(z.dataset.date){const ns=z.dataset.date;if(ns===t.start)return;const len=t.end?diff(t.start,t.end):0;save({...t,start:ns,end:len?addDays(ns,len):""});toast("Movida para "+short(ns));return}
-  const k=z.dataset.col, f=groupField();
+  const k=z.dataset.col;
+  if(group==="etapa"){const cur=etapaOf(t);if(cur===k||k==="processos"||cur==="processos")return;
+    if(k==="feitas"){save({...t,status:"done"});toast("Feito! Um passo a mais.");return}
+    const reopen=t.status==="done"?{status:"todo"}:{};
+    if(k==="semana"){const ns=t.start>WE?TODAY:t.start, len=t.end?diff(t.start,t.end):0;save({...t,...reopen,start:ns,end:len?addDays(ns,len):""});toast("Para esta semana");return}
+    if(k==="proximas"){const ns=t.start<=WE?nextMon():t.start, len=t.end?diff(t.start,t.end):0;save({...t,...reopen,start:ns,end:len?addDays(ns,len):""});toast("Para a próxima semana");return}
+    if(k==="neg"){const p=t.owner&&t.owner!=="time"?t.owner:me;if(p!==me&&!isSocio()){toast("Só o dono marca o próprio inegociável.");return}
+      if(t.status==="done"||t.start>WE)save({...t,status:"todo",start:t.start>WE?TODAY:t.start});
+      write("focus",{id:focusId(p,TODAY),person:p,date:TODAY,taskId:t.id,done:false},focus);toast("Virou o inegociável de hoje de "+pname(p));return}
+    return}
+  if(group==="conteudo"){if((t.cst||"producao")===k)return;save({...t,cst:k,status:k==="postado"?"done":(t.status==="done"?"todo":t.status)});toast(k==="postado"?"Postado!":"Conteúdo movido");return}
+  const f=groupField();
   if((t[f]||"")===k)return;save({...t,[f]:k});toast(f==="owner"?"Agora com "+pname(k):"Tarefa movida");
+});
+
+$("#main").addEventListener("submit",e=>{
+  const f=e.target;
+  if(f.id==="bonForm"){e.preventDefault();const item=$("#bfItem").value.trim();if(!item)return;const modo=$("#bfModo").value;
+    write("bonus",{id:newId("bn"),person:$("#bfP").value,mes:bMes,item,modo,regra:modo==="extra"?">=":$("#bfRegra").value,meta:modo==="extra"?null:Number($("#bfMeta").value)||0,un:$("#bfUn").value.trim(),valor:Number($("#bfVal").value)||0,real:null,ord:Date.now()},bonus);toast("Regra de bônus criada");return}
+  if(f.matches("[data-baddf]")){e.preventDefault();const b=bonus.get(f.dataset.baddf);if(!b)return;const nota=f.nota.value.trim();if(!nota)return;
+    write("bonuslog",{id:newId("bl"),bonus:b.id,person:b.person,mes:b.mes,date:TODAY,nota,link:safeUrl(f.link.value),rej:false,by:me},blog);bAdd=null;toast("Registrado! Conta no bônus.");return}
 });
 
 /* inicialização: Supabase */
@@ -1485,7 +1611,7 @@ function startApp(session){
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
   sub("people",m=>{peopleDocs=m;peopleLoaded=true;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
-  sub("sonhos",m=>{sonhos=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
+  sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
