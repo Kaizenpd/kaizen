@@ -349,6 +349,8 @@ label.negi{cursor:pointer}
 .bigmeta h2{margin:0;font-family:var(--f-display);font-size:30px}.bigmeta p{margin:0;color:#d1fae5}.bigmeta .eyebrow{color:#a7f3d0}.bigmeta .bar{background:rgba(255,255,255,.2)}.bigmeta small{color:#d1fae5;font-weight:700}
 .bigmeta .mini{color:#fff;border-color:rgba(255,255,255,.4);align-self:flex-start}.bigmeta .inp{background:rgba(0,0,0,.35);color:#fff}
 .vals{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.val{position:relative;padding:14px;border-radius:12px;background:var(--surface-2)}.val b{display:block;margin-top:6px}.val p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.ritual .rt-h{font-weight:800;margin-bottom:4px}.ritual .rt-d{display:flex;gap:8px;padding:2px 0}.ritual .rt-d b{min-width:30px}.ritual .rt-d.now{color:var(--accent)}.ritual .rt-f{margin-top:6px;opacity:.8}
+.benlogo{max-height:44px;max-width:150px;object-fit:contain}.ben.logo{justify-content:center;padding:14px 26px}
 .vi{font-size:26px;line-height:1}.val .x,.ben .x,.kpi2 .x{all:unset;cursor:pointer;position:absolute;top:6px;right:8px;color:var(--muted)}
 .cult2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px}
 .ben{position:relative;display:flex;align-items:center;gap:12px;padding:10px 26px 10px 12px;border-radius:12px;background:var(--surface-2)}.ben>div{flex:1}.ben p{margin:2px 0 0;color:var(--muted);font-size:13px}
@@ -451,7 +453,7 @@ html{-webkit-text-size-adjust:100%}body{margin:0}
       <div class="count"><div class="n" id="lDays">–</div><div class="t"><b>dias até o lançamento</b><span id="lDate">–</span></div></div>
       <div class="count"><div class="n c2" id="bfDays">–</div><div class="t"><b>dias até a Black Friday</b>sexta, 27 de novembro</div></div>
     </div>
-    <div class="ritual"><b>Daily às 16h</b>, de segunda a sexta.<br><b>Reunião estratégica</b> às sextas.<br>Uma coisa fechada por dia.</div>
+    <div class="ritual" id="ritual"></div>
     <div class="side-foot">
       <button class="help-btn" id="helpBtn" type="button">Como o Kaizen funciona</button>
       <button class="help-btn" id="ttBtn" type="button">Conectar TickTick</button>
@@ -695,9 +697,9 @@ let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY
 let insSt="ativos", insTag="all", insWho="all", editing=null, delArmed=false, pendingIns=null, insDelArmed=null, introDone=load("kz-intro","")==="1";
 if(!VIEWS.some(v=>v.id===view))view="week";
 if(!/^\d{4}-\d{2}$/.test(calYM))calYM=TODAY.slice(0,7);
-if(calMode!=="week"&&calMode!=="timeline")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
+if(calMode!=="week")calMode="month";if(!/^\d{4}-\d{2}-\d{2}$/.test(calWk))calWk=WS;
 function shiftYM(ym,n){const d=new Date(+ym.slice(0,4),+ym.slice(5,7)-1+n,1);return d.getFullYear()+"-"+pad(d.getMonth()+1)}
-if(!["etapa","conteudo","owner","status"].includes(group))group="etapa";
+if(!["etapa","conteudo","owner"].includes(group))group="etapa";
 if(!["week","month","all"].includes(period))period="week";
 
 function endOf(t){return t.end&&t.end>=t.start?t.end:t.start}
@@ -725,7 +727,7 @@ function occurs(t,ds){
 }
 const meetEmailsOk=()=>true;
 const byTime=(a,b)=>a.start.localeCompare(b.start)||(a.time||"99").localeCompare(b.time||"99")||a.title.localeCompare(b.title);
-function launchDate(){const t=tasks.get("t30");return t&&t.start?t.start:"2026-11-06"}
+function launchDate(){const t=tasks.get("t30");return t&&t.start?t.start:"2026-11-12"}
 function toast(msg){const el=$("#toast");el.textContent=msg;el.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>el.hidden=true,2200)}
 const whoOptions=(cur,all)=>[{id:"all",name:all},...PEOPLE].map(p=>`<option value="${p.id}"${cur===p.id?" selected":""}>${p.name}</option>`).join("");
 const focusId=(p,d)=>`${p}_${d}`;
@@ -742,10 +744,19 @@ function renderShell(){
   const L=launchDate(), ld=Math.max(0,diff(TODAY,L)), bd=Math.max(0,diff(TODAY,BF));
   $("#lDays").textContent=ld;$("#bfDays").textContent=bd;$("#lDaysM").textContent=ld;$("#bfDaysM").textContent=bd;
   $("#lDate").textContent=fullDate(L);
+  const rt=$("#ritual");if(rt)rt.innerHTML=ritualHtml();
   const pic=size=>myAvatar?`<img src="${esc(myAvatar)}" alt="">`:(me?avatar(me,size):`<span class="av" style="--c:var(--ph-gestao);width:${size}px;height:${size}px">?</span>`);
   $("#whoBox").innerHTML=`${pic(34)}<div><div class="nm">${me?esc(pname(me)):"Sem perfil ligado"}</div><div class="sub">${me?esc(person(me).role||"no Kaizen"):esc(myEmail)}</div></div>`;
   $("#meBtnM").innerHTML=pic(30);
   $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";
+}
+function ritualHtml(){
+  const DS=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"], by={};
+  [...tasks.values()].filter(t=>t.meeting&&t.rec&&t.start&&inMeet(t,me)).forEach(t=>{const days=t.rec==="weekdays"?[1,2,3,4,5]:t.rec==="weekly"?[parse(t.start).getDay()]:[];days.forEach(d=>(by[d]=by[d]||[]).push(t))});
+  const today=parse(TODAY).getDay(), order=[1,2,3,4,5,6,0].filter(d=>by[d]);
+  if(!order.length)return "Uma coisa fechada por dia.";
+  const nm=t=>esc(t.title.replace(/^(Reunião|Reuniao)\s*(de|do|da)?\s*/i,"").slice(0,26));
+  return `<div class="rt-h">Reuniões da semana</div>`+order.map(d=>`<div class="rt-d${d===today?" now":""}"><b>${DS[d]}</b><span>${by[d].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(t=>`${esc((t.time||"").replace(":00","h").replace(":","h"))} ${nm(t)}`).join("<br>")}</span></div>`).join("")+`<div class="rt-f">Uma coisa fechada por dia.</div>`;
 }
 function setView(v){view=v;store("pv-view",v);render();try{window.scrollTo({top:0})}catch(e){}}
 
@@ -857,7 +868,7 @@ function fasesEditorHtml(){
 }
 function calTop(eyebrow,title){
   return `<div class="phead"><div><div class="eyebrow">${eyebrow}</div><h1>${title}</h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button><button type="button" data-calmode="timeline" aria-pressed="${calMode==="timeline"}">Linha do tempo</button></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Visualização"><button type="button" data-calmode="month" aria-pressed="${calMode==="month"}">Mês</button><button type="button" data-calmode="week" aria-pressed="${calMode==="week"}">Semana</button></div>
 
   <div class="seg" role="group" aria-label="Navegar"><button type="button" data-month="-1" aria-label="Anterior">‹</button><button type="button" data-month="0" aria-pressed="${calMode==="week"?calWk===WS:calMode==="timeline"?tlStart===addDays(WS,-14):calYM===TODAY.slice(0,7)}">Hoje</button><button type="button" data-month="1" aria-label="Próximo">›</button></div>
   ${isSocio()?`<select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`:""}
@@ -944,13 +955,13 @@ const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="etapa"?etapaOf(t):group==="conteudo"?(t.cst||"producao"):group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
 function curArea(){if(!bArea){const st=person(me).setor;bArea=isSocio()?"all":({conteudo:"conteudo",funil:"funil",sucesso:"sucesso",produto:"produto"}[st]||"all")}return group==="conteudo"?"conteudo":bArea}
 function renderBoard(){
-  if(!["etapa","conteudo","owner","status"].includes(group))group="etapa";
+  if(!["etapa","conteudo","owner"].includes(group))group="etapa";
   const ar=curArea(), monthAgo=addDays(TODAY,-30);
   const all=[...tasks.values()].filter(t=>t.start&&(ar==="all"||areaOf(t)===ar)&&(group==="owner"||who==="all"||t.owner===who)&&!(group==="etapa"&&t.status==="done"&&endOf(t)<monthAgo)&&!(group==="conteudo"&&(t.rec||t.meeting||(cTab!=="all"&&(t.ctipo||"conversao")!==cTab)))&&!(group!=="etapa"&&group!=="owner"&&t.rec)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
   const sub=group==="etapa"?"As tarefas entram sozinhas na etapa certa pela data. Arraste para mudar.":group==="conteudo"?"Do roteiro ao post: arraste o cartão quando mudar de etapa.":"Arraste os cartões entre as colunas";
   $("#vBoard").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">${sub}</div><h1>Quadro ${ar==="all"?"do <em>time</em>":"de <em>"+esc((BAREAS.find(x=>x.id===ar)||{}).name||"")+"</em>"}</h1></div>
-  <div class="actions"><div class="seg" role="group" aria-label="Ver por"><button type="button" data-group="etapa" aria-pressed="${group==="etapa"}">Por etapa</button><button type="button" data-group="conteudo" aria-pressed="${group==="conteudo"}">Conteúdos</button><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button><button type="button" data-group="status" aria-pressed="${group==="status"}">Por status</button></div>
+  <div class="actions"><div class="seg" role="group" aria-label="Ver por"><button type="button" data-group="etapa" aria-pressed="${group==="etapa"}">Por etapa</button><button type="button" data-group="conteudo" aria-pressed="${group==="conteudo"}">Conteúdos</button><button type="button" data-group="owner" aria-pressed="${group==="owner"}">Por pessoa</button></div>
   ${group==="conteudo"?`<div class="seg" role="group" aria-label="Tipo de conteúdo"><button type="button" data-ctab="all" aria-pressed="${cTab==="all"}">Todos</button>${Object.entries(CTIPO).map(([k,v])=>`<button type="button" data-ctab="${k}" aria-pressed="${cTab===k}">${v}</button>`).join("")}</div>`:`<select class="sel areasel" id="boardArea" aria-label="Área">${BAREAS.map(x=>`<option value="${x.id}"${ar===x.id?" selected":""}>${x.name}</option>`).join("")}</select>`}
   ${group==="owner"||!isSocio()?"":`<select class="sel" id="boardWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>
@@ -1060,7 +1071,7 @@ const visibleTeam=()=>TEAM.filter(p=>canSeePerson(p.id));
 /* utilidades de configuração (listas editadas pelos sócios) */
 const cfgItems=k=>{const c=cfg.get(k);return c&&Array.isArray(c.items)?c.items:[]};
 function setCfg(k,patch){write("config",{id:k,...(cfg.get(k)||{}),...patch},cfg)}
-function resizeImage(file,max){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(c.toDataURL("image/jpeg",.72))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
+function resizeImage(file,max,png){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const s=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext("2d").drawImage(im,0,0,c.width,c.height);res(png?c.toDataURL("image/png"):c.toDataURL("image/jpeg",.72))};im.onerror=rej;im.src=r.result};r.onerror=rej;r.readAsDataURL(file)})}
 const safeImg=u=>/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u||"")?u:safeUrl(u);
 
 /* mérito: placar dos inegociáveis */
@@ -1199,8 +1210,8 @@ function metaGrandeHtml(edit){
 const chkId=()=>`${me}_${WS}`;
 function weekReminders(){
   const l=cfg.get("livro")||{}, out=[];
-  if(l.title)out.push({k:"livro",t:`Ler a parte da semana do livro "${l.title}"`});
   cfgItems("lembretes").forEach((x,i)=>out.push({k:"l"+i,t:x.title||x}));
+  if(l.title)out.push({k:"livro",t:l.parte?`Ler ${l.parte} do livro "${l.title}"`:`Ler a parte da semana do livro "${l.title}"`});
   return out;
 }
 function remindersHtml(){
@@ -1226,10 +1237,11 @@ function renderCult(){
   <div class="card-s chart"><h3>Nossos valores</h3>${vals.length?`<div class="vals">${vals.map((v,i)=>`<div class="val"><span class="vi">${esc(v.icon||"⭐")}</span><b>${esc(v.title)}</b>${v.text?`<p>${esc(v.text)}</p>`:""}${delBtn("valores",i)}</div>`).join("")}</div>`:`<p class="empty">${isSocio()?"Coloquem aqui os valores da empresa, com um ícone para cada um.":"Os valores da empresa aparecem aqui em breve."}</p>`}
   ${listEditor("valores",[{n:"icon",ph:"Ícone (emoji)",max:4,small:1},{n:"title",ph:"Valor (ex.: Dono do resultado)",req:1,max:60},{n:"text",ph:"O que isso significa na prática",max:160}])}</div>
   <div class="cult2">
-  <div class="card-s chart"><h3>Benefícios da empresa</h3>${bens.length?bens.map((v,i)=>`<div class="ben"><span class="vi">${esc(v.icon||"🎁")}</span><div><b>${esc(v.title)}</b>${v.text?`<p>${esc(v.text)}</p>`:""}</div>${safeUrl(v.url)?`<a class="mini" href="${esc(safeUrl(v.url))}" target="_blank" rel="noopener noreferrer">Acessar</a>`:""}${delBtn("beneficios",i)}</div>`).join(""):'<p class="empty">Nenhum benefício cadastrado.</p>'}
-  ${listEditor("beneficios",[{n:"icon",ph:"Ícone",max:4,small:1},{n:"title",ph:"Benefício (ex.: TotalPass)",req:1,max:60},{n:"text",ph:"Como funciona",max:160},{n:"url",ph:"Link (https://...)",max:300}])}</div>
-  <div class="card-s chart"><h3>Livro do mês</h3>${livro.title?`<div class="book">${safeImg(livro.cover)?`<img src="${esc(safeImg(livro.cover))}" alt="">`:`<span class="vi">📚</span>`}<div><b>${esc(livro.title)}</b>${livro.author?`<p>${esc(livro.author)}</p>`:""}<small>${readers.length?`Leram a parte desta semana: ${readers.map(p=>esc(p.name)).join(", ")}`:"Ninguém marcou a leitura desta semana ainda."}</small></div></div>`:'<p class="empty">Nenhum livro escolhido.</p>'}
-  ${isSocio()?`<form class="mform" id="livroForm" autocomplete="off"><input class="inp" id="lvTitle" maxlength="100" value="${esc(livro.title||"")}" placeholder="Título do livro" aria-label="Título"><input class="inp" id="lvAuthor" maxlength="80" value="${esc(livro.author||"")}" placeholder="Autor" aria-label="Autor"><label class="ghost filebtn">Capa<input type="file" id="lvCover" accept="image/*" hidden></label><button class="ghost" type="submit">Salvar livro</button></form>`:""}
+  <div class="card-s chart"><h3>Benefícios da empresa</h3>${bens.length?`<div class="vals">${bens.map((v,i)=>{const lg=safeImg(v.logo), u=safeUrl(v.url), inner=lg?`<img class="benlogo" src="${esc(lg)}" alt="${esc(v.title)}" title="${esc(v.title)}">`:`<b style="font-size:20px">${esc(v.title)}</b>`;
+    return `<div class="ben logo">${u?`<a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${inner}</a>`:inner}${isSocio()?`<label class="mini filebtn" style="position:absolute;bottom:4px;right:6px">${lg?"Trocar logo":"Pôr logo"}<input type="file" accept="image/*" data-benlogo="${i}" hidden></label>`:""}${delBtn("beneficios",i)}</div>`}).join("")}</div>`:'<p class="empty">Nenhum benefício cadastrado.</p>'}
+  ${listEditor("beneficios",[{n:"title",ph:"Benefício (ex.: TotalPass)",req:1,max:60},{n:"url",ph:"Link (opcional)",max:300}])}</div>
+  <div class="card-s chart"><h3>Livro do mês</h3>${livro.title?`<div class="book">${safeImg(livro.cover)?`<img src="${esc(safeImg(livro.cover))}" alt="">`:`<span class="vi">📚</span>`}<div><b>${esc(livro.title)}</b>${livro.parte?`<p>Parte desta semana: ${esc(livro.parte)}</p>`:""}<small>${readers.length?`Leram a parte desta semana: ${readers.map(p=>esc(p.name)).join(", ")}`:"Ninguém marcou a leitura desta semana ainda."}</small></div></div>`:'<p class="empty">Nenhum livro escolhido.</p>'}
+  ${isSocio()?`<form class="mform" id="livroForm" autocomplete="off"><input class="inp" id="lvTitle" maxlength="100" value="${esc(livro.title||"")}" placeholder="Título do livro" aria-label="Título"><input class="inp" id="lvAuthor" maxlength="80" value="${esc(livro.parte||"")}" placeholder="Parte da semana (ex.: capítulos 1 a 3)" aria-label="Parte da semana"><label class="ghost filebtn">Capa<input type="file" id="lvCover" accept="image/*" hidden></label><button class="ghost" type="submit">Salvar livro</button></form>`:""}
   <p class="empty" style="padding:0">Cada um marca a leitura da semana em "Lembretes da semana", na Minha semana.</p></div>
   </div>
   ${isSocio()?`<div class="card-s chart"><h3>Lembretes da semana (aparecem para todos na Minha semana)</h3>${cfgItems("lembretes").map((x,i)=>`<div class="ben"><span class="vi">🔔</span><div><b>${esc(x.title||x)}</b></div>${delBtn("lembretes",i)}</div>`).join("")||'<p class="empty">Ex.: "Fazer o check-in na daily", "Postar o resultado da semana no grupo".</p>'}${listEditor("lembretes",[{n:"title",ph:"Novo lembrete",req:1,max:120}])}</div>`:""}
@@ -1515,6 +1527,7 @@ $("#main").addEventListener("change",e=>{
   if(t.matches("[data-mf]")){const [mid,f]=t.dataset.mf.split(":");const m=metas.get(mid);if(m)write("metas",{...m,[f]:t.value.trim()},metas);return}
   if(t.matches("[data-mstat]")){const m=metricas.get(t.dataset.mstat);if(m)write("metricas",{...m,status:t.value},metricas);return}
   if(t.matches("[data-eqsetor]")||t.matches("[data-eqpapel]")){const pid=t.dataset.eqsetor||t.dataset.eqpapel, cur=person(pid), d=peopleDocs.get(pid)||{id:pid,name:cur.name,email:cur.email||"",setor:cur.setor,papel:cur.papel};write("people",{...d,[t.dataset.eqsetor?"setor":"papel"]:t.value},peopleDocs);rebuildPeople();toast("Equipe atualizada");return}
+  if(t.matches("[data-benlogo]")){const f=t.files&&t.files[0];if(!f)return;const i=Number(t.dataset.benlogo);resizeImage(f,300,1).then(u=>{const it=[...cfgItems("beneficios")];if(!it[i])return;it[i]={...it[i],logo:u};setCfg("beneficios",{items:it});toast("Logo salva")}).catch(()=>toast("Não deu para usar essa imagem."));return}
   if(t.id==="mgPhoto"||t.id==="lvCover"){const f=t.files&&t.files[0];if(!f)return;resizeImage(f,t.id==="lvCover"?320:900).then(u=>{if(t.id==="mgPhoto")setCfg("metaGrande",{photo:u});else setCfg("livro",{cover:u});toast("Imagem salva")}).catch(()=>toast("Não deu para ler essa imagem."));return}
   if(t.id==="dPhoto"){const f=t.files&&t.files[0];if(!f)return;resizeImage(f,480).then(u=>{dreamPhoto=u;const l=$("#dPhotoLbl");if(l)l.firstChild.textContent="Foto ✓"}).catch(()=>toast("Não deu para ler essa imagem."));return}
   if(t.matches("[data-ist]")){const i=insights.get(t.dataset.ist);if(i)saveIns({...i,status:t.value});return}
@@ -1536,7 +1549,7 @@ $("#main").addEventListener("submit",e=>{
   if(e.target.classList.contains("negForm")){e.preventDefault();const np=e.target.closest("[data-negp]").dataset.negp, inp=e.target.querySelector("input"), text=inp.value.trim();if(!text)return;setNegItems([...negItems(np),{text,done:false}],np);return}
   const cf=e.target.closest("[data-cfgform]");if(cf){e.preventDefault();const k=cf.dataset.cfgform, o={};cf.querySelectorAll("input").forEach(x=>{o[x.name]=x.value.trim()});if(o.url)o.url=safeUrl(o.url);setCfg(k,{items:[...cfgItems(k),o]});toast("Adicionado");return}
   if(e.target.id==="mgForm"){e.preventDefault();setCfg("metaGrande",{title:$("#mgTitle").value.trim(),sub:$("#mgSub").value.trim(),progress:Math.max(0,Math.min(100,Number($("#mgProg").value)||0))});mgEdit=false;toast("Meta salva");return}
-  if(e.target.id==="livroForm"){e.preventDefault();setCfg("livro",{title:$("#lvTitle").value.trim(),author:$("#lvAuthor").value.trim()});toast("Livro salvo");return}
+  if(e.target.id==="livroForm"){e.preventDefault();setCfg("livro",{title:$("#lvTitle").value.trim(),parte:$("#lvAuthor").value.trim()});toast("Livro salvo");return}
   if(e.target.id==="eqForm"){e.preventDefault();const name=$("#eqName").value.trim(), email=$("#eqEmail").value.trim().toLowerCase();if(!name||!email)return;let id=norm(name).split(/\s+/)[0].replace(/[^a-z0-9]/g,"")||newId("p");if(person(id).email&&person(id).email!==email)id=id+Math.random().toString(36).slice(2,5);write("people",{id,name,email,setor:$("#eqSetor").value,papel:$("#eqPapel").value},peopleDocs);rebuildPeople();toast(name+" adicionado. Avise para entrar em \"Primeiro acesso\" com esse e-mail.");return}
   const af=e.target.closest("[data-actform]");if(af){e.preventDefault();const inp=af.querySelector("input"), text=inp.value.trim();if(!text)return;write("acoes",{id:newId("ac"),metric:af.dataset.actform,text,by:me||"",at:new Date().toISOString()},acoes);return}
   if(e.target.id==="metForm"){e.preventDefault();const name=$("#metName").value.trim();if(!name)return;write("metricas",{id:newId("mt"),name,status:"ok",createdAt:new Date().toISOString()},metricas);return}
