@@ -1710,11 +1710,10 @@ $("#loginForm").addEventListener("submit",async e=>{
   if(firstMode){e.preventDefault();const btn=$("#lBtn"),er=$("#lErr"),email=$("#lEmail").value.trim().toLowerCase(),pw=$("#lPass").value;er.hidden=true;
     if(pw.length<8){er.textContent="Use pelo menos 8 caracteres.";er.hidden=false;return}
     btn.disabled=true;btn.textContent="Criando…";
-    const {data,error}=await sb.auth.signUp({email,password:pw,options:{emailRedirectTo:location.origin+location.pathname}});
+    let res={};try{const r=await sb.functions.invoke("acesso",{body:{email,password:pw}});res=r.data||{};if(r.error){try{res=await r.error.context.json()}catch(x){res={error:"falha"}}}}catch(x){res={error:"falha"}}
+    if(res.ok){const {data:d2,error:e2}=await sb.auth.signInWithPassword({email,password:pw});btn.disabled=false;btn.textContent="Criar minha senha";if(!e2&&d2&&d2.session){$("#lPass").value="";startApp(d2.session);return}er.textContent="Senha criada! Agora entre com ela.";er.hidden=false;return}
     btn.disabled=false;btn.textContent="Criar minha senha";
-    if(error){er.textContent=/registered|exists/i.test(error.message)?"Esse e-mail já tem senha. Use \"Já tenho senha: entrar\".":"Não deu para criar agora. Tente de novo em alguns minutos.";er.hidden=false;return}
-    if(data&&data.session){$("#lPass").value="";startApp(data.session);return}
-    er.textContent="Pronto! Enviamos um e-mail de confirmação para "+email+". Clique no link e depois entre com a sua senha.";er.hidden=false;return}
+    er.textContent=({existe:"Esse e-mail já tem senha. Use \"Já tenho senha: entrar\".",naocadastrado:"Esse e-mail não está cadastrado no Kaizen. Confira se digitou certo ou peça para o Gabriel cadastrar.",senha:"Use pelo menos 8 caracteres.",email:"Confira o e-mail."})[res.error]||"Não deu para criar agora. Tente de novo em instantes.";er.hidden=false;return}
 });
 $("#loginForm").addEventListener("submit",async e=>{if(firstMode)return;
   e.preventDefault();const btn=$("#lBtn");btn.disabled=true;btn.textContent="Entrando…";$("#lErr").hidden=true;
