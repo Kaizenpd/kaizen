@@ -1359,7 +1359,7 @@ function autoInsights(){
     if(pct!=null&&Math.abs(pct)>=10){const verb=b.v>a.v?"subiu":"caiu";out.push({key:`${b.w}:${k.id}:var`,kpi:k.id,w:b.w,tone:good==null?"neu":good?"ok":"bad",prio:Math.abs(pct)*(good===false?2:1),
       text:`${k.name} ${verb} ${Math.abs(pct)}% na semana de ${wLabel(b.w)} (${fmtK(a.v,k.un)} → ${fmtK(b.v,k.un)}).${good===false?" Vale olhar o que mudou.":""}`})}
     if(s.length>=3){const max=Math.max(...s.slice(0,-1).map(x=>x.v)),min=Math.min(...s.slice(0,-1).map(x=>x.v));
-      if(k.better&&((k.better==="up"&&b.v>max)||(k.better==="down"&&b.v<min)))out.push({key:`${b.w}:${k.id}:rec`,kpi:k.id,w:b.w,tone:"ok",prio:40,text:`Recorde: melhor ${k.name.toLowerCase()} desde que começamos a registrar (${fmtK(b.v,k.un)}).`});
+      if(k.better&&((k.better==="up"&&b.v>max)||(k.better==="down"&&b.v<min)))out.push({key:`${b.w}:${k.id}:rec`,kpi:k.id,w:b.w,tone:"ok",prio:40,text:`Recorde em ${k.name}: o melhor número desde que começamos a registrar (${fmtK(b.v,k.un)}).`});
       const c=s[s.length-3];if(k.better&&((k.better==="up"&&c.v>a.v&&a.v>b.v)||(k.better==="down"&&c.v<a.v&&a.v<b.v)))out.push({key:`${b.w}:${k.id}:trend`,kpi:k.id,w:b.w,tone:"bad",prio:60,text:`${k.name} piorou 2 semanas seguidas (${fmtK(c.v,k.un)} → ${fmtK(a.v,k.un)} → ${fmtK(b.v,k.un)}). Precisa de uma ação.`})}
   });
   const last=weeksSorted().slice(-1)[0];
