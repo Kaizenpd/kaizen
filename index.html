@@ -521,7 +521,7 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
 @media (max-width:760px){.follow.f2{grid-template-columns:1fr}}
 .ckb .col{min-width:260px}
 #metaForm,#bonForm{flex-direction:row}
-.day.tg-all{max-height:132px;overflow-y:auto}
+.day.tg-all{max-height:140px;overflow-y:auto;gap:3px}.day.tg-all .ev{flex:none;white-space:nowrap;padding:3px 6px;font-size:11.5px}
 #cAdd.card-s{padding:12px}
 /* final: acabamento */
 .card-s{transition:box-shadow .2s,border-color .2s}
@@ -972,7 +972,7 @@ function calTop(eyebrow,title){
   ${isSocio()?`<select class="sel" id="calWho" aria-label="Mostrar tarefas de">${whoOptions(who,"Todo mundo")}</select>`:""}
   <button type="button" class="primary" data-newtask>+ Nova tarefa</button></div></div>`;
 }
-const GH0=7, GH1=22, GPX=46;
+const GH0=6, GH1=23, GPX=46;
 const tmin=x=>{const m=/^(\d{1,2}):(\d{2})/.exec(x||"");return m?(+m[1])*60+(+m[2]):null};
 const fmtT=m=>pad(Math.floor(m/60))+":"+pad(m%60);
 function renderCalWeek(list){
