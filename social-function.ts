@@ -36,6 +36,17 @@ function abbrev(s: string): number | null {
 }
 
 async function instagram(h: string) {
+  try { return await instagramApi(h); } catch (e1) {
+    for (const url of [`https://www.instagram.com/${encodeURIComponent(h)}/`, `https://www.instagram.com/${encodeURIComponent(h)}/?hl=en`]) {
+      const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)", "Accept-Language": "en-US,en;q=0.9" } });
+      const t = await r.text();
+      const m = t.match(/content="([\d.,]+[KMB]?) Followers/i) || t.match(/"edge_followed_by":\{"count":(\d+)\}/);
+      if (m) return { n: abbrev(m[1]) ?? 0, nome: (t.match(/<meta property="og:title" content="([^"(]+)/) || [])[1]?.trim() || h, aprox: /[KMB]/i.test(m[1]) };
+    }
+    throw e1;
+  }
+}
+async function instagramApi(h: string) {
   const r = await fetch(`https://i.instagram.com/api/v1/users/web_profile_info/?username=${encodeURIComponent(h)}`, { headers: { "User-Agent": "Instagram 309.0.0.40.113 Android", "x-ig-app-id": "936619743392459", "Accept": "application/json" } });
   if (!r.ok) throw new Error(`instagram ${r.status}`);
   const j = await r.json();

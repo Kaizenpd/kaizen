@@ -318,6 +318,7 @@ h1 em{font-style:normal;color:var(--accent)}
 .chsvg{width:100%;height:auto;max-height:260px}.chsvg .ax{font-size:10px;fill:var(--muted)}.chsvg .metaln{stroke:var(--danger,#e5484d);stroke-dasharray:4 4;stroke-width:1.5}
 .chgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
 .iarea{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-right:4px}.partial{border-left:3px solid var(--accent)}
+.rede a{color:inherit}.rede .row{display:flex;gap:6px;margin-top:4px}.muted{color:var(--muted)}
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
 .kpi3{padding:12px 14px;border-radius:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:4px}.kpi3 .l{font-size:12px;font-weight:700;color:var(--muted)}.kpi3 .v{font-family:var(--f-display);font-size:22px;font-weight:800}
 .kf{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:26px}.spk{width:90px;height:26px;color:var(--accent)}
@@ -721,7 +722,7 @@ let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let peopleLoaded=false, decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
-let semanas=new Map(), numEdit=false, numWeek="";
+let semanas=new Map(), numEdit=false, numWeek="", redes=new Map(), numTab=load("pv-numtab","vendas"), redeEdit=null;
 let bonus=new Map(), blog=new Map(), bMes=TODAY.slice(0,7), bAdd=null, bDelArmed=null;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group2","etapa"), who=load("pv-who","all"), period=load("pv-period","week");
@@ -1336,18 +1337,20 @@ function renderNum(){
   $("#vNum").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">Todos com clareza</div><h1>Nossos <em>números</em></h1><p class="lede">Os números da semana com a evolução, os insights que o Kaizen escreve sozinho, o painel do VK Metrics e as ações para cada métrica.</p></div>
   <div class="actions">${url?`<a class="primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${svg("link")}Abrir VK Metrics</a>`:""}</div></div>
-  ${numbersHtml()}
-  <div class="card-s chart"><h3>Métricas e ações</h3><p class="empty" style="padding:0">Para cada métrica, as ações que podem melhorá-la. Quando uma métrica estiver abaixo, comece por aqui. Qualquer pessoa sugere ações; a boa vai para a Central de insights.</p>
+  <div class="seg" role="group" aria-label="Números" style="width:fit-content"><button type="button" data-numtab="vendas" aria-pressed="${numTab!=="redes"}">Vendas e funil</button><button type="button" data-numtab="redes" aria-pressed="${numTab==="redes"}">Redes sociais</button></div>
+  ${numTab==="redes"?redesHtml():numbersHtml()}
+  ${numTab==="redes"?"":`<div class="card-s chart"><h3>Métricas e ações</h3><p class="empty" style="padding:0">Para cada métrica, as ações que podem melhorá-la. Quando uma métrica estiver abaixo, comece por aqui. Qualquer pessoa sugere ações; a boa vai para a Central de insights.</p>
   <div class="mets">${mets.map(m=>{const as=acts.filter(a=>a.metric===m.id);return `<div class="met st-${m.status||"ok"}"><div class="mh"><b>${esc(m.name)}</b>${isSocio()?`<select class="sel sm" data-mstat="${m.id}" aria-label="Situação de ${esc(m.name)}">${Object.entries(MSTATUS).map(([k,v])=>`<option value="${k}"${(m.status||"ok")===k?" selected":""}>${v}</option>`).join("")}</select>`:`<span class="mst">${MSTATUS[m.status||"ok"]}</span>`}</div>
     ${as.length?as.map(a=>`<div class="act"><span>${esc(a.text)}</span>${a.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-asend="${a.id}">Para a central</button>`}${isSocio()||a.by===me?`<button type="button" class="x" data-adel="${a.id}" aria-label="Remover">×</button>`:""}</div>`).join(""):'<p class="empty">Nenhuma ação ainda.</p>'}
     <form class="addrow" data-actform="${m.id}" autocomplete="off"><input class="inp" maxlength="200" placeholder="Ação para melhorar ${esc(m.name.toLowerCase())}" aria-label="Nova ação para ${esc(m.name)}"><button class="ghost" type="submit">+</button></form></div>`}).join("")}</div>
-  ${isSocio()?`<form class="addrow" id="metForm" autocomplete="off"><input class="inp" id="metName" maxlength="40" placeholder="Nova métrica (ex.: Ticket médio)" aria-label="Nova métrica"><button class="ghost" type="submit">Adicionar métrica</button></form>`:""}</div>
+  ${isSocio()?`<form class="addrow" id="metForm" autocomplete="off"><input class="inp" id="metName" maxlength="40" placeholder="Nova métrica (ex.: Ticket médio)" aria-label="Nova métrica"><button class="ghost" type="submit">Adicionar métrica</button></form>`:""}</div>`}
+  <div class="stack"${numTab==="redes"?" hidden":""}>
   ${url?`<div class="card-s dash"><iframe src="${esc(url)}" title="Painel de números" loading="lazy" referrerpolicy="no-referrer"></iframe><p class="empty">Se o painel não aparecer acima, a ferramenta não deixa ser exibida dentro de outro site. Use o botão "Abrir painel".</p></div>`:'<div class="card-s box"><h3>Painel ainda não ligado</h3><p class="empty" style="padding:0">Os sócios colam abaixo o link de visualização do painel.</p></div>'}
   ${isSocio()?`<form class="card-s box" id="dashForm" autocomplete="off"><h3>Painel do VK Metrics</h3><p class="empty" style="padding:0">Cole o link do painel (ex.: https://app.vkmetrics.com/). Cada pessoa entra com o login do VK Metrics dentro do Kaizen.</p><div class="addrow"><input class="inp" id="dashUrl" type="url" value="${esc(c.url||"")}" placeholder="https://..." aria-label="Link do painel"><button class="ghost" type="submit">Salvar</button></div></form>`:""}
   <div class="card-s chart"><h3>Insights dos números</h3><p class="empty" style="padding:0">Olhou o painel e percebeu algo? Anote aqui.</p>
   <form class="mform" id="dinsForm" autocomplete="off"><textarea class="inp" id="diText" required maxlength="800" rows="2" placeholder="Ex.: ticket médio caiu 12% na semana; checkout mobile converte metade do desktop" aria-label="Insight dos números"></textarea><button class="primary" type="submit">Anotar</button></form>
   <div class="anon">${list.length?list.map(m=>`<div class="amsg"><p>${esc(m.text)}</p><div class="ins-act">${avatar(m.by||"time")}<small>${m.at?short(m.at.slice(0,10)):""}</small>${m.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-dsend="${m.id}">Mandar para a central</button>`}<button type="button" class="mini del" data-dxdel="${m.id}">Excluir</button></div></div>`).join(""):'<p class="empty">Nada anotado ainda.</p>'}</div></div>
-  </div>`;
+  </div></div>`;
 }
 
 /* números da semana + insights automáticos */
@@ -1415,6 +1418,29 @@ function numbersHtml(){
   ${charts}
   <div class="card-s chart"><h3>Insights automáticos</h3><p class="empty" style="padding:0">O Kaizen compara as semanas e escreve sozinho o que mudou. Os que pedem atenção vão automaticamente para a Central de insights, em "Números".</p>
   ${ins.length?`<div class="ains">${ins.map(x=>`<div class="ain ${x.tone}"><span>${x.tone==="bad"?"⚠️":x.tone==="ok"?"🚀":"📊"}</span><p>${x.area?`<b class="iarea">${esc(x.area)}</b> `:""}${esc(x.text)}</p></div>`).join("")}</div>`:'<p class="empty">Aparecem quando houver pelo menos duas semanas de números.</p>'}</div>`;
+}
+
+/* redes sociais */
+const REDE={instagram:{n:"Instagram",ic:"📸",url:h=>`https://www.instagram.com/${h}/`},tiktok:{n:"TikTok",ic:"🎵",url:h=>`https://www.tiktok.com/@${h}`},youtube:{n:"YouTube",ic:"▶️",url:h=>`https://www.youtube.com/@${h}`}};
+const fmtN=n=>n==null?"—":Number(n).toLocaleString("pt-BR");
+function histAt(h,daysAgo){const t=addDays(TODAY,-daysAgo);let best=null;(h||[]).forEach(x=>{if(x.d<=t&&(!best||x.d>best.d))best=x});return best}
+function redeSpark(h){const s=(h||[]).slice(-30);if(s.length<2)return "";const vs=s.map(x=>x.n),mn=Math.min(...vs),mx=Math.max(...vs),W=120,H=30;const pts=vs.map((v,i)=>`${(i/(vs.length-1)*W).toFixed(1)},${(H-2-((v-mn)/((mx-mn)||1))*(H-4)).toFixed(1)}`).join(" ");return `<svg class="spk" style="width:120px;height:30px" viewBox="0 0 ${W} ${H}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"/></svg>`}
+function redesHtml(){
+  const list=[...redes.values()].sort((a,b)=>(a.ord||9)-(b.ord||9));
+  const tot=list.reduce((s,r)=>s+(Number(r.n)||0),0);
+  const card=r=>{const R=REDE[r.rede]||{n:r.rede,ic:"🌐",url:()=>"#"}, h=r.hist||[], a7=histAt(h,7), a30=histAt(h,30);
+    const dl=(a,lb)=>a&&r.n!=null&&a.n?(()=>{const d=r.n-a.n,p=Math.round(d/a.n*1000)/10;return `<span class="dl ${d>0?"ok":d<0?"bad":"neu"}">${d>=0?"+":""}${fmtN(d)} (${p>=0?"+":""}${p}%) em ${lb}</span>`})():"";
+    const ed=isSocio()&&redeEdit===r.id;
+    return `<div class="kpi3 rede"><div class="l">${R.ic} ${R.n} · <a href="${esc(R.url(r.handle))}" target="_blank" rel="noopener noreferrer">@${esc(r.handle)}</a></div>
+    <div class="v">${r.aprox?"~":""}${fmtN(r.n)}</div><small class="muted">seguidores${r.at?` · atualizado ${short(r.at.slice(0,10))}`:""}${r.manual?" · preenchido à mão":""}</small>
+    <div class="kf">${dl(a7,"7 dias")||dl(a30,"30 dias")||'<span class="dl neu">o crescimento aparece a partir de amanhã</span>'}${redeSpark(h)}</div>
+    ${r.erro&&!r.manual?`<small class="muted">Não deu para ler sozinho da última vez.</small>`:""}
+    ${isSocio()?(ed?`<form class="addrow" data-redeform="${r.id}"><input class="inp" type="number" min="0" name="n" placeholder="Seguidores hoje" value="${r.n??""}" aria-label="Seguidores hoje"><button class="primary" type="submit">Salvar</button></form>`:`<div class="row"><button type="button" class="mini" data-redeedit="${r.id}">${r.manual?"Atualizar número":"Corrigir à mão"}</button><button type="button" class="mini del" data-redeldel="${r.id}">Remover</button></div>`):""}</div>`};
+  return `<div class="card-s chart"><h3>Redes sociais <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">· ${fmtN(tot)} seguidores no total</span></h3>
+  <p class="empty" style="padding:0">TikTok e YouTube atualizam sozinhos todo dia pelo perfil público. O Instagram bloqueia a leitura automática, então um sócio atualiza o número toda segunda (ou ligamos a conta pelo Meta).</p>
+  ${list.length?`<div class="kgrid">${list.map(card).join("")}</div>`:'<p class="empty">Nenhuma rede cadastrada.</p>'}
+  ${isSocio()?`<div class="actions" style="justify-content:flex-start"><button type="button" class="ghost" data-redesync>Atualizar agora</button></div>
+  <form class="mform" id="redeAdd" autocomplete="off"><select class="sel" id="raRede" aria-label="Rede">${Object.entries(REDE).map(([k,v])=>`<option value="${k}">${v.n}</option>`).join("")}</select><input class="inp" id="raHandle" required maxlength="60" placeholder="@ do perfil (sem o @)" aria-label="Perfil"><button class="ghost" type="submit">Adicionar rede</button></form>`:""}</div>`;
 }
 
 /* render */
@@ -1626,6 +1652,10 @@ $("#main").addEventListener("click",e=>{
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group2",group);render();return}
+  const nt=e.target.closest("[data-numtab]");if(nt){numTab=nt.dataset.numtab;store("pv-numtab",numTab);render();return}
+  const re=e.target.closest("[data-redeedit]");if(re){redeEdit=redeEdit===re.dataset.redeedit?null:re.dataset.redeedit;render();return}
+  const rd=e.target.closest("[data-redeldel]");if(rd){if(rd.dataset.armed!=="1"){rd.dataset.armed="1";rd.textContent="Confirmar";return}del("redes",rd.dataset.redeldel,redes);return}
+  if(e.target.closest("[data-redesync]")){toast("Buscando seguidores…");sb.functions.invoke("social",{body:{action:"atualizar"}}).then(({data,error})=>toast(error||!data?"Não deu agora. Tente de novo.":"Seguidores atualizados"));return}
   if(e.target.closest("[data-vksync]")){toast("Buscando os números no VK Metrics…");sb.functions.invoke("vk",{body:{action:"sync",weeks:8}}).then(({data,error})=>{if(error||!data||!data.ok){toast("Não deu para buscar no VK agora. Tente de novo.");return}setTimeout(()=>{pushAutoInsights();render()},1500);toast("Números atualizados pelo VK")});return}
   if(e.target.closest("[data-numedit]")){numEdit=!numEdit;render();return}
   const me2=e.target.closest("[data-medit]");if(me2){metaEdit=metaEdit===me2.dataset.medit?null:me2.dataset.medit;render();return}
@@ -1733,6 +1763,8 @@ $("#main").addEventListener("drop",e=>{
 
 $("#main").addEventListener("submit",e=>{
   const f=e.target;
+  if(f.matches("[data-redeform]")){e.preventDefault();const r=redes.get(f.dataset.redeform);const n=Number(f.n.value);if(!r||!(n>=0))return;const h=(r.hist||[]).filter(x=>x.d!==TODAY);h.push({d:TODAY,n});redeEdit=null;write("redes",{...r,n,hist:h.slice(-120),at:new Date().toISOString(),aprox:false},redes);toast("Seguidores atualizados");return}
+  if(f.id==="redeAdd"){e.preventDefault();const rede=$("#raRede").value, handle=$("#raHandle").value.trim().replace(/^@/,"").replace(/^https?:\/\/[^/]+\/@?/,"").replace(/\/.*$/,"");if(!handle)return;write("redes",{id:rede.slice(0,2)+"_"+handle.replace(/[^a-z0-9]/gi,"").toLowerCase(),rede,handle,ord:redes.size+1,hist:[],manual:rede==="instagram"},redes);toast("Rede adicionada. Clique em Atualizar agora.");return}
   if(f.id==="numForm"){e.preventDefault();const w=$("#nfWeek").value, vals={};kpis().forEach(k=>{const el=f.elements[k.id];if(el&&el.value!=="")vals[k.id]=Number(el.value)});if(vals.roas==null&&vals.fat!=null&&vals.invest>0)vals.roas=Math.round(vals.fat/vals.invest*100)/100;
     write("semanas",{id:w,valores:vals,by:me,at:new Date().toISOString()},semanas);numEdit=false;setTimeout(()=>{pushAutoInsights();render()},400);toast("Números salvos. Insights gerados.");return}
   if(f.id==="cAdd"){e.preventDefault();const title=$("#caTitle").value.trim();if(!title)return;const st=$("#caStart").value||TODAY;
@@ -1780,7 +1812,7 @@ function startApp(session){
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
   sub("people",m=>{peopleDocs=m;peopleLoaded=true;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
-  sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("semanas",m=>{semanas=m;if(isSocio()&&!window.__autoIns&&insights.size){window.__autoIns=1;setTimeout(pushAutoInsights,1500)}});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
+  sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("redes",m=>{redes=m});sub("semanas",m=>{semanas=m;if(isSocio()&&!window.__autoIns&&insights.size){window.__autoIns=1;setTimeout(pushAutoInsights,1500)}});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
