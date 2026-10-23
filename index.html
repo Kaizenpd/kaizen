@@ -313,6 +313,12 @@ h1 em{font-style:normal;color:var(--accent)}
 .anon{display:flex;flex-direction:column;gap:8px}
 .amsg{padding:12px;border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;gap:6px}
 .amsg p{margin:0;white-space:pre-wrap}.amsg.done{opacity:.55}.amsg small{color:var(--muted);font-size:12px}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.kpi3{padding:12px 14px;border-radius:12px;background:var(--surface-2);display:flex;flex-direction:column;gap:4px}.kpi3 .l{font-size:12px;font-weight:700;color:var(--muted)}.kpi3 .v{font-family:var(--f-display);font-size:22px;font-weight:800}
+.kf{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:26px}.spk{width:90px;height:26px;color:var(--accent)}
+.dl{font-size:12px;font-weight:800}.dl.ok{color:var(--ok,#16a34a)}.dl.bad{color:var(--danger,#e5484d)}.dl.neu{color:var(--muted)}
+.numform{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;padding:12px;border:1px dashed var(--line);border-radius:12px}.numform .cdl{flex:1 1 150px}
+.ains{display:flex;flex-direction:column;gap:8px}.ain{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:var(--surface-2)}.ain p{margin:0}.ain.bad{border-left:3px solid var(--danger,#e5484d)}.ain.ok{border-left:3px solid var(--ok,#16a34a)}
 .dash{padding:10px;display:flex;flex-direction:column;gap:6px}.dash iframe{width:100%;height:75vh;min-height:420px;border:0;border-radius:10px;background:var(--surface-2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px}.chips label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:5px 10px 5px 6px;font-size:13px;font-weight:700;cursor:pointer}
 .chips label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}.chips input{accent-color:var(--accent)}
@@ -710,6 +716,7 @@ let db=null, uid=null, myAvatar="", myName="", myEmail="", ready=false;
 /* cada login é sempre a mesma pessoa: o perfil vem do e-mail, não dá para trocar */
 let tasks=new Map(), insights=new Map(), members=new Map(), comments=new Map(), focus=new Map(), negs=new Map(), membersReady=false;
 let peopleLoaded=false, decisoes=new Map(), editDeps=[], pendingDec=null, calColor=load("pv-calcolor","frente"), tlStart=load("pv-tl",""), checks=new Map(), metricas=new Map(), acoes=new Map(), teamSetor=load("pv-tsetor","all");
+let semanas=new Map(), numEdit=false, numWeek="";
 let bonus=new Map(), blog=new Map(), bMes=TODAY.slice(0,7), bAdd=null, bDelArmed=null;
 let sonhos=new Map(), metas=new Map(), anon=new Map(), dashIns=new Map(), cfg=new Map(), metaDelArmed=null;
 let me=load("pv-me",""), view=load("pv-view","week"), calYM=load("pv-cal2",TODAY.slice(0,7)), calMode=load("pv-calm","month"), calWk=load("pv-calwk",WS), group=load("pv-group2","etapa"), who=load("pv-who","all"), period=load("pv-period","week");
@@ -1322,22 +1329,62 @@ function renderNum(){
   const acts=[...acoes.values()].sort((x,y)=>(x.at||"").localeCompare(y.at||""));
   const list=[...dashIns.values()].sort((x,y)=>(y.at||"").localeCompare(x.at||""));
   $("#vNum").innerHTML=`<div class="stack">
-  <div class="phead"><div><div class="eyebrow">Todos com clareza</div><h1>Nossos <em>números</em></h1><p class="lede">Os números principais da empresa, o painel e, para cada métrica, as ações que podem melhorá-la.</p></div>
-  <div class="actions">${url?`<a class="primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${svg("link")}Abrir painel</a>`:""}</div></div>
-  <div class="card-s chart"><h3>Números principais <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">atualizados a cada trimestre</span></h3>
-  ${nums.length?`<div class="kpis">${nums.map((n,i)=>`<div class="kpi2"><div class="v">${esc(n.value)}</div><div class="l">${esc(n.label)}</div>${n.date?`<small>${esc(n.date)}</small>`:""}${delBtn("numeros",i)}</div>`).join("")}</div>`:'<p class="empty">Ex.: faturamento do trimestre, alunos ativos, seguidores no Instagram e no TikTok.</p>'}
-  ${listEditor("numeros",[{n:"label",ph:"Número (ex.: Seguidores no Instagram)",req:1,max:60},{n:"value",ph:"Valor (ex.: 152 mil)",req:1,max:30,small:1},{n:"date",ph:"Referência (ex.: 3º tri/2026)",max:30,small:1}])}</div>
+  <div class="phead"><div><div class="eyebrow">Todos com clareza</div><h1>Nossos <em>números</em></h1><p class="lede">Os números da semana com a evolução, os insights que o Kaizen escreve sozinho, o painel do VK Metrics e as ações para cada métrica.</p></div>
+  <div class="actions">${url?`<a class="primary" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${svg("link")}Abrir VK Metrics</a>`:""}</div></div>
+  ${numbersHtml()}
   <div class="card-s chart"><h3>Métricas e ações</h3><p class="empty" style="padding:0">Para cada métrica, as ações que podem melhorá-la. Quando uma métrica estiver abaixo, comece por aqui. Qualquer pessoa sugere ações; a boa vai para a Central de insights.</p>
   <div class="mets">${mets.map(m=>{const as=acts.filter(a=>a.metric===m.id);return `<div class="met st-${m.status||"ok"}"><div class="mh"><b>${esc(m.name)}</b>${isSocio()?`<select class="sel sm" data-mstat="${m.id}" aria-label="Situação de ${esc(m.name)}">${Object.entries(MSTATUS).map(([k,v])=>`<option value="${k}"${(m.status||"ok")===k?" selected":""}>${v}</option>`).join("")}</select>`:`<span class="mst">${MSTATUS[m.status||"ok"]}</span>`}</div>
     ${as.length?as.map(a=>`<div class="act"><span>${esc(a.text)}</span>${a.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-asend="${a.id}">Para a central</button>`}${isSocio()||a.by===me?`<button type="button" class="x" data-adel="${a.id}" aria-label="Remover">×</button>`:""}</div>`).join(""):'<p class="empty">Nenhuma ação ainda.</p>'}
     <form class="addrow" data-actform="${m.id}" autocomplete="off"><input class="inp" maxlength="200" placeholder="Ação para melhorar ${esc(m.name.toLowerCase())}" aria-label="Nova ação para ${esc(m.name)}"><button class="ghost" type="submit">+</button></form></div>`}).join("")}</div>
   ${isSocio()?`<form class="addrow" id="metForm" autocomplete="off"><input class="inp" id="metName" maxlength="40" placeholder="Nova métrica (ex.: Ticket médio)" aria-label="Nova métrica"><button class="ghost" type="submit">Adicionar métrica</button></form>`:""}</div>
   ${url?`<div class="card-s dash"><iframe src="${esc(url)}" title="Painel de números" loading="lazy" referrerpolicy="no-referrer"></iframe><p class="empty">Se o painel não aparecer acima, a ferramenta não deixa ser exibida dentro de outro site. Use o botão "Abrir painel".</p></div>`:'<div class="card-s box"><h3>Painel ainda não ligado</h3><p class="empty" style="padding:0">Os sócios colam abaixo o link de visualização do painel.</p></div>'}
-  ${isSocio()?`<form class="card-s box" id="dashForm" autocomplete="off"><h3>Link do painel</h3><div class="addrow"><input class="inp" id="dashUrl" type="url" value="${esc(c.url||"")}" placeholder="https://..." aria-label="Link do painel"><button class="ghost" type="submit">Salvar</button></div></form>`:""}
+  ${isSocio()?`<form class="card-s box" id="dashForm" autocomplete="off"><h3>Painel do VK Metrics</h3><p class="empty" style="padding:0">Cole o link do painel (ex.: https://app.vkmetrics.com/). Cada pessoa entra com o login do VK Metrics dentro do Kaizen.</p><div class="addrow"><input class="inp" id="dashUrl" type="url" value="${esc(c.url||"")}" placeholder="https://..." aria-label="Link do painel"><button class="ghost" type="submit">Salvar</button></div></form>`:""}
   <div class="card-s chart"><h3>Insights dos números</h3><p class="empty" style="padding:0">Olhou o painel e percebeu algo? Anote aqui.</p>
   <form class="mform" id="dinsForm" autocomplete="off"><textarea class="inp" id="diText" required maxlength="800" rows="2" placeholder="Ex.: ticket médio caiu 12% na semana; checkout mobile converte metade do desktop" aria-label="Insight dos números"></textarea><button class="primary" type="submit">Anotar</button></form>
   <div class="anon">${list.length?list.map(m=>`<div class="amsg"><p>${esc(m.text)}</p><div class="ins-act">${avatar(m.by||"time")}<small>${m.at?short(m.at.slice(0,10)):""}</small>${m.sent?'<span class="mini">Na central</span>':`<button type="button" class="mini" data-dsend="${m.id}">Mandar para a central</button>`}<button type="button" class="mini del" data-dxdel="${m.id}">Excluir</button></div></div>`).join(""):'<p class="empty">Nada anotado ainda.</p>'}</div></div>
   </div>`;
+}
+
+/* números da semana + insights automáticos */
+const KPI_BASE=[{id:"fat",name:"Faturamento",un:"R$",better:"up"},{id:"vendas",name:"Vendas",un:"",better:"up"},{id:"invest",name:"Investimento em tráfego",un:"R$",better:""},{id:"roas",name:"ROAS",un:"x",better:"up"},{id:"cpa",name:"CPA (custo por venda)",un:"R$",better:"down"},{id:"ticket",name:"Ticket médio",un:"R$",better:"up"},{id:"leads",name:"Leads",un:"",better:"up"},{id:"conv",name:"Conversão da página",un:"%",better:"up"},{id:"reemb",name:"Taxa de reembolso",un:"%",better:"down"}];
+const kpis=()=>{const it=cfgItems("kpis");return it.length?it:KPI_BASE};
+const fmtK=(v,un)=>{if(v==null||v==="")return "—";const n=Number(v);if(un==="R$")return "R$ "+n.toLocaleString("pt-BR",{maximumFractionDigits:n<100?2:0});if(un==="%")return n.toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";if(un==="x")return n.toLocaleString("pt-BR",{maximumFractionDigits:2})+"x";return n.toLocaleString("pt-BR",{maximumFractionDigits:1})};
+const weeksSorted=()=>[...semanas.values()].filter(w=>w.valores).sort((a,b)=>a.id.localeCompare(b.id));
+function kSeries(id){return weeksSorted().map(w=>({w:w.id,v:w.valores[id]})).filter(x=>x.v!=null&&x.v!=="").map(x=>({w:x.w,v:Number(x.v)}))}
+const wLabel=ws=>`${short(ws)} a ${short(addDays(ws,6))}`;
+function autoInsights(){
+  const out=[];const ks=kpis();
+  ks.forEach(k=>{const s=kSeries(k.id);if(s.length<2)return;const a=s[s.length-2],b=s[s.length-1];if(!a.v&&!b.v)return;
+    const pct=a.v?Math.round((b.v-a.v)/Math.abs(a.v)*100):null;const good=k.better==="up"?b.v>a.v:k.better==="down"?b.v<a.v:null;
+    if(pct!=null&&Math.abs(pct)>=10){const verb=b.v>a.v?"subiu":"caiu";out.push({key:`${b.w}:${k.id}:var`,kpi:k.id,w:b.w,tone:good==null?"neu":good?"ok":"bad",prio:Math.abs(pct)*(good===false?2:1),
+      text:`${k.name} ${verb} ${Math.abs(pct)}% na semana de ${wLabel(b.w)} (${fmtK(a.v,k.un)} → ${fmtK(b.v,k.un)}).${good===false?" Vale olhar o que mudou.":""}`})}
+    if(s.length>=3){const max=Math.max(...s.slice(0,-1).map(x=>x.v)),min=Math.min(...s.slice(0,-1).map(x=>x.v));
+      if(k.better&&((k.better==="up"&&b.v>max)||(k.better==="down"&&b.v<min)))out.push({key:`${b.w}:${k.id}:rec`,kpi:k.id,w:b.w,tone:"ok",prio:40,text:`Recorde: melhor ${k.name.toLowerCase()} desde que começamos a registrar (${fmtK(b.v,k.un)}).`});
+      const c=s[s.length-3];if(k.better&&((k.better==="up"&&c.v>a.v&&a.v>b.v)||(k.better==="down"&&c.v<a.v&&a.v<b.v)))out.push({key:`${b.w}:${k.id}:trend`,kpi:k.id,w:b.w,tone:"bad",prio:60,text:`${k.name} piorou 2 semanas seguidas (${fmtK(c.v,k.un)} → ${fmtK(a.v,k.un)} → ${fmtK(b.v,k.un)}). Precisa de uma ação.`})}
+  });
+  const last=weeksSorted().slice(-1)[0];
+  if(last){const v=last.valores, r=Number(v.reemb);if(v.reemb!=null&&v.reemb!==""&&r>=10)out.push({key:`${last.id}:reemb:lim`,kpi:"reemb",w:last.id,tone:"bad",prio:80,text:`Taxa de reembolso em ${fmtK(r,"%")}: acima da meta de 10%.`});
+    const f=Number(v.fat),i=Number(v.invest);if(v.fat!=null&&v.invest!=null&&v.fat!==""&&v.invest!==""&&i>0&&!(v.roas>0)){const ro=f/i;out.push({key:`${last.id}:roascalc`,kpi:"roas",w:last.id,tone:ro>=2?"ok":"bad",prio:20,text:`ROAS calculado da semana: ${ro.toLocaleString("pt-BR",{maximumFractionDigits:2})}x (faturamento ÷ investimento).`})}}
+  return out.sort((a,b)=>b.prio-a.prio);
+}
+function spark(id){const s=kSeries(id).slice(-8);if(s.length<2)return "";const vs=s.map(x=>x.v),mn=Math.min(...vs),mx=Math.max(...vs),W=90,H=26;const pts=vs.map((v,i)=>`${(i/(vs.length-1)*W).toFixed(1)},${(H-2-((v-mn)/((mx-mn)||1))*(H-4)).toFixed(1)}`).join(" ");return `<svg class="spk" viewBox="0 0 ${W} ${H}" aria-hidden="true"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>`}
+function pushAutoInsights(){const sent=new Set([...insights.values()].map(i=>i.autoKey).filter(Boolean));autoInsights().filter(x=>x.tone==="bad"&&!sent.has(x.key)).slice(0,3).forEach(x=>saveIns({id:newId("i"),text:x.text,area:x.kpi==="reemb"?"sucesso":"funil",tag:"Números",owner:"time",by:"",status:"nova",autoKey:x.key,createdAt:new Date().toISOString()}))}
+function numbersHtml(){
+  const ks=kpis(), ws=weeksSorted(), last=ws.slice(-1)[0], prev=ws.slice(-2,-1)[0];
+  const card=k=>{const v=last?last.valores[k.id]:null, p=prev?prev.valores[k.id]:null;let d="";
+    if(v!=null&&v!==""&&p!=null&&p!==""&&Number(p)){const pct=Math.round((v-p)/Math.abs(p)*100), good=k.better==="up"?pct>0:k.better==="down"?pct<0:null;d=`<span class="dl ${pct===0?"":good==null?"neu":good?"ok":"bad"}">${pct>0?"▲":pct<0?"▼":"="} ${Math.abs(pct)}%</span>`}
+    return `<div class="kpi3"><div class="l">${esc(k.name)}</div><div class="v">${fmtK(v,k.un)}</div><div class="kf">${d}${spark(k.id)}</div></div>`};
+  const ins=autoInsights().slice(0,8);
+  const wk=numWeek||(last&&last.id===WS?WS:addDays(WS,-7)), cur=semanas.get(wk);
+  return `<div class="card-s chart"><h3>Números da semana ${last?`<span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">· ${wLabel(last.id)}${prev?" · comparado com a semana anterior":""}</span>`:""}</h3>
+  ${last?`<div class="kgrid">${ks.map(card).join("")}</div>`:`<p class="empty">Ainda não tem números. ${isSocio()?"Toda segunda, alguém copia os números da semana do VK Metrics aqui (leva 2 minutos) e o Kaizen compara, desenha a evolução e escreve os insights sozinho.":"Os sócios atualizam os números toda segunda."}</p>`}
+  ${isSocio()?`<div class="actions" style="justify-content:flex-start"><button type="button" class="${last?"ghost":"primary"}" data-numedit>${numEdit?"Fechar":"Atualizar números da semana"}</button></div>`:""}
+  ${isSocio()&&numEdit?`<form class="numform" id="numForm" autocomplete="off"><label class="cdl"><small>Semana</small><select class="sel" id="nfWeek">${[0,1,2,3,4,5,6,7].map(i=>addDays(WS,-7*i)).map(w=>`<option value="${w}"${w===wk?" selected":""}>${wLabel(w)}${w===WS?" (esta)":""}</option>`).join("")}</select></label>
+    ${ks.map(k=>`<label class="cdl"><small>${esc(k.name)}${k.un?` (${esc(k.un)})`:""}</small><input class="inp" type="number" step="any" inputmode="decimal" name="${k.id}" value="${cur&&cur.valores&&cur.valores[k.id]!=null?esc(cur.valores[k.id]):""}"></label>`).join("")}
+    <button class="primary" type="submit">Salvar e gerar insights</button><p class="hint" style="flex-basis:100%">Copie do VK Metrics, filtro "semana passada". Pode deixar em branco o que não tiver.</p></form>`:""}
+  </div>
+  <div class="card-s chart"><h3>Insights automáticos</h3><p class="empty" style="padding:0">O Kaizen compara as semanas e escreve sozinho o que mudou. Os que pedem atenção vão automaticamente para a Central de insights, em "Números".</p>
+  ${ins.length?`<div class="ains">${ins.map(x=>`<div class="ain ${x.tone}"><span>${x.tone==="bad"?"⚠️":x.tone==="ok"?"🚀":"📊"}</span><p>${esc(x.text)}</p></div>`).join("")}</div>`:'<p class="empty">Aparecem quando houver pelo menos duas semanas de números.</p>'}</div>`;
 }
 
 /* render */
@@ -1549,6 +1596,7 @@ $("#main").addEventListener("click",e=>{
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group2",group);render();return}
+  if(e.target.closest("[data-numedit]")){numEdit=!numEdit;render();return}
   const me2=e.target.closest("[data-medit]");if(me2){metaEdit=metaEdit===me2.dataset.medit?null:me2.dataset.medit;render();return}
   if(e.target.closest("[data-viewback]")){viewAs("");return}
   const cl=e.target.closest("[data-clay]");if(cl){cLay=cl.dataset.clay;store("pv-clay",cLay);render();return}
@@ -1589,6 +1637,7 @@ $("#main").addEventListener("change",e=>{
     if(k==="start"){if(!v){render();return}const len=x.end?diff(x.start,x.end):0;nx.end=len?addDays(v,len):""}
     if(k==="cst"){nx.status=v==="postado"?"done":(x.status==="done"?"todo":x.status);if(v==="postado")toast("Postado!")}
     save(nx);return}
+  if(t.id==="nfWeek"){numWeek=t.value;render();return}
   if(t.id==="boardArea"){bArea=t.value;store("pv-barea",bArea);render();return}
   if(t.matches("[data-bf]")){const [id,k]=t.dataset.bf.split(":"), b=bonus.get(id);if(!b)return;const v=t.value===""?null:Number(t.value);write("bonus",{...b,[k]:v},bonus);return}
   if(t.matches("[data-tick]")){const x=tasks.get(t.dataset.tick);if(x){save({...x,status:t.checked?"done":"todo"});toast(t.checked?"Feito! Um passo a mais.":"Reaberta")}return}
@@ -1653,6 +1702,8 @@ $("#main").addEventListener("drop",e=>{
 
 $("#main").addEventListener("submit",e=>{
   const f=e.target;
+  if(f.id==="numForm"){e.preventDefault();const w=$("#nfWeek").value, vals={};kpis().forEach(k=>{const el=f.elements[k.id];if(el&&el.value!=="")vals[k.id]=Number(el.value)});if(vals.roas==null&&vals.fat!=null&&vals.invest>0)vals.roas=Math.round(vals.fat/vals.invest*100)/100;
+    write("semanas",{id:w,valores:vals,by:me,at:new Date().toISOString()},semanas);numEdit=false;setTimeout(()=>{pushAutoInsights();render()},400);toast("Números salvos. Insights gerados.");return}
   if(f.id==="cAdd"){e.preventDefault();const title=$("#caTitle").value.trim();if(!title)return;const st=$("#caStart").value||TODAY;
     save({id:newId("t"),title,owner:isSocio()?$("#caOwner").value:me,phase:"conteudo",start:st,end:"",time:"",status:"todo",milestone:false,notes:"",link:"",ctipo:$("#caTipo").value,cst:"producao",cpost:$("#caPost").value||"",meta:"",criterio:"",deps:[]});
     $("#caTitle").value="";toast("Conteúdo adicionado");return}
@@ -1698,7 +1749,7 @@ function startApp(session){
   sub("focus",m=>{focus=m});
   sub("inegociaveis",m=>{negs=m});
   sub("people",m=>{peopleDocs=m;peopleLoaded=true;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
-  sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
+  sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("semanas",m=>{semanas=m});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
   sub("ticktick",m=>{ttStatus=m;ttLabel()});
   ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
