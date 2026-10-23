@@ -86,9 +86,14 @@ async function sync(weeks = 8) {
     queries.push({ metrics: ["revenue", "purchase_count"], dimensions: ["vk_source", "purchase.status"], filters_json: JSON.stringify({ ...f, "purchase.status": { operator: "$in", value: ["approved", "completed", "refunded", "chargeback"] } }), limit: 500 });
     queries.push({ metrics: ["spend"], filters_json: JSON.stringify(f) });
   }
-  const r: any = await m.rpc("tools/call", { name: "vk_analytics_query_batch", arguments: { queries, parallel: true } });
-  const txt = (r.content ?? []).map((c: any) => c.text ?? "").join("");
-  const res = JSON.parse(txt).results;
+  const res: any[] = [];
+  for (let i = 0; i < queries.length; i += 8) {
+    const r: any = await m.rpc("tools/call", { name: "vk_analytics_query_batch", arguments: { queries: queries.slice(i, i + 8), parallel: true } });
+    const txt = (r.content ?? []).map((c: any) => c.text ?? "").join("");
+    let part: any[] = [];
+    try { part = JSON.parse(txt).results ?? []; } catch (_) { throw new Error("vk: " + txt.slice(0, 200)); }
+    res.push(...part);
+  }
   const out: string[] = [];
   for (let i = 0; i < list.length; i++) {
     const w = list[i], sales = res[2 * i], sp = res[2 * i + 1];
