@@ -1068,10 +1068,10 @@ const groupField=()=>group==="status"?"status":group==="phase"?"phase":"owner";
 const groupKey=t=>group==="etapa"?etapaOf(t):group==="conteudo"?(t.cst||"producao"):group==="status"?(t.status||"todo"):group==="phase"?(t.phase||"gestao"):(t.owner||"time");
 function curArea(){if(!bArea){const st=person(me).setor;bArea=isSocio()?"all":({conteudo:"conteudo",funil:"funil",comercial:"funil",sucesso:"sucesso",produto:"produto"}[st]||"all")}return group==="conteudo"?"conteudo":bArea}
 function contentAdd(){
-  const ctab=cTab==="all"?"":cTab, own=TEAM.filter(p=>isSocio()||p.id===me);
+  const ctab=cTab==="all"?"":cTab, own=teamPick();
   return `<form class="cadd card-s" id="cAdd" autocomplete="off"><input class="inp" id="caTitle" required maxlength="160" placeholder="Novo conteúdo (ex.: Carrossel 70: hook de autoridade)" aria-label="Novo conteúdo">
     <select class="sel" id="caTipo" aria-label="Tipo">${Object.entries(CTIPO).map(([k,v])=>`<option value="${k}"${(ctab||"conversao")===k?" selected":""}>${v}</option>`).join("")}</select>
-    <select class="sel" id="caOwner" aria-label="Responsável"${isSocio()?"":" disabled"}>${own.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}</option>`).join("")}</select>
+    <select class="sel" id="caOwner" aria-label="Responsável">${own.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}</option>`).join("")}</select>
     <label class="cdl"><small>Entrega</small><input type="date" class="sel" id="caStart" value="${TODAY}" required></label>
     <label class="cdl"><small>Postagem</small><input type="date" class="sel" id="caPost"></label>
     <button class="primary" type="submit">Adicionar</button></form>`;
@@ -1080,11 +1080,11 @@ function contentList(){
   const ctab=cTab==="all"?"":cTab, monthAgo=addDays(TODAY,-30);
   const all=[...tasks.values()].filter(t=>t.phase==="conteudo"&&t.start&&!t.rec&&!t.meeting&&(!ctab||(t.ctipo||"conversao")===ctab)&&(who==="all"||t.owner===who));
   const ord=(a,b)=>(a.cpost||a.start).localeCompare(b.cpost||b.start)||a.title.localeCompare(b.title);
-  const own=TEAM.filter(p=>isSocio()||p.id===me);
-  const row=t=>{const late=t.status!=="done"&&t.start<TODAY&&(t.cst||"producao")==="producao", u=safeUrl(t.link), mine=isSocio()||t.owner===me;
+  const own=teamPick();
+  const row=t=>{const late=t.status!=="done"&&t.start<TODAY&&(t.cst||"producao")==="producao", u=safeUrl(t.link), mine=canEdit(t);
     return `<div class="crow2${(t.cst||"producao")==="postado"?" done":""}">
     <button type="button" class="ctitle" data-open="${t.id}"><span class="ctag">${esc(CTIPO[t.ctipo||"conversao"])}</span>${esc(t.title)}${late?' <span class="late">atrasado</span>':""}</button>
-    <select class="sel sm" data-cf="${t.id}:owner" aria-label="Responsável"${isSocio()?"":" disabled"}>${TEAM.map(p=>`<option value="${p.id}"${t.owner===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}${t.owner==="time"?'<option value="time" selected>Time todo</option>':""}</select>
+    <select class="sel sm" data-cf="${t.id}:owner" aria-label="Responsável"${mine?"":" disabled"}>${(mine?[...new Set([...teamPick(),person(t.owner)].filter(p=>p&&p.id&&p.id!=="time"))]:TEAM).map(p=>`<option value="${p.id}"${t.owner===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}${t.owner==="time"?'<option value="time" selected>Time todo</option>':""}</select>
     <label class="cdl"><small>Entrega</small><input type="date" class="sel sm" data-cf="${t.id}:start" value="${esc(t.start)}"${mine?"":" disabled"}></label>
     <label class="cdl"><small>Postagem</small><input type="date" class="sel sm" data-cf="${t.id}:cpost" value="${esc(t.cpost||"")}"${mine?"":" disabled"}></label>
     <select class="sel sm cst-${t.cst||"producao"}" data-cf="${t.id}:cst" aria-label="Etapa"${mine?"":" disabled"}>${CSTS.map(c=>`<option value="${c.id}"${(t.cst||"producao")===c.id?" selected":""}>${c.name}</option>`).join("")}</select>
@@ -1092,7 +1092,7 @@ function contentList(){
   const groups=CSTS.map(c=>({c,items:all.filter(t=>(t.cst||"producao")===c.id&&!(c.id==="postado"&&(t.cpost||t.start)<monthAgo)).sort(ord)}));
   return `<form class="cadd" id="cAdd" autocomplete="off"><input class="inp" id="caTitle" required maxlength="160" placeholder="Novo conteúdo (ex.: Carrossel 70: hook de autoridade)" aria-label="Novo conteúdo">
     <select class="sel" id="caTipo" aria-label="Tipo">${Object.entries(CTIPO).map(([k,v])=>`<option value="${k}"${(ctab||"conversao")===k?" selected":""}>${v}</option>`).join("")}</select>
-    <select class="sel" id="caOwner" aria-label="Responsável"${isSocio()?"":" disabled"}>${own.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}</option>`).join("")}</select>
+    <select class="sel" id="caOwner" aria-label="Responsável">${own.map(p=>`<option value="${p.id}"${p.id===me?" selected":""}>${esc(p.name)}</option>`).join("")}</select>
     <label class="cdl"><small>Entrega</small><input type="date" class="sel" id="caStart" value="${TODAY}" required></label>
     <label class="cdl"><small>Postagem</small><input type="date" class="sel" id="caPost"></label>
     <button class="primary" type="submit">Adicionar</button></form>
@@ -1548,10 +1548,14 @@ function render(){
 async function write(col,obj,map){
   if(col==="tasks"){const prev=map.get(obj.id);if(prev&&prev.tt&&!obj.tt)obj={...obj,tt:prev.tt};if(prev&&prev.inv&&!obj.inv)obj={...obj,inv:prev.inv};if(prev&&prev.status!=="done"&&obj.status==="done"){const o=obj;setTimeout(()=>{const rel=[...tasks.values()].filter(x=>x.status!=="done"&&Array.isArray(x.deps)&&x.deps.some(d=>d.type==="task"&&d.taskId===o.id)&&!isBlocked(x));if(rel.length)toast(`Liberada para avançar: ${rel.map(x=>x.title).slice(0,2).join(", ")}`)},50)}
   if(prev&&prev.status!==obj.status)focus.forEach(f=>{if(f.taskId===obj.id&&!!f.done!==(obj.status==="done"))setTimeout(()=>write("focus",{...f,done:obj.status==="done"},focus),0)})}
+  const before=map.get(obj.id);
   map.set(obj.id,obj);render();
   if(!db)return;
   try{const {id,...body}=obj;await db.collection(col).doc(id).set(body);if(col==="tasks")ttPush({id})}
-  catch(e){toast(e&&e.code==="invalid_argument"?"Sua sessão expirou. Entre de novo.":"Não deu para salvar. Tente de novo.")}
+  catch(e){
+    if(before)map.set(obj.id,before);else map.delete(obj.id);render();
+    const rls=e&&(e.code==="42501"||/row-level security/i.test(e.message||""));
+    toast(e&&e.code==="invalid_argument"?"Sua sessão expirou. Entre de novo.":rls?"Você não tem permissão para mudar esta tarefa. Fale com um sócio.":"Não deu para salvar. Confira a internet e tente de novo.")}
 }
 async function del(col,id,map){
   const old=map.get(id);
@@ -1588,6 +1592,11 @@ function toggleFocus(taskId){
   else{const tk=tasks.get(taskId);write("focus",{id,person:me,date:TODAY,taskId,done:!!(tk&&tk.status==="done")},focus);toast("Inegociável do dia definido")}
 }
 
+/* quem pode editar: dono, "time" ou o mesmo setor da frente da tarefa */
+const SETOR_PH={conteudo:["conteudo"],sucesso:["sucesso"],comercial:["comercial"],funil:["trafego","oferta","vsl","lancamento","comercial","parcerias"],produto:["produto"]};
+const myPh=()=>SETOR_PH[person(me).setor]||[];
+const canEdit=t=>isSocio()||!t||t.owner===me||t.owner==="time"||myPh().includes(t.phase);
+const teamPick=()=>isSocio()?TEAM:TEAM.filter(p=>p.id===me||(p.setor&&p.setor===person(me).setor));
 /* modais */
 function fillSelects(){
   const ppl=PEOPLE.map(p=>`<option value="${p.id}">${p.name}</option>`).join("");
@@ -1612,7 +1621,8 @@ function openModal(t,d={}){
   if(t||!d.fromIns)pendingIns=null;
   const v=t||{title:d.title||"",owner:d.owner||me||"time",phase:d.phase||"gestao",start:d.start||TODAY,end:"",time:d.time||"",status:d.status||"todo",milestone:false,notes:d.notes||"",link:""};
   $("#mTitle").textContent=t?"Editar tarefa":d.fromIns?"Transformar insight em tarefa":"Nova tarefa";
-  $("#fTitle").value=v.title;$("#fOwner").value=isSocio()?(v.owner||"time"):(t?v.owner:me);$("#fOwner").disabled=!isSocio();$("#fPhase").value=v.phase||"gestao";
+  $("#fTitle").value=v.title;{const ok=new Set(teamPick().map(p=>p.id).concat(["time"]));$("#fOwner").querySelectorAll("option").forEach(o=>{o.hidden=!isSocio()&&!ok.has(o.value)&&o.value!==v.owner})}
+  $("#fOwner").value=v.owner||(isSocio()?"time":me);$("#fOwner").disabled=!!t&&!canEdit(t);$("#fPhase").value=v.phase||"gestao";
   $("#fStart").value=v.start;$("#fEnd").value=v.end||"";$("#fTime").value=v.time||"";$("#fStatus").value=v.status||"todo";
   $("#fCTipo").value=v.ctipo||d.ctipo||"conversao";$("#fCSt").value=v.cst||d.cst||"producao";$("#fCPost").value=v.cpost||"";cToggle();pendingNeg=!!d.negNow;
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
@@ -1707,9 +1717,10 @@ $("#form").addEventListener("submit",e=>{
   e.preventDefault();
   const start=$("#fStart").value;let end=$("#fEnd").value;if(end&&end<start)end=start;if(end===start)end="";
   const id=editing||newId("t"), prev=editing?tasks.get(editing):null, meeting=$("#fMeet").checked;
+  if(prev&&!canEdit(prev)){toast("Esta tarefa é de outra pessoa de outro setor. Só ela ou um sócio podem mudar.");return}
   if(meeting&&!$("#fTime").value){toast("Reunião precisa de horário.");$("#fTime").focus();return}
   let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);if(!att.length||att.includes("all"))att=["all"];
-  const t={id,title:$("#fTitle").value.trim(),owner:isSocio()?$("#fOwner").value:(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
+  const t={id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value||(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
   if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
   if(!meeting&&prev&&prev.dur)t.dur=prev.dur;
@@ -1846,7 +1857,7 @@ document.addEventListener("pointermove",e=>{if(!tgd)return;const g=tgd;if(!g.mov
   const m=tgYtoMin(g.col,e.clientY-g.off);g.el.style.top=((m-GH0*60)/60*GPX)+"px";g.el.querySelector(".tw").firstChild.textContent=fmtT(m)});
 document.addEventListener("pointerup",e=>{if(!tgd)return;const g=tgd;tgd=null;g.el.classList.remove("dragging");
   if(!g.moved){openModal(g.t);return}
-  const t=g.t;let nt;
+  const t=g.t;let nt;if(!canEdit(t)){toast("Esta tarefa é de outro setor. Só o dono ou um sócio podem mudar.");render();return}
   if(g.mode==="rz"){const dur=Math.max(15,Math.round((g.el.offsetHeight+2)/GPX*60/15)*15);nt={...t,dur};toast("Duração: "+(dur>=60?Math.floor(dur/60)+"h"+(dur%60?pad(dur%60):""):dur+" min"))}
   else{const m=tgYtoMin(g.col,e.clientY-g.off), ns=g.col.dataset.date, len=t.end?diff(t.start,t.end):0;nt={...t,start:ns,end:len?addDays(ns,len):"",time:fmtT(m)};toast(`Movida para ${short(ns)} às ${fmtT(m)}`)}
   save(nt);if(nt.meeting||nt.inv)setTimeout(()=>invPush({action:"push",id:nt.id}),700)});
@@ -1859,7 +1870,7 @@ document.addEventListener("dragend",()=>{dragId=null;document.querySelectorAll("
 $("#main").addEventListener("dragover",e=>{if(!dragId)return;const z=e.target.closest(".tcol[data-date],.day[data-date],.col[data-col]");if(!z)return;e.preventDefault();document.querySelectorAll(".drop").forEach(x=>x!==z&&x.classList.remove("drop"));z.classList.add("drop")});
 $("#main").addEventListener("drop",e=>{
   if(!dragId)return;const z=e.target.closest(".tcol[data-date],.day[data-date],.col[data-col]");if(!z)return;e.preventDefault();z.classList.remove("drop");
-  const t=tasks.get(dragId);dragId=null;if(!t)return;
+  const t=tasks.get(dragId);dragId=null;if(!t)return;if(!canEdit(t)){toast("Esta tarefa é de outro setor. Só o dono ou um sócio podem mover.");return}
   if(z.classList.contains("tcol")){const m=tgYtoMin(z,e.clientY), ns=z.dataset.date, len=t.end?diff(t.start,t.end):0;save({...t,start:ns,end:len?addDays(ns,len):"",time:fmtT(m)});toast(`Marcada para ${short(ns)} às ${fmtT(m)}`);return}
   if(z.classList.contains("tg-all")&&t.time){const ns=z.dataset.date, len=t.end?diff(t.start,t.end):0;save({...t,start:ns,end:len?addDays(ns,len):"",time:""});toast("Agora sem horário, em "+short(ns));return}
   if(z.dataset.date){const ns=z.dataset.date;if(ns===t.start)return;const len=t.end?diff(t.start,t.end):0;save({...t,start:ns,end:len?addDays(ns,len):""});toast("Movida para "+short(ns));return}
@@ -1885,7 +1896,7 @@ $("#main").addEventListener("submit",e=>{
   if(f.id==="numForm"){e.preventDefault();const w=$("#nfWeek").value, vals={};kpis().forEach(k=>{const el=f.elements[k.id];if(el&&el.value!=="")vals[k.id]=Number(el.value)});if(vals.roas==null&&vals.fat!=null&&vals.invest>0)vals.roas=Math.round(vals.fat/vals.invest*100)/100;
     write("semanas",{id:w,valores:vals,by:me,at:new Date().toISOString()},semanas);numEdit=false;setTimeout(()=>{pushAutoInsights();render()},400);toast("Números salvos. Insights gerados.");return}
   if(f.id==="cAdd"){e.preventDefault();const title=$("#caTitle").value.trim();if(!title)return;const st=$("#caStart").value||TODAY;
-    save({id:newId("t"),title,owner:isSocio()?$("#caOwner").value:me,phase:"conteudo",start:st,end:"",time:"",status:"todo",milestone:false,notes:"",link:"",ctipo:$("#caTipo").value,cst:"producao",cpost:$("#caPost").value||"",meta:"",criterio:"",deps:[]});
+    save({id:newId("t"),title,owner:$("#caOwner").value||me,phase:"conteudo",start:st,end:"",time:"",status:"todo",milestone:false,notes:"",link:"",ctipo:$("#caTipo").value,cst:"producao",cpost:$("#caPost").value||"",meta:"",criterio:"",deps:[]});
     $("#caTitle").value="";toast("Conteúdo adicionado");return}
   if(f.id==="bonForm"){e.preventDefault();const item=$("#bfItem").value.trim();if(!item)return;const modo=$("#bfModo").value;
     write("bonus",{id:newId("bn"),person:$("#bfP").value,mes:bMes,item,modo,regra:modo==="extra"?">=":$("#bfRegra").value,meta:modo==="extra"?null:Number($("#bfMeta").value)||0,un:$("#bfUn").value.trim(),valor:Number($("#bfVal").value)||0,real:null,ord:Date.now()},bonus);toast("Regra de bônus criada");return}
