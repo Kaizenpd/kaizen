@@ -530,6 +530,9 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
 .card .ct{font-weight:700}
 .col{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
 .kpi .v{font-family:var(--f-display)}
+.rt-m.opt{color:#a5b4fc;font-style:italic}
+.meetrow.opt b{color:#a5b4fc}.optt{font-size:10px;font-weight:800;color:#a5b4fc;background:rgba(165,180,252,.14);border-radius:999px;padding:1px 7px;margin-left:4px;text-transform:uppercase;letter-spacing:.05em}
+.optc{border-style:dashed!important}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -623,6 +626,7 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
     <label class="chk" for="fMeet"><input type="checkbox" id="fMeet"> É reunião: mandar convite por e-mail para a agenda de cada participante</label>
     <div class="meetbox" id="meetBox" hidden>
       <div class="f"><span class="lbl">Participantes</span><div class="chips" id="fAtt"></div></div>
+      <div class="f"><span class="lbl">Opcionais <small style="text-transform:none;letter-spacing:0;font-weight:600">(convidados, entram quando quiserem)</small></span><div class="chips" id="fOpt"></div></div>
       <div class="row2">
         <div class="f"><label for="fDur">Duração</label><select id="fDur"><option value="15">15 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60" selected>1 hora</option><option value="90">1h30</option><option value="120">2 horas</option></select></div>
         <div class="f"><label for="fRec">Repetir</label><select id="fRec"><option value="">Não repete</option><option value="weekdays">Todo dia útil (seg a sex)</option><option value="weekly">Toda semana, mesmo dia</option><option value="monthly">Todo mês, mesmo dia</option></select></div>
@@ -848,13 +852,14 @@ function renderShell(){
   const vb=$("#viewBanner");if(vb){vb.hidden=!realMe;vb.innerHTML=realMe?`Você está vendo o Kaizen como <b>${esc(pname(me))}</b>. O que fizer aqui conta como ${esc(pname(me))}. <button type="button" class="mini" data-viewback>Voltar para mim</button>`:""}
   $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";
 }
+const isOpt=(t,p)=>Array.isArray(t.opt)&&t.opt.includes(p);
 function ritualHtml(){
   const DS=["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"], by={};
   [...tasks.values()].filter(t=>t.meeting&&t.rec&&t.start&&inMeet(t,me)).forEach(t=>{const days=t.rec==="weekdays"?[1,2,3,4,5]:t.rec==="weekly"?[parse(t.start).getDay()]:[];days.forEach(d=>(by[d]=by[d]||[]).push(t))});
   const today=parse(TODAY).getDay(), order=[1,2,3,4,5,6,0].filter(d=>by[d]);
   if(!order.length)return "Fluxo contínuo: planejar, fazer, revisar.";
   const nm=t=>{let x=t.title.replace(/^(Reunião|Reuniao)\s*(de|do|da)?\s*(setor:?)?\s*/i,"").replace(/\s*\(.*$/,"").trim();x=x.charAt(0).toUpperCase()+x.slice(1);return esc(x.slice(0,22))};
-  return `<div class="rt-h">Reuniões da semana</div>`+order.map(d=>`<div class="rt-d${d===today?" now":""}"><b>${DS[d]}</b><span>${by[d].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(t=>`${esc((t.time||"").replace(":00","h").replace(":","h"))} ${nm(t)}`).join("<br>")}</span></div>`).join("")+`<div class="rt-f">Fluxo contínuo: planejar, fazer, revisar.</div>`;
+  return `<div class="rt-h">Reuniões da semana</div>`+order.map(d=>`<div class="rt-d${d===today?" now":""}"><b>${DS[d]}</b><span>${by[d].sort((a,b)=>(a.time||"").localeCompare(b.time||"")).map(t=>{const o=isOpt(t,me);return `<span class="rt-m${o?" opt":""}"${o?' title="Opcional: entre quando quiser"':""}>${esc((t.time||"").replace(":00","h").replace(":","h"))} ${nm(t)}${o?" ·":""}</span>`}).join("<br>")}</span></div>`).join("")+(order.some(d=>by[d].some(t=>isOpt(t,me)))?`<div class="rt-f"><span class="rt-m opt">Em lilás</span>: opcional, entre quando quiser.</div>`:"")+`<div class="rt-f">Fluxo contínuo: planejar, fazer, revisar.</div>`;
 }
 function setView(v){view=v;store("pv-view",v);render();try{window.scrollTo({top:0})}catch(e){}}
 
@@ -1204,7 +1209,7 @@ const inMeet=(t,p)=>t.meeting&&(attOf(t).includes("all")||attOf(t).includes(p)||
 function meetTodayHtml(){
   const ms=[...tasks.values()].filter(t=>t.meeting&&inMeet(t,me)&&occurs(t,TODAY)).sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
   if(!ms.length)return "";
-  return `<div class="card-s box"><h3>Reuniões de hoje</h3>${ms.map(t=>{const u=safeUrl(t.call);return `<div class="meetrow"><b>${esc(t.time||"--:--")}</b><span>${esc(t.title)}</span>${u?`<a class="mini" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Entrar</a>`:""}<button type="button" class="mini" data-open="${t.id}">Ver</button></div>`}).join("")}</div>`;
+  return `<div class="card-s box"><h3>Reuniões de hoje</h3>${ms.map(t=>{const u=safeUrl(t.call), o=isOpt(t,me);return `<div class="meetrow${o?" opt":""}"><b>${esc(t.time||"--:--")}</b><span>${esc(t.title)}${o?' <small class="optt">opcional</small>':""}</span>${u?`<a class="mini" href="${esc(u)}" target="_blank" rel="noopener noreferrer">Entrar</a>`:""}<button type="button" class="mini" data-open="${t.id}">Ver</button></div>`}).join("")}</div>`;
 }
 function invPush(body){if(!db)return;sb.functions.invoke("convites",{body}).then(({data,error})=>{if(error){toast("Tarefa salva, mas o convite não foi enviado. Tente salvar de novo.");return}if(data&&data.sent)toast(`Convite enviado para ${data.sent} pessoa${data.sent>1?"s":""}${data.meet?" com link do Meet":""}`)}).catch(()=>{})}
 
@@ -1628,7 +1633,9 @@ function openModal(t,d={}){
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
   const att=v.meeting?attOf(v):["all"];
   $("#fMeet").checked=!!v.meeting;$("#meetBox").hidden=!v.meeting;$("#fDur").value=String(v.dur||60);$("#fRec").value=v.rec||"";$("#fCall").value=v.call||"";
-  $("#fAtt").innerHTML=`<label><input type="checkbox" value="all"${att.includes("all")?" checked":""}> Todos</label>`+TEAM.map(p=>`<label><input type="checkbox" value="${p.id}"${!att.includes("all")&&att.includes(p.id)?" checked":""}> ${esc(p.name)}</label>`).join("");
+  const opt0=Array.isArray(v.opt)?v.opt:[];
+  $("#fAtt").innerHTML=`<label><input type="checkbox" value="all"${att.includes("all")?" checked":""}> Todos</label>`+TEAM.map(p=>`<label><input type="checkbox" value="${p.id}"${!att.includes("all")&&att.includes(p.id)&&!opt0.includes(p.id)?" checked":""}> ${esc(p.name)}</label>`).join("");
+  $("#fOpt").innerHTML=TEAM.map(p=>`<label class="optc"><input type="checkbox" value="${p.id}"${opt0.includes(p.id)?" checked":""}> ${esc(p.name)}</label>`).join("");
   pendingDec=d.fromDec||null;
   const emp=[...metas.values()].filter(m=>m.scope!=="individual");
   $("#fMeta").innerHTML=`<option value="">Nenhuma</option>`+emp.map(m=>`<option value="${m.id}"${v.meta===m.id?" selected":""}>${esc(m.title)}</option>`).join("");
@@ -1719,9 +1726,9 @@ $("#form").addEventListener("submit",e=>{
   const id=editing||newId("t"), prev=editing?tasks.get(editing):null, meeting=$("#fMeet").checked;
   if(prev&&!canEdit(prev)){toast("Esta tarefa é de outra pessoa de outro setor. Só ela ou um sócio podem mudar.");return}
   if(meeting&&!$("#fTime").value){toast("Reunião precisa de horário.");$("#fTime").focus();return}
-  let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);if(!att.length||att.includes("all"))att=["all"];
+  let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);const opt=[...document.querySelectorAll("#fOpt input:checked")].map(i=>i.value).filter(p=>!att.includes(p));if((!att.length&&!opt.length)||att.includes("all"))att=["all"];else att=[...new Set([...att,...opt])];
   const t={id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value||(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
-  if(meeting)Object.assign(t,{meeting:true,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
+  if(meeting)Object.assign(t,{meeting:true,opt:att.includes("all")?[]:opt,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
   if(!meeting&&prev&&prev.dur)t.dur=prev.dur;
   t.meta=$("#fMeta").value||"";t.criterio=$("#fCrit").value.trim();t.deps=editDeps;
