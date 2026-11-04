@@ -533,6 +533,13 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
 .rt-m.opt{color:#a5b4fc;font-style:italic}
 .meetrow.opt b{color:#a5b4fc}.optt{font-size:10px;font-weight:800;color:#a5b4fc;background:rgba(165,180,252,.14);border-radius:999px;padding:1px 7px;margin-left:4px;text-transform:uppercase;letter-spacing:.05em}
 .optc{border-style:dashed!important}
+.avs{display:inline-flex}.avs .av+.av{margin-left:-7px;box-shadow:0 0 0 2px var(--surface)}.avmore{font-style:normal;font-size:10px;font-weight:800;color:var(--muted);margin-left:3px;align-self:center}
+.cowith{color:var(--accent);font-weight:700}
+#coBox .chips{gap:6px}#coBox .mini{border-style:dashed}
+.negteam{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.ngp{background:var(--surface-2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.ngp .hd{display:flex;align-items:center;gap:8px}.ngp .hd small{margin-left:auto;color:var(--muted);font-weight:700}
+.negmain h3{display:flex;align-items:center;gap:8px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -592,6 +599,7 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
       <div class="f"><label for="fOwner">Responsável</label><select id="fOwner"></select></div>
       <div class="f"><label for="fPhase">Frente</label><select id="fPhase"></select></div>
     </div>
+    <div class="f cobox" id="coBox"><span class="lbl">Mais responsáveis <small style="text-transform:none;letter-spacing:0;font-weight:600">(todos veem a tarefa na própria semana)</small></span><div class="chips" id="fCo"></div></div>
     <div class="row2">
       <div class="f"><label for="fStart">Data</label><input type="date" id="fStart" required min="2026-01-01" max="2027-12-31"></div>
       <div class="f"><label for="fEnd">Até (se durar vários dias)</label><input type="date" id="fEnd" min="2026-01-01" max="2027-12-31"></div>
@@ -864,18 +872,22 @@ function ritualHtml(){
 function setView(v){view=v;store("pv-view",v);render();try{window.scrollTo({top:0})}catch(e){}}
 
 /* minha semana */
+const coOf=t=>Array.isArray(t.co)?t.co.filter(p=>p&&p!==t.owner):[];
+const isOwner=(t,p)=>t.owner===p||coOf(t).includes(p);
+const ownersName=t=>[t.owner,...coOf(t)].map(pname).join(", ");
+const avatars=(t,sz)=>{const c=coOf(t);return `<span class="avs">${avatar(t.owner,sz)}${c.slice(0,3).map(p=>avatar(p,sz)).join("")}${c.length>3?`<i class="avmore">+${c.length-3}</i>`:""}</span>`};
 function rowHtml(t,showDate,fid){
   const late=t.status!=="done"&&endOf(t)<TODAY, isF=fid===t.id, n=cmCount(t.id), link=safeUrl(t.link);
   const when=showDate?`${WD[parse(t.start).getDay()].slice(0,3)} ${short(t.start)}${t.end&&t.end!==t.start?" → "+short(t.end):""}`:(t.end&&t.end!==t.start?"até "+short(t.end):"");
   return `<div class="wrow${t.status==="done"?" done":""}${isF?" isfocus":""}" style="--c:${phc(t.phase)}">
     <input type="checkbox" class="tick" data-tick="${t.id}" aria-label="Marcar como feita: ${esc(t.title)}"${t.status==="done"?" checked":""}>
     <button type="button" class="wbody" data-open="${t.id}"><span class="wt">${esc(t.title)}</span>
-    <span class="wm">${t.time?`<b>${esc(t.time)}</b>`:""}${when?`<span>${when}</span>`:""}<span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}</span>${t.owner==="time"?"<span>Time todo</span>":""}${t.status==="doing"?'<span class="doingtag">fazendo</span>':""}${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico">${svg("link")}link</span>`:""}</span></button>
+    <span class="wm">${t.time?`<b>${esc(t.time)}</b>`:""}${when?`<span>${when}</span>`:""}<span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}</span>${t.owner==="time"?"<span>Time todo</span>":""}${coOf(t).length?`<span class="cowith">com ${esc([t.owner,...coOf(t)].filter(p=>p!==me).map(pname).join(", "))}</span>`:""}${t.status==="doing"?'<span class="doingtag">fazendo</span>':""}${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico">${svg("link")}link</span>`:""}</span></button>
     ${t.status!=="done"&&t.start<=TODAY?`<button type="button" class="star" data-focus="${t.id}" aria-pressed="${isF}" aria-label="${isF?"Tirar do inegociável do dia":"Marcar como inegociável do dia"}" title="Inegociável do dia">${svg(isF?"starOn":"star")}</button>`:""}</div>`;
 }
 function greet(){const h=new Date().getHours();return h<5?"Boa noite":h<12?"Bom dia":h<18?"Boa tarde":"Boa noite"}
 function myLists(){
-  const mine=[...tasks.values()].filter(t=>t.start&&!t.rec&&(t.owner===me||t.owner==="time"));
+  const mine=[...tasks.values()].filter(t=>t.start&&!t.rec&&(isOwner(t,me)||t.owner==="time"));
   const late=mine.filter(t=>t.status!=="done"&&endOf(t)<TODAY).sort(byTime);
   const today=mine.filter(t=>t.start<=TODAY&&endOf(t)>=TODAY).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
   const week=mine.filter(t=>t.start>TODAY&&t.start<=WE).sort(byTime);
@@ -906,7 +918,7 @@ function renderWeek(){
   ${introDone?"":`<div class="card-s intro"><h3>Bem-vindo ao Kaizen</h3><p>A central do time: toda ideia vira insight, todo insight ganha um destino, toda tarefa tem dono e data, e o trabalho anda num fluxo contínuo.</p><ol><li>Marque com a <b>estrela</b> o seu inegociável do dia.</li><li><b>Marque a caixinha</b> quando terminar. Clique na tarefa para editar, colocar link ou comentar.</li><li>Na segunda, escreva seus <b>inegociáveis da semana</b>.</li></ol><div class="row"><p>Dúvidas depois? "Como o Kaizen funciona", no menu.</p><button type="button" class="primary" data-intro>Entendi</button></div></div>`}
   ${dreamHtml()}
   <div class="card-s focus"><div class="k" aria-hidden="true">改善</div><h3>Inegociável do dia</h3>${f?`<div class="ft"><input type="checkbox" class="tick" data-tick="${f.id}" aria-label="Marcar inegociável como feito"${f.status==="done"?" checked":""}><b>${esc(f.title)}</b></div><p>${f.status==="done"?"Cumprido. Inegociável é inegociável.":"Isso não pode passar de hoje. Se não fez, está errado."}</p>`:`<p>Escolha a tarefa que não pode deixar de ser feita hoje. Clique na estrela ao lado dela.</p>`}</div>
-  <div class="card-s box negmain"><h3>Meus inegociáveis da semana</h3>${negHtml(me,isSocio(),true)}</div>
+  <div class="card-s box negmain"><h3>Meus inegociáveis da semana${isSocio()?'<button type="button" class="mini" data-negteam style="margin-left:auto">Definir os do time →</button>':""}</h3>${negHtml(me,isSocio(),true)}</div>
   ${myBonusCard()}
   <div class="kpis">
     <div class="card-s kpi${late.length?" bad":""}"><div class="v">${late.length}</div><div class="l">atrasadas</div></div>
@@ -999,7 +1011,7 @@ function renderCalWeek(list){
     const lanes=[], place=timed.map(t=>{const s0=tmin(t.time), e0=s0+(Number(t.dur)||60);let k=lanes.findIndex(end=>end<=s0);if(k<0){k=lanes.length;lanes.push(e0)}else lanes[k]=e0;return {t,s0,e0,k}});
     const ev=place.map(({t,s0,e0,k})=>{let n=1;place.forEach(o=>{if(o.s0<e0&&o.e0>s0)n=Math.max(n,o.k+1)});
       const top=Math.max(0,(s0-GH0*60)/60*GPX), h=Math.max(22,(e0-s0)/60*GPX-2), fix=!!t.rec;
-      return `<div class="tev${t.status==="done"?" done":""}${t.meeting?" mt":""}${t.milestone?" ms":""}${isBlocked(t)?" blk":""}${fix?" fix":""}" style="--c:${evColor(t)};top:${top}px;height:${h}px;left:calc(${k}/${n}*100% + 2px);width:calc(100%/${n} - 4px)" data-tid="${t.id}" data-date="${ds}" title="${esc(t.title)} · ${esc(pname(t.owner))}${fix?" · repete: abra para mudar":""}"><span class="tw">${esc(t.time)}${t.meeting?" · 📅":""} · ${esc(pname(t.owner))}</span><b>${esc(t.title)}</b>${fix?"":'<i class="rz" aria-hidden="true"></i>'}</div>`}).join("");
+      return `<div class="tev${t.status==="done"?" done":""}${t.meeting?" mt":""}${t.milestone?" ms":""}${isBlocked(t)?" blk":""}${fix?" fix":""}" style="--c:${evColor(t)};top:${top}px;height:${h}px;left:calc(${k}/${n}*100% + 2px);width:calc(100%/${n} - 4px)" data-tid="${t.id}" data-date="${ds}" title="${esc(t.title)} · ${esc(ownersName(t))}${fix?" · repete: abra para mudar":""}"><span class="tw">${esc(t.time)}${t.meeting?" · 📅":""} · ${esc(pname(t.owner))}${coOf(t).length?" +"+coOf(t).length:""}</span><b>${esc(t.title)}</b>${fix?"":'<i class="rz" aria-hidden="true"></i>'}</div>`}).join("");
     const nowLine=ds===TODAY&&nowM>=GH0*60&&nowM<GH1*60?`<div class="tg-now" style="top:${(nowM-GH0*60)/60*GPX}px"></div>`:"";
     cols+=`<div class="tcol${i>4?" weekend":""}${ds===TODAY?" today":""}" data-date="${ds}" style="height:${(GH1-GH0)*GPX}px">${nowLine}${ev}</div>`;
   }
@@ -1033,7 +1045,7 @@ function renderTimeline(list){
 }
 function renderCal(){
   const y=+calYM.slice(0,4), m=+calYM.slice(5,7), L=launchDate();
-  const list=[...tasks.values()].filter(t=>t.start&&(who==="all"||t.owner===who)).sort((a,b)=>(b.milestone?1:0)-(a.milestone?1:0)||byTime(a,b));
+  const list=[...tasks.values()].filter(t=>t.start&&(who==="all"||isOwner(t,who))).sort((a,b)=>(b.milestone?1:0)-(a.milestone?1:0)||byTime(a,b));
   if(calMode==="week"){renderCalWeek(list);return}
   if(calMode==="timeline"){renderTimeline(list);return}
   const first=new Date(y,m-1,1), last=new Date(y,m,0);
@@ -1083,7 +1095,7 @@ function contentAdd(){
 }
 function contentList(){
   const ctab=cTab==="all"?"":cTab, monthAgo=addDays(TODAY,-30);
-  const all=[...tasks.values()].filter(t=>t.phase==="conteudo"&&t.start&&!t.rec&&!t.meeting&&(!ctab||(t.ctipo||"conversao")===ctab)&&(who==="all"||t.owner===who));
+  const all=[...tasks.values()].filter(t=>t.phase==="conteudo"&&t.start&&!t.rec&&!t.meeting&&(!ctab||(t.ctipo||"conversao")===ctab)&&(who==="all"||isOwner(t,who)));
   const ord=(a,b)=>(a.cpost||a.start).localeCompare(b.cpost||b.start)||a.title.localeCompare(b.title);
   const own=teamPick();
   const row=t=>{const late=t.status!=="done"&&t.start<TODAY&&(t.cst||"producao")==="producao", u=safeUrl(t.link), mine=canEdit(t);
@@ -1106,7 +1118,7 @@ function contentList(){
 function renderBoard(){
   if(!["etapa","conteudo","owner"].includes(group))group="etapa";
   const ar=curArea(), monthAgo=addDays(TODAY,-30);
-  const all=[...tasks.values()].filter(t=>t.start&&(ar==="all"||areaOf(t)===ar)&&(group==="owner"||who==="all"||t.owner===who)&&!(group==="etapa"&&t.status==="done"&&endOf(t)<monthAgo)&&!(group==="conteudo"&&(t.rec||t.meeting||(cTab!=="all"&&(t.ctipo||"conversao")!==cTab)||((t.cst||"")==="postado"&&(t.cpost||t.start)<monthAgo)))&&!(group!=="etapa"&&group!=="owner"&&t.rec)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
+  const all=[...tasks.values()].filter(t=>t.start&&(ar==="all"||areaOf(t)===ar)&&(group==="owner"||who==="all"||isOwner(t,who))&&!(group==="etapa"&&t.status==="done"&&endOf(t)<monthAgo)&&!(group==="conteudo"&&(t.rec||t.meeting||(cTab!=="all"&&(t.ctipo||"conversao")!==cTab)||((t.cst||"")==="postado"&&(t.cpost||t.start)<monthAgo)))&&!(group!=="etapa"&&group!=="owner"&&t.rec)).sort((a,b)=>(a.status==="done")-(b.status==="done")||byTime(a,b));
   const sub=group==="etapa"?"As tarefas entram sozinhas na etapa certa pela data. Arraste para mudar.":group==="conteudo"?"Do roteiro ao post: cada conteúdo anda da esquerda para a direita. Arraste o cartão quando mudar de etapa.":"Arraste os cartões entre as colunas";
   $("#vBoard").innerHTML=`<div class="stack">
   <div class="phead"><div><div class="eyebrow">${sub}</div><h1>Quadro ${ar==="all"?"do <em>time</em>":"de <em>"+esc((BAREAS.find(x=>x.id===ar)||{}).name||"")+"</em>"}</h1></div>
@@ -1123,7 +1135,7 @@ function renderBoard(){
       return `<div class="card${t.status==="done"?" done":""}" style="--c:${phc(t.phase)}" draggable="${c.id==="processos"?"false":"true"}" data-id="${t.id}" tabindex="0">
         <span class="ph" style="--c:${phc(t.phase)}">${esc(phn(t.phase))}${isC&&t.ctipo?" · "+esc(CTIPO[t.ctipo]||""):""}${t.milestone?" · marco":""}${group!=="etapa"&&isNegTask(t)&&t.status!=="done"?" · inegociável":""}</span>
         <div class="ct">${esc(t.title)}</div>
-        <div class="meta">${group!=="owner"?avatar(t.owner):""}<span class="dates">${isC?"entrega ":""}${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}${isC&&t.cpost?" · posta "+short(t.cpost):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
+        <div class="meta">${group!=="owner"?avatars(t):""}<span class="dates">${isC?"entrega ":""}${short(t.start)}${t.time?" "+esc(t.time):""}${t.end&&t.end!==t.start?" → "+short(t.end):""}${isC&&t.cpost?" · posta "+short(t.cpost):""}</span>${late?'<span class="late">atrasada</span>':""}${depTag(t)}${n?`<span class="ico">${svg("chat")}${n}</span>`:""}${link?`<span class="ico" title="Tem link">${svg("link")}</span>`:""}
         <button type="button" class="st ${t.status||"todo"}" data-cycle="${t.id}">${{todo:"A fazer",doing:"Fazendo",done:"Feito"}[t.status||"todo"]}</button></div></div>`}).join("")
     }${c.id==="processos"?`<p class="empty" style="padding:4px 2px">Tarefas e reuniões que se repetem.</p>`:`<button type="button" class="add-col" data-addcol="${c.id}">+ ${group==="conteudo"?"conteúdo":"tarefa"}</button>`}</div>`}).join("")}</div></div>`}`;
 }
@@ -1170,7 +1182,7 @@ function renderTeam(){
   const [a,b,label]=periodRange();
   const vis=visibleTeam();
   const rows=vis.map(p=>{
-    const ts=[...tasks.values()].filter(t=>t.start&&!t.rec&&t.owner===p.id&&t.start<=b&&endOf(t)>=a);
+    const ts=[...tasks.values()].filter(t=>t.start&&!t.rec&&isOwner(t,p.id)&&t.start<=b&&endOf(t)>=a);
     const done=ts.filter(t=>t.status==="done").length, late=ts.filter(t=>t.status!=="done"&&endOf(t)<TODAY).length, doing=ts.filter(t=>t.status==="doing").length;
     const f=focus.get(focusId(p.id,TODAY)), ft=f&&tasks.get(f.taskId);
     return {p,total:ts.length,done,late,doing,pct:ts.length?Math.round(done/ts.length*100):0,ft};
@@ -1194,6 +1206,7 @@ function renderTeam(){
     <div class="ckey"><span><i style="background:color-mix(in srgb,var(--accent) 28%,transparent)"></i>Previstas</span><span><i style="background:var(--accent)"></i>Feitas</span></div>
     ${rows.map(r=>`<div class="crow"><span>${esc(r.p.name)}</span><div class="ctrack" role="img" aria-label="${esc(r.p.name)}: ${r.done} de ${r.total} feitas"><div class="p" style="width:${(r.total/max*100).toFixed(1)}%"></div><div class="d" style="width:${(r.done/max*100).toFixed(1)}%"></div></div><span class="cval">${r.done}/${r.total}</span></div>`).join("")}
   </div>
+  ${negTeamHtml()}
   ${followHtml()}
   ${scoreHtml(a,b,label)}
   ${bonusHtml()}
@@ -1203,6 +1216,13 @@ function renderTeam(){
   ${equipeHtml()}</div>`;
 }
 
+/* inegociáveis da semana de cada pessoa (sócios definem na segunda) */
+function negTeamHtml(){
+  const vis=visibleTeam(); if(!vis.length)return "";
+  const so=isSocio(), wk=`${short(WS)} a ${short(WE)}`;
+  return `<div class="card-s chart" id="negTeam"><h3>Inegociáveis da semana <span style="font-weight:600;color:var(--muted);font-size:12px">· ${wk}${so?" · escreva até 5 por pessoa; cada um marca o que cumpriu":""}</span></h3>
+  <div class="negteam">${vis.map(p=>{const it=negItems(p.id), dn=it.filter(i=>i.done).length;return `<div class="ngp"><div class="hd">${avatar(p.id,24)}<b>${esc(p.name)}</b><small>${it.length?`${dn}/${it.length}`:"nenhum ainda"}</small></div>${negHtml(p.id,so,so||p.id===me)}</div>`}).join("")}</div></div>`;
+}
 /* reuniões */
 const attOf=t=>Array.isArray(t.att)&&t.att.length?t.att:["all"];
 const inMeet=(t,p)=>t.meeting&&(attOf(t).includes("all")||attOf(t).includes(p)||t.owner===p);
@@ -1338,7 +1358,7 @@ function followHtml(){
   const all=[...tasks.values()].filter(t=>t.start&&!t.rec);
   const late=all.filter(t=>t.status!=="done"&&endOf(t)<TODAY).sort((x,y)=>endOf(x).localeCompare(endOf(y)));
   const blk=all.filter(isBlocked);
-  const li=t=>`<button type="button" class="frow" data-open="${t.id}">${avatar(t.owner,20)}<span>${esc(t.title)}</span><small>${short(endOf(t))}</small></button>`;
+  const li=t=>`<button type="button" class="frow" data-open="${t.id}">${avatars(t,20)}<span>${esc(t.title)}</span><small>${short(endOf(t))}</small></button>`;
   return `<div class="card-s chart"><h3>Acompanhamento <span class="sub" style="font-weight:600;color:var(--muted);font-size:12px">para a reunião de sexta · o João consolida e cobra</span></h3>
   <div class="follow f2"><div><div class="eyebrow">Atrasadas (${late.length})</div>${late.slice(0,8).map(li).join("")||'<p class="empty">Nada atrasado.</p>'}${late.length>8?`<p class="empty">e mais ${late.length-8}</p>`:""}</div>
   <div><div class="eyebrow">Bloqueadas (${blk.length})</div>${blk.slice(0,8).map(t=>{const d=t.deps.find(x=>!depOk(x));const what=d.type==="task"?((tasks.get(d.taskId)||{}).title||"outra tarefa"):d.text;return `<button type="button" class="frow" data-open="${t.id}">${avatar(t.owner,20)}<span>${esc(t.title)}<small class="blkby">espera: ${esc(what||"")}${d.who?" · "+esc(pname(d.who)):""}</small></span></button>`}).join("")||'<p class="empty">Nada bloqueado.</p>'}</div>
@@ -1600,7 +1620,7 @@ function toggleFocus(taskId){
 /* quem pode editar: dono, "time" ou o mesmo setor da frente da tarefa */
 const SETOR_PH={conteudo:["conteudo"],sucesso:["sucesso"],comercial:["comercial"],funil:["trafego","oferta","vsl","lancamento","comercial","parcerias"],produto:["produto"]};
 const myPh=()=>SETOR_PH[person(me).setor]||[];
-const canEdit=t=>isSocio()||!t||t.owner===me||t.owner==="time"||myPh().includes(t.phase);
+const canEdit=t=>isSocio()||!t||isOwner(t,me)||t.owner==="time"||myPh().includes(t.phase);
 const teamPick=()=>isSocio()?TEAM:TEAM.filter(p=>p.id===me||(p.setor&&p.setor===person(me).setor));
 /* modais */
 function fillSelects(){
@@ -1627,7 +1647,9 @@ function openModal(t,d={}){
   const v=t||{title:d.title||"",owner:d.owner||me||"time",phase:d.phase||"gestao",start:d.start||TODAY,end:"",time:d.time||"",status:d.status||"todo",milestone:false,notes:d.notes||"",link:""};
   $("#mTitle").textContent=t?"Editar tarefa":d.fromIns?"Transformar insight em tarefa":"Nova tarefa";
   $("#fTitle").value=v.title;{const ok=new Set(teamPick().map(p=>p.id).concat(["time"]));$("#fOwner").querySelectorAll("option").forEach(o=>{o.hidden=!isSocio()&&!ok.has(o.value)&&o.value!==v.owner})}
-  $("#fOwner").value=v.owner||(isSocio()?"time":me);$("#fOwner").disabled=!!t&&!canEdit(t);$("#fPhase").value=v.phase||"gestao";
+  $("#fOwner").value=v.owner||(isSocio()?"time":me);
+  {const co0=coOf(v), pool=[...new Set([...teamPick(),...co0.map(person)])].filter(p=>p&&p.id&&p.id!=="time"), sts=[...new Set(pool.map(p=>p.setor).filter(Boolean))];
+   $("#fCo").innerHTML=pool.map(p=>`<label><input type="checkbox" value="${p.id}"${co0.includes(p.id)?" checked":""}${t&&!canEdit(t)?" disabled":""}> ${esc(p.name)}</label>`).join("")+(t&&!canEdit(t)?"":sts.map(st=>`<button type="button" class="mini" data-cosetor="${st}">+ ${esc(SETOR_N[st]||st)} todo</button>`).join(""))}$("#fOwner").disabled=!!t&&!canEdit(t);$("#fPhase").value=v.phase||"gestao";
   $("#fStart").value=v.start;$("#fEnd").value=v.end||"";$("#fTime").value=v.time||"";$("#fStatus").value=v.status||"todo";
   $("#fCTipo").value=v.ctipo||d.ctipo||"conversao";$("#fCSt").value=v.cst||d.cst||"producao";$("#fCPost").value=v.cpost||"";cToggle();pendingNeg=!!d.negNow;
   $("#fMs").checked=!!v.milestone;$("#fNotes").value=v.notes||"";$("#fLink").value=v.link||"";renderLinkOpen();
@@ -1698,6 +1720,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&e.target.id==="cmText"){e.preventDefault();sendComment()}
 });
 $("#fLink").addEventListener("input",renderLinkOpen);
+$("#fCo").addEventListener("click",e=>{const b=e.target.closest("[data-cosetor]");if(!b)return;const st=b.dataset.cosetor, own=$("#fOwner").value;TEAM.filter(p=>p.setor===st).forEach(p=>{const i=$("#fCo").querySelector(`input[value="${p.id}"]`);if(i&&p.id!==own)i.checked=true})});
 $("#fMeet").addEventListener("change",()=>{$("#meetBox").hidden=!$("#fMeet").checked;renderDecs()});
 $("#fStart").addEventListener("change",renderDeps);
 let pendingNeg=false;
@@ -1728,6 +1751,7 @@ $("#form").addEventListener("submit",e=>{
   if(meeting&&!$("#fTime").value){toast("Reunião precisa de horário.");$("#fTime").focus();return}
   let att=[...document.querySelectorAll("#fAtt input:checked")].map(i=>i.value);const opt=[...document.querySelectorAll("#fOpt input:checked")].map(i=>i.value).filter(p=>!att.includes(p));if((!att.length&&!opt.length)||att.includes("all"))att=["all"];else att=[...new Set([...att,...opt])];
   const t={id,title:$("#fTitle").value.trim(),owner:$("#fOwner").value||(prev?prev.owner:me),phase:$("#fPhase").value,start,end:meeting?"":end,time:$("#fTime").value||"",status:$("#fStatus").value,milestone:$("#fMs").checked,notes:$("#fNotes").value.trim(),link:safeUrl($("#fLink").value)};
+  {const co=[...document.querySelectorAll("#fCo input:checked")].map(i=>i.value).filter(p=>p!==t.owner);if(co.length)t.co=co;else delete t.co}
   if(meeting)Object.assign(t,{meeting:true,opt:att.includes("all")?[]:opt,att,dur:Number($("#fDur").value)||60,rec:$("#fRec").value||"",call:safeUrl($("#fCall").value)});
   if(prev&&prev.inv)t.inv=prev.inv;
   if(!meeting&&prev&&prev.dur)t.dur=prev.dur;
@@ -1761,6 +1785,7 @@ $("#main").addEventListener("click",e=>{
   const cm=e.target.closest("[data-calmode]");if(cm){calMode=cm.dataset.calmode;store("pv-calm",calMode);if(calMode==="week"){calWk=calYM===TODAY.slice(0,7)?WS:weekStart(calYM+"-01")}else{calYM=calWk.slice(0,7)}store("pv-calwk",calWk);store("pv-cal2",calYM);render();return}
   const mo=e.target.closest("[data-month]");if(mo){const n=Number(mo.dataset.month);if(calMode==="timeline"){tlStart=n?addDays(tlStart||addDays(WS,-14),n*28):addDays(WS,-14);store("pv-tl",tlStart);render();return}if(calMode==="week"){calWk=n?addDays(calWk,n*7):WS;store("pv-calwk",calWk)}else{calYM=n?shiftYM(calYM,n):TODAY.slice(0,7);store("pv-cal2",calYM)}render();return}
   const gr=e.target.closest("[data-group]");if(gr){group=gr.dataset.group;store("pv-group2",group);render();return}
+  if(e.target.closest("[data-negteam]")){setView("team");setTimeout(()=>{const n=document.getElementById("negTeam");if(n)n.scrollIntoView({behavior:"smooth",block:"start"})},150);return}
   const nt=e.target.closest("[data-numtab]");if(nt){numTab=nt.dataset.numtab;store("pv-numtab",numTab);render();return}
   const re=e.target.closest("[data-redeedit]");if(re){redeEdit=redeEdit===re.dataset.redeedit?null:re.dataset.redeedit;render();return}
   const rd=e.target.closest("[data-redeldel]");if(rd){if(rd.dataset.armed!=="1"){rd.dataset.armed="1";rd.textContent="Confirmar";return}del("redes",rd.dataset.redeldel,redes);return}
