@@ -229,6 +229,10 @@ h1 em{font-style:normal;color:var(--accent)}
 .st.done{color:var(--ok);border-color:var(--ok)}
 .add-col{border:1px dashed var(--line);background:transparent;border-radius:12px;padding:9px;color:var(--muted);font-weight:700;font-size:13px}
 .add-col:hover{color:var(--accent);border-color:var(--accent)}
+.akb .col{flex-basis:276px}.ahint{margin:-4px 0 0;font-size:12px;color:var(--muted)}
+.aobs{font-size:12px;color:var(--muted);line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.asearch{font-weight:600;width:170px}.alinks{display:flex;flex-direction:column;gap:4px;font-size:13px}.alinks a{color:var(--accent);overflow-wrap:anywhere}
+#aModal .lbl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px}
 
 /* insights */
 .ifilters{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
@@ -586,6 +590,7 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
     <section id="vTeam" hidden></section>
     <section id="vCult" hidden></section>
     <section id="vNum" hidden></section>
+    <section id="vAulas" hidden></section>
   </main>
 
   <nav class="tabbar" id="tabbar" aria-label="Navegação"></nav>
@@ -718,6 +723,27 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
     <div class="foot"><div class="r"><button type="button" class="ghost" data-close>Cancelar</button><button type="submit" class="primary">Salvar senha</button></div></div>
   </form>
 </div>
+<div class="scrim" id="aModal" hidden>
+  <form class="sheet" id="aForm" autocomplete="off">
+    <h3 id="aTitle">Aula</h3>
+    <div class="f"><label for="aTit">Aula</label><input id="aTit" required maxlength="200"></div>
+    <div class="row2">
+      <div class="f"><label for="aCod">Código</label><input id="aCod" maxlength="20" placeholder="Ex.: 8.4"></div>
+      <div class="f"><label for="aMod">Módulo</label><input id="aMod" maxlength="120"></div>
+    </div>
+    <div class="row2">
+      <div class="f"><label for="aFase">Etapa</label><select id="aFase"></select></div>
+      <div class="f"><label for="aRespSel">Responsável</label><select id="aRespSel"></select></div>
+    </div>
+    <div class="f"><label for="aData">Data (gravação ou entrega)</label><input type="date" id="aData" min="2026-01-01" max="2027-12-31"></div>
+    <div class="f"><label for="aFinal">Vídeo final editado (link do Drive)</label><input id="aFinal" type="url" inputmode="url" maxlength="600" placeholder="https://drive.google.com/..."></div>
+    <div class="f"><label for="aDocs">Transcrição no Docs (link)</label><input id="aDocs" type="url" inputmode="url" maxlength="600" placeholder="https://docs.google.com/..."></div>
+    <div class="f"><label for="aObs">Anotação</label><textarea id="aObs" rows="3" maxlength="1000"></textarea></div>
+    <div id="aBruto"></div><div id="aEmb"></div>
+    <p class="hint" id="aWho"></p>
+    <div class="foot"><button type="button" class="ghost" id="aDel" hidden>Excluir</button><div class="r"><button type="button" class="ghost" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div></div>
+  </form>
+</div>
 <div class="scrim" id="ttModal" hidden>
   <div class="sheet" style="max-width:460px">
     <h3>TickTick</h3>
@@ -763,10 +789,11 @@ const ICONS={
   chat:'<path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
   dream:'<path d="M12 3l1.8 4.6L18.5 9l-4.7 1.6L12 15l-1.8-4.4L5.5 9l4.7-1.4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none"/><path d="M18 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z" fill="currentColor"/>',
   chart:'<path d="M4 20V10M10 20V4M16 20v-7M21 20H3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  play:'<rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M10 9.5v5l4.5-2.5z" fill="currentColor"/>',
   copy:'<rect x="8" y="8" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8" stroke="currentColor" stroke-width="2" fill="none"/>'
 };
 const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[k]}</svg>`;
-const VIEWS=[{id:"week",name:"Minha semana",short:"Semana",icon:"week"},{id:"cal",name:"Calendário",short:"Agenda",icon:"cal"},{id:"board",name:"Quadro",short:"Quadro",icon:"board"},{id:"ins",name:"Insights",short:"Insights",icon:"ins"},{id:"team",name:"Time",short:"Time",icon:"team"},{id:"cult",name:"Cultura",short:"Cultura",icon:"dream"},{id:"num",name:"Números",short:"Números",icon:"chart"}];
+const VIEWS=[{id:"week",name:"Minha semana",short:"Semana",icon:"week"},{id:"cal",name:"Calendário",short:"Agenda",icon:"cal"},{id:"board",name:"Quadro",short:"Quadro",icon:"board"},{id:"ins",name:"Insights",short:"Insights",icon:"ins"},{id:"team",name:"Time",short:"Time",icon:"team"},{id:"cult",name:"Cultura",short:"Cultura",icon:"dream"},{id:"num",name:"Números",short:"Números",icon:"chart"},{id:"aulas",name:"Aulas",short:"Aulas",icon:"play"}];
 const MNAME=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
 const WD=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
 const BF="2026-11-27";
@@ -858,7 +885,7 @@ function renderShell(){
   $("#meBtnM").innerHTML=pic(30);
   const va=$("#viewAs");if(va)va.innerHTML=viewAsHtml();
   const vb=$("#viewBanner");if(vb){vb.hidden=!realMe;vb.innerHTML=realMe?`Você está vendo o Kaizen como <b>${esc(pname(me))}</b>. O que fizer aqui conta como ${esc(pname(me))}. <button type="button" class="mini" data-viewback>Voltar para mim</button>`:""}
-  $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";
+  $("#vWeek").hidden=view!=="week";$("#vCal").hidden=view!=="cal";$("#vBoard").hidden=view!=="board";$("#vIns").hidden=view!=="ins";$("#vTeam").hidden=view!=="team";$("#vCult").hidden=view!=="cult";$("#vNum").hidden=view!=="num";$("#vAulas").hidden=view!=="aulas";
 }
 const isOpt=(t,p)=>Array.isArray(t.opt)&&t.opt.includes(p);
 function ritualHtml(){
@@ -1565,7 +1592,7 @@ function render(){
   else if(!db){n.hidden=false;n.textContent="Não deu para conectar ao banco de dados. Confira a internet e recarregue a página."}
   else n.hidden=true;
   $("#importBox").hidden=!(ready&&db&&tasks.size===0&&insights.size===0);
-  ({week:renderWeek,cal:renderCal,board:renderBoard,ins:renderIns,team:renderTeam,cult:renderCult,num:renderNum})[view]();
+  ({week:renderWeek,cal:renderCal,board:renderBoard,ins:renderIns,team:renderTeam,cult:renderCult,num:renderNum,aulas:renderAulas})[view]();
   if(typeof ttLabel==="function")ttLabel();
 }
 
@@ -1936,6 +1963,98 @@ $("#main").addEventListener("submit",e=>{
     write("bonuslog",{id:newId("bl"),bonus:b.id,person:b.person,mes:b.mes,date:TODAY,nota,link:safeUrl(f.link.value),rej:false,by:me},blog);bAdd=null;toast("Registrado! Conta no bônus.");return}
 });
 
+/* aulas: acompanhamento de gravação, edição, transcrição e postagem */
+const AFASES=[
+  {id:"falta",name:"Falta gravar",hint:"Quem grava marca o dia",c:"var(--ph-oferta)"},
+  {id:"edicao",name:"Gravada, na edição",hint:"Nank e Dz editam",c:"var(--ph-conteudo)"},
+  {id:"transcricao",name:"Transcrição",hint:"Gilberto transcreve e coloca no Docs",c:"var(--ph-trafego)"},
+  {id:"postar",name:"Com o Lucas · postar",hint:"Lucas posta na plataforma",c:"var(--ph-produto)"},
+  {id:"ok",name:"No lugar certo",hint:"Postada e conferida na plataforma",c:"var(--ph-parcerias)"}
+];
+const ALINHAS=[["all","Todas as linhas"],["Fase 1","Fase 1"],["Fase 2","Fase 2"],["Estratégias","Estratégias avançadas"]];
+let aulas=new Map(), aLinha=load("kz-alinha","all"), aResp=load("kz-aresp","all"), aBusca="", aEdit=null, aDrag=null;
+const pidByName=n=>{const k=norm(n);const p=PEOPLE.find(x=>x.id===k||norm(x.name).split(" ")[0]===k||(x.alias||[]).includes(k));return p?p.id:""};
+const aRespName=id=>id==="edicao"?"Edição (Nank e Dz)":id?pname(id):"Sem responsável";
+const aRespAv=id=>id==="edicao"?`<span class="avs">${avatar(pidByName("nank")||"nank",22)}${avatar(pidByName("dz")||pidByName("daniel")||"dz",22)}</span>`:id?avatar(id,22):"";
+function aDefaultResp(fase,cur){
+  if(fase==="edicao")return "edicao";
+  if(fase==="transcricao")return pidByName("gilberto")||cur;
+  if(fase==="postar"||fase==="ok")return pidByName("lucas")||"lucas";
+  return cur;
+}
+const aLinks=s=>String(s||"").split(" | ").filter(Boolean).map(p=>{const m=p.match(/^(.*?):?\s*(https?:\/\/\S+)$/);return m?`<a href="${esc(m[2])}" target="_blank" rel="noopener noreferrer">${esc(m[1]||"Abrir")}</a>`:`<span>${esc(p)}</span>`}).join("");
+function aFiltered(){
+  const q=norm(aBusca);
+  return [...aulas.values()].filter(a=>(aLinha==="all"||String(a.linha||"").startsWith(aLinha))&&(aResp==="all"||a.resp===aResp)&&(!q||norm(a.titulo+" "+a.codigo+" "+a.modulo).includes(q))).sort((a,b)=>(a.ordem??999)-(b.ordem??999));
+}
+function renderAulas(){
+  const list=aFiltered(), total=aulas.size, ok=[...aulas.values()].filter(a=>a.fase==="ok").length;
+  const resps=[...new Set([...aulas.values()].map(a=>a.resp).filter(Boolean))];
+  const el=$("#vAulas");
+  if(!total){el.innerHTML=`<div class="stack"><div class="phead"><div><div class="eyebrow">Gravação → edição → transcrição → plataforma</div><h1>Aulas da <em>plataforma</em></h1></div></div><p class="empty">Ainda não há aulas cadastradas.</p></div>`;return}
+  el.innerHTML=`<div class="stack">
+  <div class="phead"><div><div class="eyebrow">Gravação → edição → transcrição → plataforma · ${ok} de ${total} no lugar certo</div><h1>Aulas da <em>plataforma</em></h1></div>
+  <div class="actions"><input class="sel asearch" id="aBusca" type="search" placeholder="Buscar aula" value="${esc(aBusca)}" aria-label="Buscar aula">
+  <select class="sel" id="aLinha" aria-label="Linha">${ALINHAS.map(([k,v])=>`<option value="${k}"${aLinha===k?" selected":""}>${v}</option>`).join("")}</select>
+  <select class="sel" id="aResp" aria-label="Responsável"><option value="all">Todo mundo</option>${resps.map(r=>`<option value="${esc(r)}"${aResp===r?" selected":""}>${esc(aRespName(r))}</option>`).join("")}</select>
+  <button type="button" class="primary" data-anew>+ Aula</button></div></div>
+  <p class="empty" style="padding:0">Arraste o cartão para a próxima coluna quando a etapa mudar. O responsável muda sozinho: edição vai para Nank e Dz, transcrição para o Gilberto e postagem para o Lucas.</p>
+  <div class="kanban akb">${AFASES.map(f=>{const items=list.filter(a=>(a.fase||"falta")===f.id);
+    return `<div class="col" data-acol="${f.id}"><h3><i class="dot" style="--c:${f.c}"></i>${esc(f.name)}<span class="n">${items.length}</span></h3><p class="ahint">${esc(f.hint)}</p>${
+      items.map(a=>{const late=a.data&&a.data<TODAY&&a.fase==="falta";
+      return `<div class="card acard" style="--c:${f.c}" draggable="true" data-aid="${esc(a.id)}" tabindex="0">
+        <span class="ph" style="--c:${f.c}">${esc(a.codigo||"")} · ${esc(String(a.modulo||"").replace(/^Módulo \d+ · /,""))}</span>
+        <div class="ct">${esc(a.titulo)}</div>
+        ${a.obs?`<div class="aobs">${esc(a.obs)}</div>`:""}
+        <div class="meta">${aRespAv(a.resp)}<span>${esc(aRespName(a.resp))}</span>${a.data?`<span class="dates">${a.fase==="falta"?"grava ":""}${short(a.data)}</span>`:""}${late?'<span class="late">atrasada</span>':""}${safeUrl(a.final)?`<span class="ico">${svg("link")}vídeo</span>`:""}${safeUrl(a.docs)?`<span class="ico">${svg("link")}docs</span>`:""}</div></div>`}).join("")||'<p class="empty">Nada aqui.</p>'}</div>`}).join("")}</div></div>`;
+}
+function aRespOptions(cur){return [{id:"",name:"Sem responsável"},{id:"edicao",name:"Edição (Nank e Dz)"},...TEAM].map(p=>`<option value="${esc(p.id)}"${cur===p.id?" selected":""}>${esc(p.name)}</option>`).join("")}
+function aOpen(a){
+  aEdit=a?a.id:null;a=a||{fase:"falta",resp:me||"",linha:"",modulo:"",codigo:"",titulo:""};
+  $("#aTitle").textContent=aEdit?"Aula "+(a.codigo||""):"Nova aula";
+  $("#aTit").value=a.titulo||"";$("#aCod").value=a.codigo||"";$("#aMod").value=a.modulo||"";
+  $("#aFase").innerHTML=AFASES.map(f=>`<option value="${f.id}"${(a.fase||"falta")===f.id?" selected":""}>${esc(f.name)}</option>`).join("");
+  $("#aRespSel").innerHTML=aRespOptions(a.resp||"");
+  $("#aData").value=a.data||"";$("#aFinal").value=a.final||"";$("#aDocs").value=a.docs||"";$("#aObs").value=a.obs||"";
+  $("#aBruto").innerHTML=a.bruto?`<span class="lbl">Vídeos brutos</span><div class="alinks">${aLinks(a.bruto)}</div>`:"";
+  $("#aEmb").innerHTML=a.embaixo?`<span class="lbl">Embaixo da aula</span><div class="alinks">${aLinks(a.embaixo)}</div>`:"";
+  $("#aWho").textContent=a.atualizado?`Atualizado por ${a.por?pname(a.por):"alguém"} · ${ago(a.atualizado)}`:"";
+  $("#aDel").hidden=!aEdit||!isSocio();$("#aDel").textContent="Excluir";delArmed=false;
+  $("#aModal").hidden=false;setTimeout(()=>$("#aTit").focus(),0);
+}
+async function aSave(a){
+  const body={...a,atualizado:new Date().toISOString(),por:me||""};delete body.id;
+  aulas.set(a.id,{id:a.id,...body});render();
+  try{await db.collection("aulas").doc(a.id).set(body)}catch(e){toast("Não deu para salvar. Confira a internet.")}
+}
+function aMove(id,fase){
+  const a=aulas.get(id);if(!a||a.fase===fase)return;
+  aSave({...a,fase,resp:aDefaultResp(fase,a.resp)});
+  toast(`${a.codigo||"Aula"} → ${AFASES.find(f=>f.id===fase).name}`);
+}
+document.addEventListener("dragstart",e=>{const el=e.target.closest("[data-aid]");if(!el)return;aDrag=el.dataset.aid;try{e.dataTransfer.setData("text/plain",aDrag);e.dataTransfer.effectAllowed="move"}catch(err){}});
+document.addEventListener("dragend",()=>{aDrag=null});
+document.addEventListener("dragover",e=>{if(!aDrag)return;const z=e.target.closest(".col[data-acol]");if(!z)return;e.preventDefault();document.querySelectorAll(".drop").forEach(x=>x!==z&&x.classList.remove("drop"));z.classList.add("drop")});
+document.addEventListener("drop",e=>{if(!aDrag)return;const z=e.target.closest(".col[data-acol]");if(!z)return;e.preventDefault();z.classList.remove("drop");const id=aDrag;aDrag=null;aMove(id,z.dataset.acol)});
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-anew]")){aOpen(null);return}
+  const c=e.target.closest("[data-aid]");if(c&&!e.target.closest("a")){const a=aulas.get(c.dataset.aid);if(a)aOpen(a);return}
+  if(e.target.closest("#aDel")){const b=$("#aDel");if(!delArmed){delArmed=true;b.textContent="Clique de novo para excluir";return}
+    const id=aEdit;closeAll();aulas.delete(id);render();db.collection("aulas").doc(id).delete().catch(()=>toast("Não deu para excluir."));toast("Aula excluída");return}
+});
+document.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.classList&&e.target.classList.contains("acard")){const a=aulas.get(e.target.dataset.aid);if(a)aOpen(a)}});
+document.addEventListener("input",e=>{if(e.target.id==="aBusca"){aBusca=e.target.value;const pos=e.target.selectionStart;renderAulas();const b=$("#aBusca");b.focus();try{b.setSelectionRange(pos,pos)}catch(x){}}});
+document.addEventListener("change",e=>{
+  if(e.target.id==="aLinha"){aLinha=e.target.value;store("kz-alinha",aLinha);renderAulas()}
+  if(e.target.id==="aResp"){aResp=e.target.value;store("kz-aresp",aResp);renderAulas()}
+  if(e.target.id==="aFase"){const cur=$("#aRespSel").value;$("#aRespSel").innerHTML=aRespOptions(aDefaultResp(e.target.value,cur))}
+});
+$("#aForm").addEventListener("submit",e=>{e.preventDefault();
+  const prev=aEdit?aulas.get(aEdit):null, id=aEdit||newId("au_");
+  const a={...(prev||{ordem:aulas.size+1000,linha:"Fase 2 · Próximos passos"}),id,titulo:$("#aTit").value.trim(),codigo:$("#aCod").value.trim(),modulo:$("#aMod").value.trim(),fase:$("#aFase").value,resp:$("#aRespSel").value,data:$("#aData").value,final:safeUrl($("#aFinal").value),docs:safeUrl($("#aDocs").value),obs:$("#aObs").value.trim()};
+  if(!a.titulo)return;closeAll();aSave(a);toast("Aula salva");
+});
+
 /* inicialização: Supabase */
 const SUPABASE_URL="https://ovdzhlwaiydskaysivtl.supabase.co";
 const SUPABASE_KEY="sb_publishable_UJotjAnY5ywWuSLmpy_jaQ_yIkfYqHF";
@@ -1973,7 +2092,7 @@ function startApp(session){
   sub("inegociaveis",m=>{negs=m});
   sub("people",m=>{peopleDocs=m;peopleLoaded=true;rebuildPeople();if(membersReady)resolveMe()});sub("checks",m=>{checks=m});sub("decisoes",m=>{decisoes=m;if(!$("#modal").hidden&&editing)renderDecs()});sub("metricas",m=>{metricas=m});sub("acoes",m=>{acoes=m});
   sub("sonhos",m=>{sonhos=m});sub("bonus",m=>{bonus=m});sub("redes",m=>{redes=m});sub("semanas",m=>{semanas=m;if(isSocio()&&!window.__autoIns&&insights.size){window.__autoIns=1;setTimeout(pushAutoInsights,1500)}});sub("bonuslog",m=>{blog=m});sub("metas",m=>{metas=m});sub("anonimo",m=>{anon=m});sub("dashins",m=>{dashIns=m});sub("config",m=>{cfg=m});
-  sub("ticktick",m=>{ttStatus=m;ttLabel()});
+  sub("ticktick",m=>{ttStatus=m;ttLabel()});sub("aulas",m=>{aulas=m});
   ttReturn();
   db.collection("members").onSnapshot(s=>{const m=new Map();s.docs.forEach(d=>{const v=d.data();if(v)m.set(d.id,{id:d.id,...v})});members=m;const first=!membersReady;membersReady=true;if(first)resolveMe();else resolveMe();render()});
 }
