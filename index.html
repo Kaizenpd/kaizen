@@ -231,6 +231,18 @@ h1 em{font-style:normal;color:var(--accent)}
 .add-col:hover{color:var(--accent);border-color:var(--accent)}
 .akb .col{flex-basis:276px}.ahint{margin:-4px 0 0;font-size:12px;color:var(--muted)}
 .aobs{font-size:12px;color:var(--muted);line-height:1.35;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.acard.revisada{border:2px solid var(--bad)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 25%,transparent)}
+.acard.reed{background:color-mix(in srgb,var(--bad) 9%,transparent)}
+.rtag.ok{background:transparent;color:var(--bad);border:1.5px solid var(--bad)}
+.rtag{align-self:flex-start;display:inline-block;background:var(--bad);color:#fff;font-size:10.5px;font-weight:900;letter-spacing:.04em;border-radius:6px;padding:2px 7px}
+.robs{color:var(--bad);font-size:12px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.robs b{font-weight:900}
+.rbanner{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;border:1.5px solid var(--bad);color:var(--bad);background:color-mix(in srgb,var(--bad) 8%,transparent);border-radius:12px;padding:10px 14px;font-weight:700;font-size:13.5px}
+.rbanner button{border:1px solid var(--bad);background:transparent;color:var(--bad);border-radius:999px;padding:4px 12px;font-weight:800;font-size:12px;cursor:pointer}
+.rbanner button.on{background:var(--bad);color:#fff}
+.rbox{border:1.5px solid var(--bad);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:10px;background:color-mix(in srgb,var(--bad) 6%,transparent)}
+.rbox label{color:var(--bad)!important}.rbox .rchk{display:flex;gap:8px;align-items:center;font-weight:800;color:var(--bad);font-size:13.5px}
+.rbox .rchk input{width:18px;height:18px;accent-color:var(--bad)}.rbox .rdone{font-size:12px;color:var(--muted)}
 .asearch{font-weight:600;width:170px}.alinks{display:flex;flex-direction:column;gap:4px;font-size:13px}.alinks a{color:var(--accent);overflow-wrap:anywhere}
 #aModal .lbl{font-size:11px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:4px}
 
@@ -739,6 +751,13 @@ details.valbox>summary{cursor:pointer;list-style:none}details.valbox>summary h3{
     <div class="f"><label for="aFinal">Vídeo final editado (link do Drive)</label><input id="aFinal" type="url" inputmode="url" maxlength="600" placeholder="https://drive.google.com/..."></div>
     <div class="f"><label for="aDocs">Transcrição no Docs (link)</label><input id="aDocs" type="url" inputmode="url" maxlength="600" placeholder="https://docs.google.com/..."></div>
     <div class="f"><label for="aObs">Anotação</label><textarea id="aObs" rows="3" maxlength="1000"></textarea></div>
+    <div class="rbox" id="aReedBox">
+      <label class="rchk"><input type="checkbox" id="aReed"> ↺ Voltou para reedição (está no ar com erro)</label>
+      <div class="f"><label for="aReedErro">O que está errado no vídeo que está no ar</label><textarea id="aReedErro" rows="3" maxlength="1500" placeholder="Ex.: aos 1:50 aparece o texto 'Qual imagem colocar?'"></textarea></div>
+      <div class="f"><label for="aReedEdicao">O que a edição (Nank e Dz) tem que fazer</label><textarea id="aReedEdicao" rows="3" maxlength="1500" placeholder="Ex.: trocar pelo esquema do ciclo de testes"></textarea></div>
+      <div class="f"><label for="aReedPlat">O que o Lucas troca na plataforma</label><textarea id="aReedPlat" rows="3" maxlength="1500" placeholder="Ex.: subir o vídeo novo no lugar do antigo e colocar os links embaixo da aula"></textarea></div>
+      <p class="rdone" id="aReedInfo"></p>
+    </div>
     <div id="aBruto"></div><div id="aEmb"></div>
     <p class="hint" id="aWho"></p>
     <div class="foot"><button type="button" class="ghost" id="aDel" hidden>Excluir</button><div class="r"><button type="button" class="ghost" data-close>Cancelar</button><button type="submit" class="primary">Salvar</button></div></div>
@@ -1983,9 +2002,13 @@ function aDefaultResp(fase,cur){
   return cur;
 }
 const aLinks=s=>String(s||"").split(" | ").filter(Boolean).map(p=>{const m=p.match(/^(.*?):?\s*(https?:\/\/\S+)$/);return m?`<a href="${esc(m[2])}" target="_blank" rel="noopener noreferrer">${esc(m[1]||"Abrir")}</a>`:`<span>${esc(p)}</span>`}).join("");
+let aSoReed=false;
+const aReedAtiva=a=>!!a.reed&&a.fase!=="ok";
+const aRevisada=a=>!!(a.reed||a.reedFeito||a.reedErro);
+document.addEventListener("click",e=>{if(e.target.closest("#aReedOnly")){aSoReed=!aSoReed;renderAulas()}});
 function aFiltered(){
   const q=norm(aBusca);
-  return [...aulas.values()].filter(a=>(aLinha==="all"||String(a.linha||"").startsWith(aLinha))&&(aResp==="all"||a.resp===aResp)&&(!q||norm(a.titulo+" "+a.codigo+" "+a.modulo).includes(q))).sort((a,b)=>(a.ordem??999)-(b.ordem??999));
+  return [...aulas.values()].filter(a=>(aLinha==="all"||String(a.linha||"").startsWith(aLinha))&&(aResp==="all"||a.resp===aResp)&&(!q||norm(a.titulo+" "+a.codigo+" "+a.modulo).includes(q))&&(!aSoReed||aRevisada(a))).sort((a,b)=>(a.ordem??999)-(b.ordem??999));
 }
 function renderAulas(){
   const list=aFiltered(), total=aulas.size, ok=[...aulas.values()].filter(a=>a.fase==="ok").length;
@@ -1998,13 +2021,18 @@ function renderAulas(){
   <select class="sel" id="aLinha" aria-label="Linha">${ALINHAS.map(([k,v])=>`<option value="${k}"${aLinha===k?" selected":""}>${v}</option>`).join("")}</select>
   <select class="sel" id="aResp" aria-label="Responsável"><option value="all">Todo mundo</option>${resps.map(r=>`<option value="${esc(r)}"${aResp===r?" selected":""}>${esc(aRespName(r))}</option>`).join("")}</select>
   <button type="button" class="primary" data-anew>+ Aula</button></div></div>
+  ${(()=>{const all=[...aulas.values()],rs=all.filter(aReedAtiva).sort((a,b)=>(a.ordem??999)-(b.ordem??999)),rv=all.filter(aRevisada);return rv.length?`<div class="rbanner">↺ ${rv.length} ${rv.length>1?"aulas passaram":"aula passou"} pela reedição (contorno vermelho).${rs.length?` Ainda no ar com erro: ${rs.map(a=>esc(a.codigo||a.titulo)).join(", ")}.`:" Todas já foram trocadas na plataforma."} Abra o cartão para ver o que estava errado, o que a edição fez e o que o Lucas trocou.<button type="button" id="aReedOnly" class="${aSoReed?"on":""}">${aSoReed?"Mostrar todas":"Ver só as revisadas"}</button></div>`:""})()}
   <p class="empty" style="padding:0">Arraste o cartão para a próxima coluna quando a etapa mudar. O responsável muda sozinho: edição vai para Nank e Dz, transcrição para o Gilberto e postagem para o Lucas.</p>
   <div class="kanban akb">${AFASES.map(f=>{const items=list.filter(a=>(a.fase||"falta")===f.id);
     return `<div class="col" data-acol="${f.id}"><h3><i class="dot" style="--c:${f.c}"></i>${esc(f.name)}<span class="n">${items.length}</span></h3><p class="ahint">${esc(f.hint)}</p>${
       items.map(a=>{const late=a.data&&a.data<TODAY&&a.fase==="falta";
-      return `<div class="card acard" style="--c:${f.c}" draggable="true" data-aid="${esc(a.id)}" tabindex="0">
+      return `<div class="card acard${aRevisada(a)?" revisada":""}${aReedAtiva(a)?" reed":""}" style="--c:${f.c}" draggable="true" data-aid="${esc(a.id)}" tabindex="0">
+        ${aReedAtiva(a)?'<span class="rtag">↺ VOLTOU PARA REEDIÇÃO · NO AR COM ERRO</span>':aRevisada(a)?`<span class="rtag ok">↺ PASSOU POR REEDIÇÃO${a.reedFeito?" · trocada em "+short(a.reedFeito):""}</span>`:""}
         <span class="ph" style="--c:${f.c}">${esc(a.codigo||"")} · ${esc(String(a.modulo||"").replace(/^Módulo \d+ · /,""))}</span>
         <div class="ct">${esc(a.titulo)}</div>
+        ${aReedAtiva(a)&&a.reedErro?`<div class="robs"><b>Erro no ar:</b> ${esc(a.reedErro)}</div>`:""}
+        ${aReedAtiva(a)&&a.reedPlat&&a.fase==="postar"?`<div class="robs"><b>Lucas troca:</b> ${esc(a.reedPlat)}</div>`:""}
+        ${aReedAtiva(a)&&a.reedEdicao&&(a.fase==="edicao"||a.fase==="falta")?`<div class="robs"><b>Edição faz:</b> ${esc(a.reedEdicao)}</div>`:""}
         ${a.obs?`<div class="aobs">${esc(a.obs)}</div>`:""}
         <div class="meta">${aRespAv(a.resp)}<span>${esc(aRespName(a.resp))}</span>${a.data?`<span class="dates">${a.fase==="falta"?"grava ":""}${short(a.data)}</span>`:""}${late?'<span class="late">atrasada</span>':""}${safeUrl(a.final)?`<span class="ico">${svg("link")}vídeo</span>`:""}${safeUrl(a.docs)?`<span class="ico">${svg("link")}docs</span>`:""}</div></div>`}).join("")||'<p class="empty">Nada aqui.</p>'}</div>`}).join("")}</div></div>`;
 }
@@ -2016,6 +2044,8 @@ function aOpen(a){
   $("#aFase").innerHTML=AFASES.map(f=>`<option value="${f.id}"${(a.fase||"falta")===f.id?" selected":""}>${esc(f.name)}</option>`).join("");
   $("#aRespSel").innerHTML=aRespOptions(a.resp||"");
   $("#aData").value=a.data||"";$("#aFinal").value=a.final||"";$("#aDocs").value=a.docs||"";$("#aObs").value=a.obs||"";
+  $("#aReed").checked=!!a.reed;$("#aReedErro").value=a.reedErro||"";$("#aReedEdicao").value=a.reedEdicao||"";$("#aReedPlat").value=a.reedPlat||"";
+  $("#aReedInfo").textContent=a.reed?(a.reedDesde?"Voltou para reedição em "+short(a.reedDesde)+". Quando o vídeo novo estiver no ar, leve o cartão para \"No lugar certo\" (a marca vermelha sai sozinha).":""):(a.reedFeito?"Última reedição concluída em "+short(a.reedFeito)+".":"Marque se a aula já está no ar e precisa voltar para a edição.");
   $("#aBruto").innerHTML=a.bruto?`<span class="lbl">Vídeos brutos</span><div class="alinks">${aLinks(a.bruto)}</div>`:"";
   $("#aEmb").innerHTML=a.embaixo?`<span class="lbl">Embaixo da aula</span><div class="alinks">${aLinks(a.embaixo)}</div>`:"";
   $("#aWho").textContent=a.atualizado?`Atualizado por ${a.por?pname(a.por):"alguém"} · ${ago(a.atualizado)}`:"";
@@ -2029,7 +2059,8 @@ async function aSave(a){
 }
 function aMove(id,fase){
   const a=aulas.get(id);if(!a||a.fase===fase)return;
-  aSave({...a,fase,resp:aDefaultResp(fase,a.resp)});
+  const extra=(fase==="ok"&&a.reed)?{reed:false,reedFeito:TODAY}:{};
+  aSave({...a,fase,resp:aDefaultResp(fase,a.resp),...extra});
   toast(`${a.codigo||"Aula"} → ${AFASES.find(f=>f.id===fase).name}`);
 }
 document.addEventListener("dragstart",e=>{const el=e.target.closest("[data-aid]");if(!el)return;aDrag=el.dataset.aid;try{e.dataTransfer.setData("text/plain",aDrag);e.dataTransfer.effectAllowed="move"}catch(err){}});
@@ -2052,6 +2083,9 @@ document.addEventListener("change",e=>{
 $("#aForm").addEventListener("submit",e=>{e.preventDefault();
   const prev=aEdit?aulas.get(aEdit):null, id=aEdit||newId("au_");
   const a={...(prev||{ordem:aulas.size+1000,linha:"Fase 2 · Próximos passos"}),id,titulo:$("#aTit").value.trim(),codigo:$("#aCod").value.trim(),modulo:$("#aMod").value.trim(),fase:$("#aFase").value,resp:$("#aRespSel").value,data:$("#aData").value,final:safeUrl($("#aFinal").value),docs:safeUrl($("#aDocs").value),obs:$("#aObs").value.trim()};
+  const rd=$("#aReed").checked;a.reed=rd;a.reedErro=$("#aReedErro").value.trim();a.reedEdicao=$("#aReedEdicao").value.trim();a.reedPlat=$("#aReedPlat").value.trim();
+  if(rd&&!(prev&&prev.reed))a.reedDesde=TODAY;
+  if(rd&&a.fase==="ok"){a.reed=false;a.reedFeito=TODAY}
   if(!a.titulo)return;closeAll();aSave(a);toast("Aula salva");
 });
 
